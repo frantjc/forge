@@ -22,6 +22,9 @@ func (c *Container) Exec(ctx context.Context, config *forge.ContainerConfig, str
 		stdout = streams.Out
 		stderr = streams.Err
 		tty = streams.Tty
+		if tty {
+			stderr = stdout
+		}
 		detachKeys = streams.DetachKeys
 	}
 
