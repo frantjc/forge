@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package forge;
+
+option go_package = "github.com/frantjc/forge";
+
+message ContainerConfig {
+  message Mount {
+    string source = 1;
+    string destination = 2;
+  }
+
+  repeated string entrypoint = 1;
+  repeated string cmd = 2;
+  string cwd = 3;
+  repeated string env = 4;
+  string user = 5;
+  bool privileged = 6;
+  repeated ContainerConfig.Mount mounts = 7;
+}

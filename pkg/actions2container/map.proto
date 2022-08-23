@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package forge.actions2container;
+
+option go_package = "github.com/frantjc/forge/pkg/actions2container";
+
+message Map {
+  string actionPath = 1;
+  string workspace = 2;
+  string runnerToolCache = 3;
+  string runnerTemp = 4;
+  string gitHubPath = 5;
+  string gitHubPathPath = 6;
+  string gitHubEnvPath = 7;
+  string runnerToolCacheVolumeName = 8;
+}

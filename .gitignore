@@ -1,0 +1,12 @@
+# IDE
+.vscode/
+
+# macOS
+.DS_Store
+
+# go
+vendor/
+
+# dev
+__debug_bin
+.env

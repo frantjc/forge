@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package forge.github.actions;
+
+option go_package = "github.com/frantjc/forge/pkg/github/actions";
+
+message Step {
+  string shell = 1;
+  string if = 2;
+  string name = 3;
+  string id = 4;
+  map<string, string> env = 5;
+  string workingDir = 6;
+  string uses = 7;
+  map<string, string> with = 8;
+  string run = 9;
+}

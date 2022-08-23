@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package forge.github.actions;
+
+import "pkg/github/actions/step.proto";
+
+option go_package = "github.com/frantjc/forge/pkg/github/actions";
+
+message Metadata {
+  message Input {
+    string description = 1;
+    bool required = 2;
+    string default = 3;
+    string deprecationMessage = 4;
+  }
+
+  message Output {
+    string description = 1;
+  }
+
+  message Runs {
+    string plugin = 1;
+    string using = 2;
+    string pre = 3;
+    string main = 4;
+    string post = 5;
+    string image = 6;
+    string preEntrypoint = 7;
+    string entrypoint = 8;
+    string postEntrypoint = 9;
+    repeated string args = 10;
+    map<string, string> env = 11;
+    repeated forge.github.actions.Step steps = 12;
+  }
+
+  string name = 1;
+  string author = 2;
+  string description = 3;
+  map<string, Metadata.Input> inputs = 4;
+  map<string, Metadata.Output> output = 5;
+  Metadata.Runs runs = 6;
+}

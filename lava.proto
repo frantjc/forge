@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package forge;
+
+option go_package = "github.com/frantjc/forge";
+
+message Lava {
+  int64 exitCode = 1;
+}

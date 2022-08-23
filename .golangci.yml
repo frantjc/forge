@@ -1,0 +1,36 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - depguard
+    - dupl
+    - exportloopref
+    - gocyclo
+    - gosec
+    - gocritic
+    - goconst
+    - importas
+    - megacheck
+    - nakedret
+    - nolintlint
+    - prealloc
+    - revive
+    - unconvert
+    # test
+    - tenv
+    - testpackage
+    - thelper
+    # auto-fix
+    - godot
+    - gofmt
+    - goimports
+    - misspell
+    # pass locally but not as a part of
+    # uses: golangci/golangci-lint-action@v3.2.0
+    # - gofumpt
+    # - whitespace
+  # disabled because of go 1.18
+  # track support at
+  # https://github.com/golangci/golangci-lint/issues/2649
+  disable:
+    - structcheck
