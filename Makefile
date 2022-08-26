@@ -1,7 +1,7 @@
 GO = go
 
-tidy downlaod:
+downlaod tidy vendor:
 	@$(GO) mod $@
 
-test generate fmt:
+fmt generate test:
 	@$(GO) $@ ./...

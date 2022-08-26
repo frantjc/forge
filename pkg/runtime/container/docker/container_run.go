@@ -30,7 +30,6 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 		detachKeys = streams.DetachKeys
 	}
 
-
 	hjr, err := c.ContainerAttach(ctx, c.ID, types.ContainerAttachOptions{
 		Stream:     streams != nil,
 		Stdin:      stdin != nil,
@@ -44,17 +43,13 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 
 	errC := make(chan error, 1)
 	go func() {
-		var err error
-		if tty {
-			_, err = io.Copy(stdout, hjr.Reader)
-		} else {
-			_, err = stdcopy.StdCopy(
-				stdout,
-				stderr,
-				hjr.Reader,
-			)
+		if _, err := stdcopy.StdCopy(
+			stdout,
+			stderr,
+			hjr.Reader,
+		); err != nil {
+			errC <- err
 		}
-		errC <- err
 	}()
 
 	if stdin != nil {
@@ -72,7 +67,9 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 				errC <- err
 			}
 
-			errC <- hjr.CloseWrite()
+			if err = hjr.CloseWrite(); err != nil {
+				errC <- hjr.CloseWrite()
+			}
 		}()
 	}
 
@@ -81,9 +78,6 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 	}
 
 	cwokbC, waitErrC := c.ContainerWait(ctx, c.ID, container.WaitConditionNotRunning)
-	if err != nil {
-		return -1, err
-	}
 
 	select {
 	case cwokb := <-cwokbC:

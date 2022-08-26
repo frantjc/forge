@@ -9,4 +9,5 @@ message Pure {
   repeated string entrypoint = 2;
   repeated string cmd = 3;
   repeated string env = 4;
+  bytes input = 5;
 }

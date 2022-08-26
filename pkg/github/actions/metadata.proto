@@ -11,7 +11,7 @@ message Metadata {
     string description = 1;
     bool required = 2;
     string default = 3;
-    string deprecationMessage = 4;
+    string deprecation_message = 4;
   }
 
   message Output {
@@ -25,9 +25,9 @@ message Metadata {
     string main = 4;
     string post = 5;
     string image = 6;
-    string preEntrypoint = 7;
+    string pre_entrypoint = 7;
     string entrypoint = 8;
-    string postEntrypoint = 9;
+    string post_entrypoint = 9;
     repeated string args = 10;
     map<string, string> env = 11;
     repeated forge.github.actions.Step steps = 12;
@@ -36,7 +36,7 @@ message Metadata {
   string name = 1;
   string author = 2;
   string description = 3;
-  map<string, Metadata.Input> inputs = 4;
-  map<string, Metadata.Output> output = 5;
-  Metadata.Runs runs = 6;
+  map<string, Input> inputs = 4;
+  map<string, Output> output = 5;
+  Runs runs = 6;
 }

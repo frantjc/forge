@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/pkg/concourse"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
@@ -34,20 +35,42 @@ func main() {
 		panic(err)
 	}
 
+	var _ = globalContext
+
 	foundry := &forge.Foundry{ContainerRuntime: docker.New(c)}
 	if _, err = foundry.Process(
-		actions.WithGlobalContext(ctx, globalContext),
-		&ore.Pure{
-			Image:      "alpine",
-			Entrypoint: []string{"base64"},
+		ctx,
+		&ore.Resource{
+			Method: "get",
+			Resource: &concourse.Resource{
+				Name: "github.com/frantjc/forge",
+				Type: "git",
+				Source: map[string]string{
+					"uri":    "https://github.com/frantjc/forge",
+					"branch": "main",
+				},
+			},
+			ResourceType: &concourse.ResourceType{
+				Name: "git",
+				Source: &concourse.Source{
+					Repository: "docker.io/concourse/git-resource",
+					Tag:        "alpine",
+				},
+			},
 		},
+		// &ore.Pure{
+		// 	Image:      "alpine",
+		// 	Entrypoint: []string{"base64"},
+		// 	Input:      []byte("hello"),
+		// },
 		// &ore.Action{
 		// 	Uses: "actions/setup-go@v3",
 		// 	With: map[string]string{
 		// 		"go-version": "1.19",
 		// 	},
-		// }
-		forge.StdStreams(),
+		// 	GlobalContext: globalContext,
+		// },
+		forge.StdDrains(),
 	); err != nil {
 		panic(err)
 	}

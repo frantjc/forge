@@ -10,7 +10,7 @@ message Step {
   string name = 3;
   string id = 4;
   map<string, string> env = 5;
-  string workingDir = 6;
+  string working_dir = 6;
   string uses = 7;
   map<string, string> with = 8;
   string run = 9;

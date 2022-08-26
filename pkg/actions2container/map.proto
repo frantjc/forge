@@ -5,12 +5,12 @@ package forge.actions2container;
 option go_package = "github.com/frantjc/forge/pkg/actions2container";
 
 message Map {
-  string actionPath = 1;
+  string action_path = 1;
   string workspace = 2;
-  string runnerToolCache = 3;
-  string runnerTemp = 4;
-  string gitHubPath = 5;
-  string gitHubPathPath = 6;
-  string gitHubEnvPath = 7;
-  string runnerToolCacheVolumeName = 8;
+  string runner_tool_cache = 3;
+  string runner_temp = 4;
+  string git_hub_path = 5;
+  string git_hub_path_path = 6;
+  string git_hub_env_path = 7;
+  string runner_tool_cache_volume_name = 8;
 }

@@ -26,24 +26,13 @@ func GlobalContextFrom(ctx context.Context) (globalContext *GlobalContext, ok bo
 	return
 }
 
-type GlobalContext struct {
-	GitHubContext  *GitHubContext
-	EnvContext     map[string]string
-	JobContext     *JobContext
-	StepsContext   map[string]*StepsContext
-	RunnerContext  *RunnerContext
-	InputsContext  map[string]string
-	SecretsContext map[string]string
-	NeedsContext   map[string]*NeedsContext
-}
-
 func (c *GlobalContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
 		switch keys[0] {
 		case "github":
 			if len(keys) > 1 {
-				return c.GitHubContext.GetString(strings.Join(keys[1:], "."))
+				return c.GetGitHubContext().GetString(strings.Join(keys[1:], "."))
 			}
 		case "env":
 			if len(keys) > 1 {
@@ -53,7 +42,7 @@ func (c *GlobalContext) GetString(key string) string {
 			}
 		case "job":
 			if len(keys) > 1 {
-				return c.JobContext.GetString(strings.Join(keys[1:], "."))
+				return c.GetJobContext().GetString(strings.Join(keys[1:], "."))
 			}
 		case "steps":
 			if len(keys) > 2 {
@@ -63,7 +52,7 @@ func (c *GlobalContext) GetString(key string) string {
 			}
 		case "runner":
 			if len(keys) > 1 {
-				return c.RunnerContext.GetString(strings.Join(keys[1:], "."))
+				return c.GetRunnerContext().GetString(strings.Join(keys[1:], "."))
 			}
 		case "inputs":
 			if len(keys) > 1 {
@@ -89,102 +78,60 @@ func (c *GlobalContext) GetString(key string) string {
 	return ""
 }
 
-// GitHubContext represents the GitHub Context
-// https://docs.github.com/en/actions/learn-github-actions/Context#github-context
-type GitHubContext struct {
-	Action          string
-	ActionPath      string
-	Actor           string
-	BaseRef         string
-	Event           string
-	EventName       string
-	EventPath       string
-	HeadRef         string
-	Job             string
-	Ref             string
-	RefName         string
-	RefProtected    bool
-	RefType         RefType
-	Repository      string
-	RepositoryOwner string
-	RunID           string
-	RunNumber       int
-	RunAttempt      int
-	ServerURL       *url.URL
-	Sha             string
-	Token           string
-	Workflow        string
-	Workspace       string
-}
-
 func (c *GitHubContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
 		switch keys[0] {
 		case "action":
-			return c.Action
+			return c.GetAction()
 		case "action_path":
-			return c.ActionPath
+			return c.GetActionPath()
 		case "actor":
-			return c.Actor
+			return c.GetActor()
 		case "base_ref":
-			return c.BaseRef
+			return c.GetBaseRef()
 		case "event":
-			return c.Event
+			return c.GetEvent()
 		case "event_name":
-			return c.EventName
+			return c.GetEventName()
 		case "event_path":
-			return c.EventPath
+			return c.GetEventPath()
 		case "head_ref":
-			return c.HeadRef
+			return c.GetHeadRef()
 		case "job":
-			return c.Job
+			return c.GetJob()
 		case "ref":
-			return c.Ref
+			return c.GetRef()
 		case "ref_name":
-			return c.RefName
+			return c.GetRefName()
 		case "ref_protected":
-			return fmt.Sprint(c.RefProtected)
+			return fmt.Sprint(c.GetRefProtected())
 		case "ref_type":
-			return c.RefType.String()
+			return c.GetRefType()
 		case "repository":
-			return c.Repository
+			return c.GetRepository()
 		case "repository_owner":
-			return c.RepositoryOwner
+			return c.GetRepositoryOwner()
 		case "run_id":
-			return c.RunID
+			return c.GetRunId()
 		case "run_number":
-			return fmt.Sprint(c.RunNumber)
+			return fmt.Sprint(c.GetRunNumber())
 		case "run_attempt":
-			return fmt.Sprint(c.RunAttempt)
+			return fmt.Sprint(c.GetRunAttempt())
 		case "server_url":
-			return c.ServerURL.String()
+			return c.GetServerUrl()
 		case "sha":
-			return c.Sha
+			return c.GetSha()
 		case "token":
-			return c.Token
+			return c.GetToken()
 		case "workflow":
-			return c.Workflow
+			return c.GetWorkflow()
 		case "workspace":
-			return c.Workspace
+			return c.GetWorkspace()
 		}
 	}
 
 	return ""
-}
-
-type JobContext struct {
-	Container *struct {
-		ID      string
-		Network string
-	}
-	Services map[string]struct {
-		ID      string
-		Network string
-		// not sure if this is the correct representation
-		Ports map[string]string
-	}
-	Status string
 }
 
 func (c *JobContext) GetString(key string) string {
@@ -195,7 +142,7 @@ func (c *JobContext) GetString(key string) string {
 			if len(keys) > 1 {
 				switch keys[1] {
 				case "id":
-					return c.Container.ID
+					return c.Container.Id
 				case "network":
 					return c.Container.Network
 				}
@@ -206,7 +153,7 @@ func (c *JobContext) GetString(key string) string {
 					if len(keys) > 2 {
 						switch keys[2] {
 						case "id":
-							return v.ID
+							return v.Id
 						case "network":
 							return v.Network
 						case "ports":
@@ -227,13 +174,7 @@ func (c *JobContext) GetString(key string) string {
 	return ""
 }
 
-type StepsContext struct {
-	Outputs    map[string]string
-	Conclusion string
-	Outcome    string
-}
-
-func (c *StepsContext) GetString(key string) string {
+func (c *StepContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
 		switch keys[0] {
@@ -244,21 +185,13 @@ func (c *StepsContext) GetString(key string) string {
 				}
 			}
 		case "outcome":
-			return c.Outcome
+			return c.GetOutcome()
 		case "conclusion":
-			return c.Conclusion
+			return c.GetConclusion()
 		}
 	}
 
 	return ""
-}
-
-type RunnerContext struct {
-	Name      string
-	OS        OS
-	Arch      Arch
-	Temp      string
-	ToolCache string
 }
 
 func (c *RunnerContext) GetString(key string) string {
@@ -266,26 +199,22 @@ func (c *RunnerContext) GetString(key string) string {
 	if len(keys) > 0 {
 		switch keys[0] {
 		case "name":
-			return c.Name
+			return c.GetName()
 		case "os":
-			return c.OS.String()
+			return c.GetOs()
 		case "arch":
-			return c.Arch.String()
+			return c.GetArch()
 		case "temp":
-			return c.Temp
+			return c.GetTemp()
 		case "tool_cache":
-			return c.ToolCache
+			return c.GetToolCache()
 		}
 	}
 
 	return ""
 }
 
-type NeedsContext struct {
-	Outputs map[string]string
-}
-
-func (c *NeedsContext) GetString(key string) string {
+func (c *NeedContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
 		if keys[0] == "outputs" && len(keys) > 1 {
@@ -377,13 +306,13 @@ func NewGlobalContextFromEnv() *GlobalContext {
 			Ref:             os.Getenv(EnvVarRef),
 			RefName:         os.Getenv(EnvVarRefName),
 			RefProtected:    refProtected,
-			RefType:         RefType(os.Getenv(EnvVarRefType)),
+			RefType:         RefType(os.Getenv(EnvVarRefType)).String(),
 			Repository:      os.Getenv(EnvVarRepository),
 			RepositoryOwner: os.Getenv(EnvVarRepositoryOwner),
-			RunID:           runID,
-			RunNumber:       runNumber,
-			RunAttempt:      runAttempt,
-			ServerURL:       serverURL,
+			RunId:           runID,
+			RunNumber:       int64(runNumber),
+			RunAttempt:      int64(runAttempt),
+			ServerUrl:       serverURL.String(),
 			Sha:             os.Getenv(EnvVarSha),
 			Token:           os.Getenv(EnvVarToken),
 			Workflow:        os.Getenv(EnvVarWorkflow),
@@ -391,17 +320,17 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		},
 		EnvContext:   make(map[string]string),
 		JobContext:   &JobContext{},
-		StepsContext: make(map[string]*StepsContext),
+		StepsContext: make(map[string]*StepContext),
 		RunnerContext: &RunnerContext{
 			Name:      runnerName,
-			OS:        runnerOS,
-			Arch:      runnerArch,
+			Os:        runnerOS.String(),
+			Arch:      runnerArch.String(),
 			Temp:      runnerTemp,
 			ToolCache: runnerToolCache,
 		},
 		InputsContext:  make(map[string]string),
 		SecretsContext: make(map[string]string),
-		NeedsContext:   make(map[string]*NeedsContext),
+		NeedsContext:   make(map[string]*NeedContext),
 	}
 }
 
@@ -423,43 +352,43 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	}
 
 	if ref, err := r.Head(); err == nil {
-		c.GitHubContext.Sha = ref.Hash().String()
+		c.GetGitHubContext().Sha = ref.Hash().String()
 		if shaBranch := strings.Split(ref.String(), " "); len(shaBranch) > 1 {
-			c.GitHubContext.RefName = strings.TrimPrefix(shaBranch[1], "refs/heads/")
-			c.GitHubContext.Ref = shaBranch[1]
+			c.GetGitHubContext().RefName = strings.TrimPrefix(shaBranch[1], "refs/heads/")
+			c.GetGitHubContext().Ref = shaBranch[1]
 		} else {
-			c.GitHubContext.RefName = ref.Hash().String()
-			c.GitHubContext.Ref = ref.Hash().String()
+			c.GetGitHubContext().RefName = ref.Hash().String()
+			c.GetGitHubContext().Ref = ref.Hash().String()
 		}
 
 		if ref.Name().IsBranch() {
 			currentBranch = ref.Name().Short()
-			c.GitHubContext.RefType = RefTypeBranch
+			c.GetGitHubContext().RefType = RefTypeBranch.String()
 		} else {
-			c.GitHubContext.RefType = RefTypeTag
+			c.GetGitHubContext().RefType = RefTypeTag.String()
 		}
 	}
 
 	if conf, err := r.Config(); err == nil {
-		c.GitHubContext.Actor = js.Coalesce(
+		c.GetGitHubContext().Actor = js.Coalesce(
 			conf.User.Name,
 			conf.Author.Name,
 			conf.Committer.Name,
 			conf.User.Email,
 			conf.Author.Email,
 			conf.Committer.Email,
-			c.GitHubContext.Actor,
+			c.GetGitHubContext().Actor,
 		)
 
 		for _, remote := range conf.Remotes {
 			for _, rurl := range remote.URLs {
 				prurl, err := url.Parse(rurl)
 				if err == nil {
-					c.GitHubContext.Repository = strings.TrimSuffix(
+					c.GetGitHubContext().Repository = strings.TrimSuffix(
 						strings.TrimPrefix(prurl.Path, "/"),
 						".git",
 					)
-					c.GitHubContext.RepositoryOwner = strings.Split(c.GitHubContext.Repository, "/")[0]
+					c.GetGitHubContext().RepositoryOwner = strings.Split(c.GetGitHubContext().Repository, "/")[0]
 					break
 				}
 			}
@@ -468,9 +397,9 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 
 	if branch, err := r.Branch(currentBranch); err == nil {
 		currentRemote = branch.Remote
-		c.GitHubContext.RefName = branch.Name
-		c.GitHubContext.Ref = "refs/heads/" + branch.Name
-		c.GitHubContext.RefType = RefTypeBranch
+		c.GetGitHubContext().RefName = branch.Name
+		c.GetGitHubContext().Ref = "refs/heads/" + branch.Name
+		c.GetGitHubContext().RefType = RefTypeBranch.String()
 	}
 
 	if remote, err := r.Remote(currentRemote); err == nil {
@@ -487,40 +416,41 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 }
 
 func (c *GlobalContext) envMap() map[string]string {
-	apiURL, _ := APIURLFromBaseURL(c.GitHubContext.ServerURL)
-	graphqlURL, _ := GraphQLURLFromBaseURL(c.GitHubContext.ServerURL)
+	serverURL, _ := url.Parse(c.GetGitHubContext().GetServerUrl())
+	apiURL, _ := APIURLFromBaseURL(serverURL)
+	graphqlURL, _ := GraphQLURLFromBaseURL(serverURL)
 	env := map[string]string{
 		EnvVarCI:              fmt.Sprint(true),
-		EnvVarWorkflow:        c.GitHubContext.Workflow,
-		EnvVarRunID:           c.GitHubContext.RunID,
-		EnvVarRunNumber:       fmt.Sprint(c.GitHubContext.RunNumber),
-		EnvVarRunAttempt:      fmt.Sprint(c.GitHubContext.RunAttempt),
-		EnvVarJob:             c.GitHubContext.Job,
-		EnvVarAction:          c.GitHubContext.Action,
-		EnvVarActionPath:      c.GitHubContext.ActionPath,
+		EnvVarWorkflow:        c.GetGitHubContext().GetWorkflow(),
+		EnvVarRunID:           c.GetGitHubContext().GetRunId(),
+		EnvVarRunNumber:       fmt.Sprint(c.GetGitHubContext().GetRunNumber()),
+		EnvVarRunAttempt:      fmt.Sprint(c.GetGitHubContext().GetRunAttempt()),
+		EnvVarJob:             c.GetGitHubContext().GetJob(),
+		EnvVarAction:          c.GetGitHubContext().GetAction(),
+		EnvVarActionPath:      c.GetGitHubContext().GetActionPath(),
 		EnvVarActions:         fmt.Sprint(true),
-		EnvVarActor:           c.GitHubContext.Actor,
-		EnvVarRepository:      c.GitHubContext.Repository,
-		EnvVarEventName:       c.GitHubContext.EventName,
-		EnvVarEventPath:       c.GitHubContext.EventPath,
-		EnvVarWorkspace:       c.GitHubContext.Workspace,
-		EnvVarSha:             c.GitHubContext.Sha,
-		EnvVarRef:             c.GitHubContext.Ref,
-		EnvVarRefName:         c.GitHubContext.RefName,
-		EnvVarRefProtected:    fmt.Sprint(c.GitHubContext.RefProtected),
-		EnvVarRefType:         c.GitHubContext.RefType.String(),
-		EnvVarHeadRef:         c.GitHubContext.HeadRef,
-		EnvVarBaseRef:         c.GitHubContext.BaseRef,
-		EnvVarServerURL:       c.GitHubContext.ServerURL.String(),
+		EnvVarActor:           c.GetGitHubContext().GetActor(),
+		EnvVarRepository:      c.GetGitHubContext().GetRepository(),
+		EnvVarEventName:       c.GetGitHubContext().GetEventName(),
+		EnvVarEventPath:       c.GetGitHubContext().GetEventPath(),
+		EnvVarWorkspace:       c.GetGitHubContext().GetWorkspace(),
+		EnvVarSha:             c.GetGitHubContext().GetSha(),
+		EnvVarRef:             c.GetGitHubContext().GetRef(),
+		EnvVarRefName:         c.GetGitHubContext().GetRefName(),
+		EnvVarRefProtected:    fmt.Sprint(c.GetGitHubContext().GetRefProtected()),
+		EnvVarRefType:         c.GetGitHubContext().GetRefType(),
+		EnvVarHeadRef:         c.GetGitHubContext().GetHeadRef(),
+		EnvVarBaseRef:         c.GetGitHubContext().GetBaseRef(),
+		EnvVarServerURL:       c.GetGitHubContext().GetServerUrl(),
 		EnvVarAPIURL:          apiURL.String(),
 		EnvVarGraphQLURL:      graphqlURL.String(),
-		EnvVarRunnerName:      c.RunnerContext.Name,
-		EnvVarRunnerOS:        c.RunnerContext.OS.String(),
-		EnvVarRunnerArch:      c.RunnerContext.Arch.String(),
-		EnvVarRunnerTemp:      c.RunnerContext.Temp,
-		EnvVarRunnerToolCache: c.RunnerContext.ToolCache,
-		EnvVarToken:           c.GitHubContext.Token,
-		EnvVarRepositoryOwner: c.GitHubContext.RepositoryOwner,
+		EnvVarRunnerName:      c.GetRunnerContext().GetName(),
+		EnvVarRunnerOS:        c.GetRunnerContext().GetOs(),
+		EnvVarRunnerArch:      c.GetRunnerContext().GetArch(),
+		EnvVarRunnerTemp:      c.GetRunnerContext().GetTemp(),
+		EnvVarRunnerToolCache: c.GetRunnerContext().GetToolCache(),
+		EnvVarToken:           c.GetGitHubContext().GetToken(),
+		EnvVarRepositoryOwner: c.GetGitHubContext().GetRepositoryOwner(),
 	}
 
 	if c.EnvContext != nil {
@@ -530,7 +460,7 @@ func (c *GlobalContext) envMap() map[string]string {
 	}
 
 	if c.InputsContext != nil {
-		for k, v := range c.InputsContext {
+		for k, v := range c.GetInputsContext() {
 			if v != "" {
 				env[fmt.Sprintf("INPUT_%s", strings.ReplaceAll(strings.ToUpper(k), " ", "_"))] = v
 			}

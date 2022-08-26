@@ -16,5 +16,5 @@ message ContainerConfig {
   repeated string env = 4;
   string user = 5;
   bool privileged = 6;
-  repeated ContainerConfig.Mount mounts = 7;
+  repeated Mount mounts = 7;
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -94,8 +95,18 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	}
 
 	hostConfig.Mounts = append(hostConfig.Mounts, js.Map(config.Mounts, func(m *forge.ContainerConfig_Mount, _ int, _ []*forge.ContainerConfig_Mount) mount.Mount {
+		var (
+			mountType = mount.TypeVolume
+		)
+		switch {
+		case m.GetSource() == "":
+			mountType = mount.TypeTmpfs
+		case filepath.IsAbs(m.GetSource()):
+			mountType = mount.TypeBind
+		}
+
 		return mount.Mount{
-			Type:   js.Ternary(m.GetSource() == "", mount.TypeTmpfs, mount.TypeVolume),
+			Type:   mountType,
 			Source: m.GetSource(),
 			Target: m.GetDestination(),
 		}

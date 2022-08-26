@@ -11,26 +11,24 @@ type Foundry struct {
 	Deposit
 }
 
-func (f *Foundry) Process(ctx context.Context, o Ore, streams *Streams) (*Metal, error) {
+func (f *Foundry) Process(ctx context.Context, o Ore, drains *Drains) (*Metal, error) {
 	if f.ContainerRuntime == nil {
 		return nil, fmt.Errorf("nil ContainerRuntime")
 	}
 
 	var (
-		stdout = streams.Out
-		stderr = streams.Err
+		stdout = drains.Out
+		stderr = drains.Err
 	)
 	if f.Deposit != nil {
 		stdout = io.MultiWriter(stdout, io.Discard)
 		stderr = io.MultiWriter(stderr, io.Discard)
 	}
 
-	lava, err := o.Liquify(ctx, f, &Streams{
-		In:         streams.In,
-		Out:        stdout,
-		Err:        stderr,
-		Tty:        streams.Tty,
-		DetachKeys: streams.DetachKeys,
+	lava, err := o.Liquify(ctx, f, &Drains{
+		Out: stdout,
+		Err: stderr,
+		Tty: drains.Tty,
 	})
 	if err != nil {
 		return nil, err

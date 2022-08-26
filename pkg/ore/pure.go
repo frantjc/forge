@@ -1,12 +1,13 @@
 package ore
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/frantjc/forge"
 )
 
-func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, streams *forge.Streams) (*forge.Lava, error) {
+func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
 	image, err := containerRuntime.PullImage(ctx, o.GetImage())
 	if err != nil {
 		return nil, err
@@ -21,7 +22,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		return nil, err
 	}
 
-	exitCode, err := container.Run(ctx, streams)
+	exitCode, err := container.Run(ctx, drains.ToStreams(bytes.NewReader(o.Input)))
 	if err != nil {
 		return nil, err
 	}

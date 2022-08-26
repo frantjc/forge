@@ -10,7 +10,7 @@ import (
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, streams *forge.Streams) (*forge.Lava, error) {
+func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
 	uses, err := actions.Parse(o.Uses)
 	if err != nil {
 		return nil, err
@@ -36,8 +36,10 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		stderr = new(bytes.Buffer)
 	)
 	exitCode, err := container.Run(ctx, &forge.Streams{
-		Out: stdout,
-		Err: stderr,
+		Drains: &forge.Drains{
+			Out: stdout,
+			Err: stderr,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -53,20 +55,19 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return nil, err
 	}
 
-	globalContext, ok := actions.GlobalContextFrom(ctx)
-	if !ok {
-		globalContext = actions.NewGlobalContextFromEnv()
+	if o.GetGlobalContext() == nil {
+		o.GlobalContext = actions.NewGlobalContextFromEnv()
 	}
 	defer func() {
-		ctx = actions.WithGlobalContext(ctx, globalContext)
+		ctx = actions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
-	conatinerConfigs, err := actions2container.ActionToConfigs(globalContext, uses, o.With, o.Env, actionMetadata)
+	conatinerConfigs, err := actions2container.ActionToConfigs(o.GlobalContext, uses, o.With, o.Env, actionMetadata)
 	if err != nil {
 		return nil, err
 	}
 
-	workflowCommandStreams := actions2container.NewWorkflowCommandStreams(globalContext, o.GetId(), streams.Out, streams.Err)
+	workflowCommandStreams := actions2container.NewWorkflowCommandStreams(o.GlobalContext, o.GetId(), drains)
 	for _, containerConfig := range conatinerConfigs {
 		container, err = actions2container.CreateContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {

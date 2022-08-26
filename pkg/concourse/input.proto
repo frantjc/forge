@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package forge.concourse;
+
+option go_package = "github.com/frantjc/forge/pkg/concourse";
+
+message Input {
+  map<string, string> params = 1;
+  map<string, string> source = 2;
+  map<string, string> version = 3;
+}

@@ -1,8 +1,6 @@
 package actions2container
 
 import (
-	"io"
-
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
@@ -29,7 +27,7 @@ func (w *DiscardWorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []b
 	switch wc.Command {
 	case actions.CommandSetOutput:
 		if w.GlobalContext.StepsContext[w.ID] == nil {
-			w.GlobalContext.StepsContext[w.ID] = &actions.StepsContext{
+			w.GlobalContext.StepsContext[w.ID] = &actions.StepContext{
 				Outputs: map[string]string{},
 			}
 		}
@@ -44,7 +42,7 @@ func (w *DiscardWorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []b
 	return make([]byte, 0)
 }
 
-func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, stdout, stderr io.Writer) *forge.Streams {
+func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
 	if globalContext == nil {
 		globalContext = ConfigureGlobalContext(actions.NewGlobalContextFromEnv())
 	}
@@ -57,7 +55,10 @@ func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, 
 	}
 
 	return &forge.Streams{
-		Out: actions.NewWorkflowCommandWriter(w.Callback, stdout),
-		Err: actions.NewWorkflowCommandWriter(w.Callback, stderr),
+		Drains: &forge.Drains{
+			Out: actions.NewWorkflowCommandWriter(w.Callback, drains.Out),
+			Err: actions.NewWorkflowCommandWriter(w.Callback, drains.Err),
+			Tty: drains.Tty,
+		},
 	}
 }

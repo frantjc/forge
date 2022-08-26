@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package forge.concourse;
+
+option go_package = "github.com/frantjc/forge/pkg/concourse";
+
+message Output {
+  message Metadata {
+    string name = 1;
+    string value = 2;
+  }
+
+  map<string, string> version = 1;
+  repeated Metadata metadata = 2;
+}

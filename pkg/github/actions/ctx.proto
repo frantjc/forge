@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package forge.github.actions;
+
+option go_package = "github.com/frantjc/forge/pkg/github/actions";
+
+message GlobalContext {
+  GitHubContext git_hub_context = 1;
+  map<string, string> env_context = 2;
+  JobContext job_context = 3;
+  map<string, StepContext> steps_context = 4;
+  RunnerContext runner_context = 5;
+  map<string, string> inputs_context = 6;
+  map<string, string> secrets_context = 7;
+  map<string, NeedContext> needs_context = 8;
+}
+
+message GitHubContext {
+  string action = 1;
+  string action_path = 2;
+  string actor = 3;
+  string base_ref = 4;
+  string event = 5;
+  string event_name = 6;
+  string event_path = 7;
+  string head_ref = 8;
+  string job = 9;
+  string ref = 10;
+  string ref_name = 11;
+  bool ref_protected = 12;
+  string ref_type = 13;
+  string repository = 14;
+  string repository_owner = 15;
+  string run_id = 16;
+  int64 run_number = 17;
+  int64 run_attempt = 18;
+  string server_url = 19;
+  string sha = 20;
+  string token = 21;
+  string workflow = 22;
+  string workspace = 23;
+}
+
+message JobContext {
+  message Container {
+    string id = 1;
+    string network = 2;
+  }
+
+  message Service {
+    string id = 1;
+    string network = 2;
+    map<string, string> ports = 3;
+  }
+
+  Container container = 1;
+  map<string, Service> services = 2;
+  string status = 3;
+}
+
+message StepContext {
+  map<string, string> outputs = 1;
+  string conclusion = 2;
+  string outcome = 3;
+}
+
+message RunnerContext {
+  string name = 1;
+  string os = 2;
+  string arch = 3;
+  string temp = 4;
+  string tool_cache = 5;
+}
+
+message NeedContext {
+  map<string, string> outputs = 1;
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package forge.concourse;
+
+option go_package = "github.com/frantjc/forge/pkg/concourse";
+
+message Resource {
+  string name = 1;
+  string type = 2;
+  map<string, string> source = 3;
+}

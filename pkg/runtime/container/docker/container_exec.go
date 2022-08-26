@@ -10,7 +10,7 @@ import (
 	"github.com/moby/term"
 )
 
-func (c *Container) Exec(ctx context.Context, config *forge.ContainerConfig, streams *forge.Streams) (int, error) {
+func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerConfig, streams *forge.Streams) (int, error) {
 	var (
 		stdin          io.Reader
 		stdout, stderr io.Writer
@@ -29,11 +29,11 @@ func (c *Container) Exec(ctx context.Context, config *forge.ContainerConfig, str
 	}
 
 	idr, err := c.Client.ContainerExecCreate(ctx, c.ID, types.ExecConfig{
-		User:         config.User,
-		Privileged:   config.Privileged,
-		Env:          config.Env,
-		WorkingDir:   config.Cwd,
-		Cmd:          append(config.Entrypoint, config.Cmd...),
+		User:         containerConfig.User,
+		Privileged:   containerConfig.Privileged,
+		Env:          containerConfig.Env,
+		WorkingDir:   containerConfig.Cwd,
+		Cmd:          append(containerConfig.Entrypoint, containerConfig.Cmd...),
 		Tty:          tty,
 		DetachKeys:   detachKeys,
 		AttachStdin:  stdin != nil,
@@ -54,16 +54,11 @@ func (c *Container) Exec(ctx context.Context, config *forge.ContainerConfig, str
 
 	errC := make(chan error, 1)
 	go func() {
-		var err error
-		if tty {
-			_, err = io.Copy(stdout, hjr.Reader)
-		} else {
-			_, err = stdcopy.StdCopy(
-				stdout,
-				stderr,
-				hjr.Reader,
-			)
-		}
+		_, err := stdcopy.StdCopy(
+			stdout,
+			stderr,
+			hjr.Reader,
+		)
 		errC <- err
 	}()
 
