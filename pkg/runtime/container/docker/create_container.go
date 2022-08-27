@@ -61,7 +61,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 			User:        config.User,
 			Env:         config.Env,
 			Cmd:         config.Cmd,
-			WorkingDir:  config.Cwd,
+			WorkingDir:  config.WorkingDir,
 			Entrypoint:  config.Entrypoint,
 			Image:       reference,
 			AttachStdin: true,
@@ -94,23 +94,26 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	}
 
-	hostConfig.Mounts = append(hostConfig.Mounts, js.Map(config.Mounts, func(m *forge.ContainerConfig_Mount, _ int, _ []*forge.ContainerConfig_Mount) mount.Mount {
-		var (
-			mountType = mount.TypeVolume
-		)
-		switch {
-		case m.GetSource() == "":
-			mountType = mount.TypeTmpfs
-		case filepath.IsAbs(m.GetSource()):
-			mountType = mount.TypeBind
-		}
+	hostConfig.Mounts = append(hostConfig.Mounts, js.Map(
+		config.Mounts,
+		func(m *forge.ContainerConfig_Mount, _ int, _ []*forge.Mount) mount.Mount {
+			var (
+				mountType = mount.TypeVolume
+			)
+			switch {
+			case m.GetSource() == "":
+				mountType = mount.TypeTmpfs
+			case filepath.IsAbs(m.GetSource()):
+				mountType = mount.TypeBind
+			}
 
-		return mount.Mount{
-			Type:   mountType,
-			Source: m.GetSource(),
-			Target: m.GetDestination(),
-		}
-	})...)
+			return mount.Mount{
+				Type:   mountType,
+				Source: m.GetSource(),
+				Target: m.GetDestination(),
+			}
+		},
+	)...)
 
 	cccb, err := d.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "")
 	if err != nil {

@@ -17,6 +17,7 @@ func UsesToConfig(uses *actions.Uses) *forge.ContainerConfig {
 func (m *Map) UsesToConfig(uses *actions.Uses) *forge.ContainerConfig {
 	return &forge.ContainerConfig{
 		Entrypoint: []string{bin.ShimPath, "-c", uses.String(), m.ActionPath},
+		WorkingDir: forge.WorkingDir,
 		Mounts: []*forge.Mount{
 			{
 				Source:      UsesToVolumeName(uses),

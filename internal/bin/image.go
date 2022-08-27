@@ -1,6 +1,8 @@
 package bin
 
 import (
+	"io"
+
 	"github.com/frantjc/forge/pkg/runtime/container/native"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
@@ -12,11 +14,6 @@ import (
 
 const (
 	ShimPath = "/" + ShimName
-)
-
-var (
-	reference = name.MustParseReference("forge.dev/shim")
-	base      = empty.Image
 )
 
 func init() {
@@ -32,13 +29,20 @@ func NewShimImage() *native.Image {
 	return img
 }
 
+var (
+	reference = name.MustParseReference("forge.dev/shim")
+	baseImage = empty.Image
+)
+
 func newShimImage() (*native.Image, error) {
-	shimLayer, err := tarball.LayerFromOpener(newShimTarArchive, tarball.WithCompressionLevel(Compression))
+	shimLayer, err := tarball.LayerFromOpener(func() (io.ReadCloser, error) {
+		return io.NopCloser(NewShimTarArchive()), nil
+	}, tarball.WithCompressionLevel(TarArchiveCompression))
 	if err != nil {
 		return nil, err
 	}
 
-	img, err := mutate.AppendLayers(base, shimLayer)
+	img, err := mutate.AppendLayers(baseImage, shimLayer)
 	if err != nil {
 		return nil, err
 	}

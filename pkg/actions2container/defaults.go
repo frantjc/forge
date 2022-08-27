@@ -1,5 +1,7 @@
 package actions2container
 
+import "github.com/frantjc/forge"
+
 var (
 	DefaultMap = &Map{
 		Workspace:                 DefaultWorkspace,
@@ -14,7 +16,7 @@ var (
 )
 
 const (
-	DefaultRootPath        = "/out"
+	DefaultRootPath        = forge.WorkingDir
 	DefaultWorkspace       = DefaultRootPath + "/workspace"
 	DefaultActionPath      = DefaultRootPath + "/action"
 	DefaultRunnerTemp      = DefaultRootPath + "/runner/tmp"

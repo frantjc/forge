@@ -12,7 +12,7 @@ message ContainerConfig {
 
   repeated string entrypoint = 1;
   repeated string cmd = 2;
-  string cwd = 3;
+  string working_dir = 3;
   repeated string env = 4;
   string user = 5;
   bool privileged = 6;

@@ -5,11 +5,11 @@ import (
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-func UsesToMount(uses *actions.Uses) *forge.ContainerConfig_Mount {
+func UsesToMount(uses *actions.Uses) *forge.Mount {
 	return DefaultMap.UsesToMount(uses)
 }
 
-func (m *Map) UsesToMount(uses *actions.Uses) *forge.ContainerConfig_Mount {
+func (m *Map) UsesToMount(uses *actions.Uses) *forge.Mount {
 	return &forge.ContainerConfig_Mount{
 		Source:      UsesToVolumeName(uses),
 		Destination: m.ActionPath,

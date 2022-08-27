@@ -32,7 +32,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		User:         containerConfig.User,
 		Privileged:   containerConfig.Privileged,
 		Env:          containerConfig.Env,
-		WorkingDir:   containerConfig.Cwd,
+		WorkingDir:   containerConfig.WorkingDir,
 		Cmd:          append(containerConfig.Entrypoint, containerConfig.Cmd...),
 		Tty:          tty,
 		DetachKeys:   detachKeys,

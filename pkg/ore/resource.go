@@ -9,12 +9,7 @@ import (
 )
 
 func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
-	image, err := concourse2container.PullImageForResourceType(ctx, containerRuntime, o.GetResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	container, err := containerRuntime.CreateContainer(ctx, image, concourse2container.ResourceToConfig(o.GetResource(), o.GetResourceType(), o.GetMethod()))
+	container, err := concourse2container.CreateContainerForResource(ctx, containerRuntime, o.GetResource(), o.GetResourceType(), o.GetMethod())
 	if err != nil {
 		return nil, err
 	}

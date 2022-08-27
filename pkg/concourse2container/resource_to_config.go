@@ -6,20 +6,14 @@ import (
 )
 
 const (
-	DefaultRootPath = "/out"
+	DefaultRootPath = forge.WorkingDir
 )
 
 func ResourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string) *forge.ContainerConfig {
 	return &forge.ContainerConfig{
 		Entrypoint: ResourceMethod(method).Entrypoint(),
-		Privileged: resourceType.GetPrivileged(),
 		Cmd:        []string{DefaultRootPath + "/" + resource.GetName()},
-		Mounts: []*forge.Mount{
-			{
-				Source:      "/tmp/" + resource.GetName(),
-				Destination: DefaultRootPath + "/" + resource.GetName(),
-			},
-		},
+		Privileged: resourceType.GetPrivileged(),
 	}
 }
 

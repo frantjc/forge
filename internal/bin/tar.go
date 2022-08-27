@@ -12,33 +12,28 @@ const (
 	ShimName = "shim"
 )
 
+func NewShimTarArchive() io.Reader {
+	return bytes.NewReader(shimTarArchive)
+}
+
 var (
 	modTime = time.Date(1985, time.October, 26, 8, 15, 00, 0, time.UTC)
 	size    = int64(len(shim))
 	mode    = int64(0777)
 )
 
+var (
+	shimTarArchive []byte
+)
+
 func init() {
-	_ = NewShimTarArchive()
-}
-
-func NewShimTarArchive() io.ReadCloser {
-	rc, err := newShimTarArchive()
-	if err != nil {
-		panic(err)
-	}
-
-	return rc
-}
-
-func newShimTarArchive() (io.ReadCloser, error) {
 	var (
-		tarArchive      = new(bytes.Buffer)
-		gzipWriter, err = gzip.NewWriterLevel(tarArchive, Compression)
+		tarArchiveBuf   = bytes.NewBuffer(shimTarArchive)
+		gzipWriter, err = gzip.NewWriterLevel(tarArchiveBuf, TarArchiveCompression)
 		tarWriter       = tar.NewWriter(gzipWriter)
 	)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	defer gzipWriter.Close()
 	defer tarWriter.Close()
@@ -49,12 +44,10 @@ func newShimTarArchive() (io.ReadCloser, error) {
 		Mode:    mode,
 		ModTime: modTime,
 	}); err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	if _, err := io.Copy(tarWriter, NewShimReader()); err != nil {
-		return nil, err
+		panic(err)
 	}
-
-	return io.NopCloser(tarArchive), nil
 }

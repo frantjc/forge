@@ -2,4 +2,4 @@ package bin
 
 import "compress/gzip"
 
-var Compression = gzip.BestCompression
+var TarArchiveCompression = gzip.BestCompression
