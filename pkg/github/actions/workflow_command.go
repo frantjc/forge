@@ -1,6 +1,10 @@
 package actions
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/frantjc/forge/pkg/rangemap"
+)
 
 type WorkflowCommand struct {
 	Command    string
@@ -14,14 +18,14 @@ func (c *WorkflowCommand) String() string {
 	paramSpl := " "
 	numParams := len(c.Parameters)
 	paramsAdded := 0
-	for k, v := range c.Parameters {
+	rangemap.Alphabetically(c.Parameters, func(k, v string) {
 		s = fmt.Sprintf("%s%s%s=%s", s, paramSpl, k, v)
 		paramSpl = ","
 		paramsAdded++
 		if paramsAdded == numParams {
 			paramSpl = ""
 		}
-	}
+	})
 
 	return fmt.Sprintf("%s::%s", s, c.Value)
 }
