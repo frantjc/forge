@@ -6,3 +6,7 @@ type Volume struct {
 	ID string
 	*client.Client
 }
+
+func (v *Volume) GoString() string {
+	return "&Volume{ID: " + v.ID + "}"
+}

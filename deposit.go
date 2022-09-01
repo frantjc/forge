@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// Deposit is a cache for Ores and their
+// resulting Metals
 type Deposit interface {
 	fmt.GoStringer
 

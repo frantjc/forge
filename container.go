@@ -6,6 +6,7 @@ import (
 	"io"
 )
 
+// Container represents a container created by a ContainerRuntime
 type Container interface {
 	fmt.GoStringer
 

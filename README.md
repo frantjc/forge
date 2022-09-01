@@ -20,7 +20,7 @@ past systems have attempted to remedy this with native wrappers around CLIs e.g.
 
 it should be possible to run containerized commands, capture their process state, their stdout and stderr streams, and a tar of a specific directory ($OUT a la nix)
 
-all of these should be cacheable via the digest of the image that the command runs in and the digest of the command's encodable representation (e.g '{ "entrypoint": [...], "cmd": [...] }')
+all of these should be cacheable via the digest of the image that the command runs in and the digest of the command's encodable representation (e.g `'{ "entrypoint": [...], "cmd": [...] }'`)
 
 a shim that executes the commands inside of the container should be able to do extra cool stuff like run github actions by cloning them, capturing their metadata, and then executing the action (none of this inherently needs to be done by the orchestrator like I did with sequence; moments ago i thought this was important but now I'm questioning it)
 
