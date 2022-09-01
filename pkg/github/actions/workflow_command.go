@@ -18,7 +18,7 @@ func (c *WorkflowCommand) String() string {
 	paramSpl := " "
 	numParams := len(c.Parameters)
 	paramsAdded := 0
-	rangemap.Alphabetically(c.Parameters, func(k, v string) {
+	rangemap.Ascending(c.Parameters, func(k, v string) {
 		s = fmt.Sprintf("%s%s%s=%s", s, paramSpl, k, v)
 		paramSpl = ","
 		paramsAdded++
