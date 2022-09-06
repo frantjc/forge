@@ -7,7 +7,7 @@ import (
 	"github.com/frantjc/forge/pkg/encoding/unixtable"
 )
 
-func TestMarshal(t *testing.T) {
+func TestMarshalStruct(t *testing.T) {
 	var (
 		ut = &Unixtable{
 			One: "hello",
@@ -35,7 +35,7 @@ hello   there
 	}
 }
 
-func TestMarshalTag(t *testing.T) {
+func TestMarshalTaggedStruct(t *testing.T) {
 	var (
 		ut = &UnixtableTagged{
 			One: "hello",
