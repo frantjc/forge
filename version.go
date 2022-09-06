@@ -5,16 +5,16 @@ import "runtime/debug"
 var (
 	// Version is the major.minor.patch version of forge.
 	// Used to build a semantic version.
-	// Meant to be be overridden at build time
+	// Meant to be be overridden at build time.
 	Version = "0.0.0"
 	// Prerelease is the prelease of forge e.g. "alpha".
 	// Used to build a semantic version.
-	// Meant to be overridden at build time
+	// Meant to be overridden at build time.
 	Prerelease = ""
 )
 
 // Semver returns the semantic version of forge as built from
-// Version, Prerelease and debug build info
+// Version, Prerelease and debug build info.
 func Semver() string {
 	version := Version
 

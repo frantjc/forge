@@ -1,4 +1,5 @@
 GO = go
+GOLANGCI-LINT = golangci-lint
 
 fmt generate test:
 	@$(GO) $@ ./...
@@ -6,4 +7,7 @@ fmt generate test:
 download tidy vendor:
 	@$(GO) mod $@
 
-.PHONY: fmt generate test download tidy vendor
+lint:
+	@$(GOLANGCI-LINT) run
+
+.PHONY: fmt generate test download tidy vendor lint

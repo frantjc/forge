@@ -10,7 +10,7 @@ import (
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
+func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
 	uses, err := actions.Parse(o.Uses)
 	if err != nil {
 		return nil, err
@@ -22,14 +22,14 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 	}
 
 	for _, volume := range volumes {
-		defer volume.Remove(ctx)
+		defer volume.Remove(ctx) //nolint:errcheck
 	}
 
 	container, err := actions2container.CreateContainerForUses(ctx, containerRuntime, uses)
 	if err != nil {
 		return nil, err
 	}
-	defer container.Remove(ctx)
+	defer container.Remove(ctx) //nolint:errcheck
 
 	var (
 		stdout = new(bytes.Buffer)
@@ -73,7 +73,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		if err != nil {
 			break
 		}
-		defer container.Remove(ctx)
+		defer container.Remove(ctx) //nolint:errcheck
 
 		exitCode, err = container.Run(ctx, workflowCommandStreams)
 		if err != nil {
@@ -84,7 +84,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return nil, err
 	}
 
-	return &forge.Lava{
+	return &forge.Cast{
 		ExitCode: int64(exitCode),
 	}, nil
 }

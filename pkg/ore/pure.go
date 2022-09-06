@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
-func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
+func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
 	image, err := containerRuntime.PullImage(ctx, o.GetImage())
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		return nil, err
 	}
 
-	return &forge.Lava{
+	return &forge.Cast{
 		ExitCode: int64(exitCode),
 	}, nil
 }

@@ -28,7 +28,7 @@ func (u *Uses) GoString() string {
 	return fmt.Sprintf("&Uses{%s}", u)
 }
 
-// TODO regexp
+// TODO regexp.
 func Parse(uses string) (*Uses, error) {
 	r := &Uses{}
 

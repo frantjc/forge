@@ -16,7 +16,7 @@ CLIs take any number of only string inputs that are then parsed into anything pl
 
 CLIs output their process state, 2 byte streams in the form of stdout and stderr, and any changes they make to the filesystem. sometimes those streams are intended to be parsed into something, others not.
 
-past systems have attempted to remedy this with native wrappers around CLIs e.g. Jenkins Plugins, GitHub Actions (e.g. actions/checkout@v2) (js), Concourse Resources (e.g. registry-image-resource) (go), but that still leaves a lot to be desired as it is impossible to write native wrappers for any possible CLI someone wants to interact with
+past systems have attempted to remedy this with native wrappers around CLIs e.g. Jenkins Plugins, GitHub Actions (e.g. actions/checkout@v2) (js), Concourse Resources (e.g. registry-image-resource) (go), but that still leaves a lot to be desired as it is inefficient to write native wrappers for any possible CLI someone wants to interact with
 
 it should be possible to run containerized commands, capture their process state, their stdout and stderr streams, and a tar of a specific directory ($OUT a la nix)
 

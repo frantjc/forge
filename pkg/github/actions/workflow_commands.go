@@ -16,7 +16,7 @@ const (
 	CommandStopCommands = "stop-commands"
 )
 
-// TODO regexp
+// TODO regexp.
 func ParseWorkflowCommandString(workflowCommand string) (*WorkflowCommand, error) {
 	if !strings.HasPrefix(workflowCommand, "::") {
 		return nil, ErrNotAWorkflowCommand

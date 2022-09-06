@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.26.0
 // 	protoc        (unknown)
-// source: lava.proto
+// source: cast.proto
 
 package forge
 
@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Lava struct {
+type Cast struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -28,23 +28,23 @@ type Lava struct {
 	ExitCode int64 `protobuf:"varint,1,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`
 }
 
-func (x *Lava) Reset() {
-	*x = Lava{}
+func (x *Cast) Reset() {
+	*x = Cast{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lava_proto_msgTypes[0]
+		mi := &file_cast_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *Lava) String() string {
+func (x *Cast) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Lava) ProtoMessage() {}
+func (*Cast) ProtoMessage() {}
 
-func (x *Lava) ProtoReflect() protoreflect.Message {
-	mi := &file_lava_proto_msgTypes[0]
+func (x *Cast) ProtoReflect() protoreflect.Message {
+	mi := &file_cast_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,23 +55,23 @@ func (x *Lava) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Lava.ProtoReflect.Descriptor instead.
-func (*Lava) Descriptor() ([]byte, []int) {
-	return file_lava_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use Cast.ProtoReflect.Descriptor instead.
+func (*Cast) Descriptor() ([]byte, []int) {
+	return file_cast_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Lava) GetExitCode() int64 {
+func (x *Cast) GetExitCode() int64 {
 	if x != nil {
 		return x.ExitCode
 	}
 	return 0
 }
 
-var File_lava_proto protoreflect.FileDescriptor
+var File_cast_proto protoreflect.FileDescriptor
 
-var file_lava_proto_rawDesc = []byte{
-	0x0a, 0x0a, 0x6c, 0x61, 0x76, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x05, 0x66, 0x6f,
-	0x72, 0x67, 0x65, 0x22, 0x23, 0x0a, 0x04, 0x4c, 0x61, 0x76, 0x61, 0x12, 0x1b, 0x0a, 0x09, 0x65,
+var file_cast_proto_rawDesc = []byte{
+	0x0a, 0x0a, 0x63, 0x61, 0x73, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x05, 0x66, 0x6f,
+	0x72, 0x67, 0x65, 0x22, 0x23, 0x0a, 0x04, 0x43, 0x61, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x65,
 	0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08,
 	0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x42, 0x1a, 0x5a, 0x18, 0x67, 0x69, 0x74, 0x68,
 	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x72, 0x61, 0x6e, 0x74, 0x6a, 0x63, 0x2f, 0x66,
@@ -79,22 +79,22 @@ var file_lava_proto_rawDesc = []byte{
 }
 
 var (
-	file_lava_proto_rawDescOnce sync.Once
-	file_lava_proto_rawDescData = file_lava_proto_rawDesc
+	file_cast_proto_rawDescOnce sync.Once
+	file_cast_proto_rawDescData = file_cast_proto_rawDesc
 )
 
-func file_lava_proto_rawDescGZIP() []byte {
-	file_lava_proto_rawDescOnce.Do(func() {
-		file_lava_proto_rawDescData = protoimpl.X.CompressGZIP(file_lava_proto_rawDescData)
+func file_cast_proto_rawDescGZIP() []byte {
+	file_cast_proto_rawDescOnce.Do(func() {
+		file_cast_proto_rawDescData = protoimpl.X.CompressGZIP(file_cast_proto_rawDescData)
 	})
-	return file_lava_proto_rawDescData
+	return file_cast_proto_rawDescData
 }
 
-var file_lava_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_lava_proto_goTypes = []interface{}{
-	(*Lava)(nil), // 0: forge.Lava
+var file_cast_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_cast_proto_goTypes = []interface{}{
+	(*Cast)(nil), // 0: forge.Cast
 }
-var file_lava_proto_depIdxs = []int32{
+var file_cast_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -102,14 +102,14 @@ var file_lava_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_lava_proto_init() }
-func file_lava_proto_init() {
-	if File_lava_proto != nil {
+func init() { file_cast_proto_init() }
+func file_cast_proto_init() {
+	if File_cast_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_lava_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Lava); i {
+		file_cast_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Cast); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -125,18 +125,18 @@ func file_lava_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_lava_proto_rawDesc,
+			RawDescriptor: file_cast_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_lava_proto_goTypes,
-		DependencyIndexes: file_lava_proto_depIdxs,
-		MessageInfos:      file_lava_proto_msgTypes,
+		GoTypes:           file_cast_proto_goTypes,
+		DependencyIndexes: file_cast_proto_depIdxs,
+		MessageInfos:      file_cast_proto_msgTypes,
 	}.Build()
-	File_lava_proto = out.File
-	file_lava_proto_rawDesc = nil
-	file_lava_proto_goTypes = nil
-	file_lava_proto_depIdxs = nil
+	File_cast_proto = out.File
+	file_cast_proto_rawDesc = nil
+	file_cast_proto_goTypes = nil
+	file_cast_proto_depIdxs = nil
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/pkg/concourse2container"
 )
 
-func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Lava, error) {
+func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Cast, error) {
 	container, err := concourse2container.CreateContainerForResource(ctx, containerRuntime, o.GetResource(), o.GetResourceType(), o.GetMethod())
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 		return nil, err
 	}
 
-	return &forge.Lava{
+	return &forge.Cast{
 		ExitCode: int64(exitCode),
 	}, nil
 }

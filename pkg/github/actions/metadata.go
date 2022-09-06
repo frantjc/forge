@@ -29,11 +29,13 @@ func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
 func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, error) {
 	inputs := make(map[string]string, len(m.Inputs))
 	for name, input := range m.Inputs {
-		if w, ok := with[name]; ok {
+		w, ok := with[name]
+		switch {
+		case ok:
 			inputs[name] = w
-		} else if input.Default != "" {
+		case input.Default != "":
 			inputs[name] = fmt.Sprint(input.Default)
-		} else if input.Required {
+		case input.Required:
 			return nil, ErrMissingRequiredInput
 		}
 	}

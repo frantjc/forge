@@ -12,7 +12,6 @@ import (
 	"github.com/frantjc/forge/pkg/envconv"
 	"github.com/frantjc/go-js"
 	"github.com/go-git/go-git/v5"
-	"github.com/google/uuid"
 )
 
 type globalContextKey struct{}
@@ -261,11 +260,6 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		runnerArch = ArchX86
 	}
 
-	runID := os.Getenv(EnvVarRunID)
-	if runID == "" {
-		runID = uuid.NewString()
-	}
-
 	refProtected, _ := strconv.ParseBool(EnvVarRefProtected)
 
 	runNumber, err := strconv.Atoi(os.Getenv(EnvVarRunNumber))
@@ -309,7 +303,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 			RefType:         RefType(os.Getenv(EnvVarRefType)).String(),
 			Repository:      os.Getenv(EnvVarRepository),
 			RepositoryOwner: os.Getenv(EnvVarRepositoryOwner),
-			RunId:           runID,
+			RunId:           os.Getenv(EnvVarRunID),
 			RunNumber:       int64(runNumber),
 			RunAttempt:      int64(runAttempt),
 			ServerUrl:       serverURL.String(),
@@ -354,30 +348,30 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	if ref, err := r.Head(); err == nil {
 		c.GetGitHubContext().Sha = ref.Hash().String()
 		if shaBranch := strings.Split(ref.String(), " "); len(shaBranch) > 1 {
-			c.GetGitHubContext().RefName = strings.TrimPrefix(shaBranch[1], "refs/heads/")
-			c.GetGitHubContext().Ref = shaBranch[1]
+			c.GitHubContext.RefName = strings.TrimPrefix(shaBranch[1], "refs/heads/")
+			c.GitHubContext.Ref = shaBranch[1]
 		} else {
-			c.GetGitHubContext().RefName = ref.Hash().String()
-			c.GetGitHubContext().Ref = ref.Hash().String()
+			c.GitHubContext.RefName = ref.Hash().String()
+			c.GitHubContext.Ref = ref.Hash().String()
 		}
 
 		if ref.Name().IsBranch() {
 			currentBranch = ref.Name().Short()
-			c.GetGitHubContext().RefType = RefTypeBranch.String()
+			c.GitHubContext.RefType = RefTypeBranch.String()
 		} else {
-			c.GetGitHubContext().RefType = RefTypeTag.String()
+			c.GitHubContext.RefType = RefTypeTag.String()
 		}
 	}
 
 	if conf, err := r.Config(); err == nil {
-		c.GetGitHubContext().Actor = js.Coalesce(
+		c.GitHubContext.Actor = js.Coalesce(
 			conf.User.Name,
 			conf.Author.Name,
 			conf.Committer.Name,
 			conf.User.Email,
 			conf.Author.Email,
 			conf.Committer.Email,
-			c.GetGitHubContext().Actor,
+			c.GetGitHubContext().GetActor(),
 		)
 
 		for _, remote := range conf.Remotes {
@@ -397,9 +391,9 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 
 	if branch, err := r.Branch(currentBranch); err == nil {
 		currentRemote = branch.Remote
-		c.GetGitHubContext().RefName = branch.Name
-		c.GetGitHubContext().Ref = "refs/heads/" + branch.Name
-		c.GetGitHubContext().RefType = RefTypeBranch.String()
+		c.GitHubContext.RefName = branch.Name
+		c.GitHubContext.Ref = "refs/heads/" + branch.Name
+		c.GitHubContext.RefType = RefTypeBranch.String()
 	}
 
 	if remote, err := r.Remote(currentRemote); err == nil {

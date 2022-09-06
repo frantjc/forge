@@ -47,9 +47,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		),
 	)
 
-	defer d.Client.ImageRemove(ctx, reference, types.ImageRemoveOptions{
-		Force: true,
-	})
+	defer d.Client.ImageRemove(ctx, reference, types.ImageRemoveOptions{Force: true}) //nolint:errcheck
 
 	if err = ilr.Body.Close(); err != nil {
 		return nil, err

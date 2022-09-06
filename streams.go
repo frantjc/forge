@@ -10,12 +10,12 @@ import (
 var (
 	// DefaultDetachKeys are the default key combinations
 	// to use when detaching from a Container that has
-	// been attached to
+	// been attached to.
 	DefaultDetachKeys = "ctrl-d"
 )
 
 // Streams represents streams to and from a process
-// inside of a Container
+// inside of a Container.
 type Streams struct {
 	*Drains
 	In         io.Reader
@@ -23,7 +23,7 @@ type Streams struct {
 }
 
 // StdStreams returns a Streams consisting of os.Stdin,
-// os.Stdout and os.Stderr
+// os.Stdout and os.Stderr.
 func StdStreams() *Streams {
 	return &Streams{
 		In:         os.Stdin,
@@ -33,14 +33,14 @@ func StdStreams() *Streams {
 }
 
 // FileDescriptor is an interface to check io.Readers and io.Writers
-// against to inspect if they are terminals
+// against to inspect if they are terminals.
 type FileDescriptor interface {
 	Fd() uintptr
 }
 
 // StdTerminalStreams creates a Streams with os.Stdin, os.Stdout and os.Stderr
 // made raw and a restore function to return them to their previous state.
-// For use with attaching to a shell inside of a Container
+// For use with attaching to a shell inside of a Container.
 func StdTerminalStreams() (*Streams, func() error) {
 	streams, restore, err := TerminalStreams(os.Stdin, os.Stdout, os.Stderr)
 	if err != nil {
@@ -53,7 +53,7 @@ func StdTerminalStreams() (*Streams, func() error) {
 // TerminalStreams creates a Streams with each of the given streams
 // that is a terminal made raw and a restore function to return
 // them to their previous states. For use with attaching to
-// a shell inside of a Container
+// a shell inside of a Container.
 func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func() error, error) {
 	var (
 		fds    = []FileDescriptor{}

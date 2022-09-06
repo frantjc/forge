@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"os"
+	"path"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/pkg/basin/bucket"
 	"github.com/frantjc/forge/pkg/concourse"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
+
+	_ "gocloud.dev/blob/fileblob"
 )
 
 var (
@@ -35,15 +39,37 @@ func main() {
 		panic(err)
 	}
 
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		panic(err)
+	}
+
+	cache = path.Join(cache, "forge")
+	if err = os.MkdirAll(cache, 0777); err != nil {
+		panic(err)
+	}
+
+	basin, err := bucket.New(ctx, "file://"+cache)
+	if err != nil {
+		panic(err)
+	}
+
 	var _ = globalContext
 	var _ *concourse.Input = nil
 
-	foundry := &forge.Foundry{ContainerRuntime: docker.New(c)}
+	foundry := &forge.Foundry{ContainerRuntime: docker.New(c), Basin: basin}
 	if _, err = foundry.Process(
 		ctx,
 		&ore.Alloy{
 			Ores: []forge.Ore{
-				//&ore.Resource{
+				&ore.Action{
+					Uses: "actions/setup-go@v3",
+					With: map[string]string{
+						"go-version": "1.19",
+					},
+					GlobalContext: globalContext,
+				},
+				// &ore.Resource{
 				// 	Method: "get",
 				// 	Resource: &concourse.Resource{
 				// 		Name: "github.com/frantjc/forge",
@@ -65,25 +91,18 @@ func main() {
 				// 	Image:      "alpine",
 				// 	Entrypoint: []string{"ls", "-al"},
 				// },
-				&ore.Cast{
-					From: &ore.Pure{
-						Image:      "alpine",
-						Entrypoint: []string{"echo", "hello"},
-					},
-					To: &ore.Pure{
-						Image:      "alpine",
-						Entrypoint: []string{"base64"},
-					},
-				},
+				// &ore.Lava{
+				// 	From: &ore.Pure{
+				// 		Image:      "alpine",
+				// 		Entrypoint: []string{"echo", "hello"},
+				// 	},
+				// 	To: &ore.Pure{
+				// 		Image:      "alpine",
+				// 		Entrypoint: []string{"base64"},
+				// 	},
+				// },
 			},
 		},
-		// &ore.Action{
-		// 	Uses: "actions/setup-go@v3",
-		// 	With: map[string]string{
-		// 		"go-version": "1.19",
-		// 	},
-		// 	GlobalContext: globalContext,
-		// },
 		forge.StdDrains(),
 	); err != nil {
 		panic(err)

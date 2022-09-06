@@ -9,7 +9,7 @@ import (
 )
 
 // Image represents a image pulled by a ContainerRuntime.
-// Used to create Containers from
+// Used to create Containers from.
 type Image interface {
 	fmt.GoStringer
 
