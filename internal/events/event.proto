@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package forge.events;
+
+option go_package = "github.com/frantjc/forge/internal/events";
+
+message Event {
+  string type = 1;
+  map<string, string> metadata = 2;
+}

@@ -17,10 +17,8 @@ import (
 )
 
 var (
-	ctx = forge.WithLogger(
-		context.Background(),
-		forge.NewLogger(),
-	)
+	logr = forge.NewLogger()
+	ctx  = forge.WithLogger(context.Background(), logr)
 )
 
 func main() {
@@ -62,13 +60,13 @@ func main() {
 		ctx,
 		&ore.Alloy{
 			Ores: []forge.Ore{
-				&ore.Action{
-					Uses: "actions/setup-go@v3",
-					With: map[string]string{
-						"go-version": "1.19",
-					},
-					GlobalContext: globalContext,
-				},
+				// &ore.Action{
+				// 	Uses: "actions/setup-go@v3",
+				// 	With: map[string]string{
+				// 		"go-version": "1.19",
+				// 	},
+				// 	GlobalContext: globalContext,
+				// },
 				// &ore.Resource{
 				// 	Method: "get",
 				// 	Resource: &concourse.Resource{
@@ -87,10 +85,10 @@ func main() {
 				// 		},
 				// 	},
 				// },
-				// &ore.Pure{
-				// 	Image:      "alpine",
-				// 	Entrypoint: []string{"ls", "-al"},
-				// },
+				&ore.Pure{
+					Image:      "alpine",
+					Entrypoint: []string{"ls", "-al"},
+				},
 				// &ore.Lava{
 				// 	From: &ore.Pure{
 				// 		Image:      "alpine",

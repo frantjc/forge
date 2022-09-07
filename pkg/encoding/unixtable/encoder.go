@@ -79,8 +79,13 @@ func (e *Encoder) Encode(a any) error {
 		)
 
 		for i := 0; i < numFields; i++ {
-			key := v.Type().Field(i).Name
-			if tag := v.Type().Field(i).Tag.Get(Tag); tag != "" {
+			f := v.Type().Field(i)
+			if f.PkgPath != "" {
+				continue
+			}
+
+			key := f.Name
+			if tag := f.Tag.Get(Tag); tag != "" {
 				key = tag
 			}
 
