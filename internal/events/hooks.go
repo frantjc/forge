@@ -1,19 +1,21 @@
 package events
 
+import "context"
+
 type Hookable interface {
 	Invoke(*Event)
 }
 
-type Hook func(*Event)
+type Hook func(context.Context, *Event)
 
-func (h Hook) Invoke(event *Event) {
-	h(event)
+func (h Hook) Invoke(ctx context.Context, event *Event) {
+	h(ctx, event)
 }
 
 type Hooks []Hook
 
-func (s Hooks) Invoke(event *Event) {
+func (s Hooks) Invoke(ctx context.Context, event *Event) {
 	for _, h := range s {
-		h.Invoke(event)
+		h.Invoke(ctx, event)
 	}
 }

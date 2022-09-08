@@ -14,6 +14,7 @@ import (
 
 func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error) {
 	var (
+		_              = forge.LoggerFrom(ctx)
 		stdin          io.Reader
 		stdout, stderr io.Writer
 		detachKeys     string
@@ -43,11 +44,16 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 
 	errC := make(chan error, 1)
 	go func() {
-		if _, err := stdcopy.StdCopy(
-			stdout,
-			stderr,
-			hjr.Reader,
-		); err != nil {
+		if tty {
+			_, err = io.Copy(stdout, hjr.Reader)
+		} else {
+			_, err = stdcopy.StdCopy(
+				stdout,
+				stderr,
+				hjr.Reader,
+			)
+		}
+		if err != nil {
 			errC <- err
 		}
 	}()

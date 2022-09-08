@@ -11,5 +11,5 @@ func (t Type) String() string {
 }
 
 func (t Type) GoString() string {
-	return "Type(" + string(t) + ")"
+	return "Type(" + t.String() + ")"
 }

@@ -7,11 +7,13 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/pkg/channels"
 	"github.com/moby/term"
 )
 
 func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerConfig, streams *forge.Streams) (int, error) {
 	var (
+		_              = forge.LoggerFrom(ctx)
 		stdin          io.Reader
 		stdout, stderr io.Writer
 		tty            bool
@@ -53,15 +55,25 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 	defer hjr.Close()
 
 	errC := make(chan error, 1)
+	outC := make(chan any, 1)
 	go func() {
-		_, err := stdcopy.StdCopy(
-			stdout,
-			stderr,
-			hjr.Reader,
-		)
-		errC <- err
+		if tty {
+			_, err = io.Copy(stdout, hjr.Reader)
+		} else {
+			_, err = stdcopy.StdCopy(
+				stdout,
+				stderr,
+				hjr.Reader,
+			)
+		}
+		if err != nil {
+			errC <- err
+		}
+
+		close(outC)
 	}()
 
+	inC := make(chan any, 1)
 	if stdin != nil {
 		if detachKeys != "" {
 			detachKeysB, err := term.ToBytes(detachKeys)
@@ -77,7 +89,11 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 				errC <- err
 			}
 
-			errC <- hjr.CloseWrite()
+			if err = hjr.CloseWrite(); err != nil {
+				errC <- hjr.CloseWrite()
+			}
+
+			close(inC)
 		}()
 	}
 
@@ -88,6 +104,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		}
 	case <-ctx.Done():
 		err = ctx.Err()
+	case err = <-channels.Wait(ctx, inC, outC):
 	}
 
 	cei, inspectErr := c.ContainerExecInspect(ctx, idr.ID)

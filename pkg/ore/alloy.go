@@ -9,7 +9,7 @@ import (
 )
 
 type Alloy struct {
-	Id   string      `json:"id,omitempty"` //nolint:revive // matching protobuf convention
+	Id   string      `json:"id,omitempty"` //nolint:revive // matching protobuf style
 	Ores []forge.Ore `json:"ores,omitempty"`
 }
 
@@ -39,7 +39,7 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	return lava, err
 }
 
-//nolint:revive // matching protobuf convention
+//nolint:revive // matching protobuf style
 func (o *Alloy) GetId() string {
 	return o.Id
 }

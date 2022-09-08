@@ -7,6 +7,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/events"
 	"github.com/frantjc/forge/pkg/basin/bucket"
 	"github.com/frantjc/forge/pkg/concourse"
 	"github.com/frantjc/forge/pkg/github/actions"
@@ -52,10 +53,33 @@ func main() {
 		panic(err)
 	}
 
-	var _ = globalContext
-	var _ *concourse.Input = nil
+	var (
+		conatinerRuntime                  = docker.New(c)
+		_                                 = globalContext
+		_                *concourse.Input = nil
+	)
 
-	foundry := &forge.Foundry{ContainerRuntime: docker.New(c), Basin: basin}
+	events.Listen(ctx, events.ContainerCreated, func(ctx context.Context, e *events.Event) {
+		// container, err := conatinerRuntime.GetContainer(ctx, events.ContainerMetadata(e.GetMetadata()).GetId())
+		// if err != nil {
+		// 	panic(err)
+		// }
+
+		// streams, restore := forge.StdTerminalStreams()
+		// defer func() {
+		// 	if err = restore(); err != nil {
+		// 		panic(err)
+		// 	}
+		// }()
+
+		// if _, err = container.Exec(ctx, &forge.ContainerConfig{
+		// 	Entrypoint: []string{"sh"},
+		// }, streams); err != nil {
+		// 	panic(err)
+		// }
+	})
+
+	foundry := &forge.Foundry{ContainerRuntime: conatinerRuntime, Basin: basin}
 	if _, err = foundry.Process(
 		ctx,
 		&ore.Alloy{
@@ -67,27 +91,27 @@ func main() {
 				// 	},
 				// 	GlobalContext: globalContext,
 				// },
-				// &ore.Resource{
-				// 	Method: "get",
-				// 	Resource: &concourse.Resource{
-				// 		Name: "github.com/frantjc/forge",
-				// 		Type: "git",
-				// 		Source: map[string]string{
-				// 			"uri":    "https://github.com/frantjc/forge",
-				// 			"branch": "main",
-				// 		},
-				// 	},
-				// 	ResourceType: &concourse.ResourceType{
-				// 		Name: "git",
-				// 		Source: &concourse.Source{
-				// 			Repository: "docker.io/concourse/git-resource",
-				// 			Tag:        "alpine",
-				// 		},
-				// 	},
-				// },
+				&ore.Resource{
+					Method: "get",
+					Resource: &concourse.Resource{
+						Name: "github.com/frantjc/forge",
+						Type: "git",
+						Source: map[string]string{
+							"uri":    "https://github.com/frantjc/forge",
+							"branch": "main",
+						},
+					},
+					ResourceType: &concourse.ResourceType{
+						Name: "git",
+						Source: &concourse.Source{
+							Repository: "docker.io/concourse/git-resource",
+							Tag:        "alpine",
+						},
+					},
+				},
 				&ore.Pure{
 					Image:      "alpine",
-					Entrypoint: []string{"ls", "-al"},
+					Entrypoint: []string{"ls", "-al", "github.com/frantjc/forge"},
 				},
 				// &ore.Lava{
 				// 	From: &ore.Pure{

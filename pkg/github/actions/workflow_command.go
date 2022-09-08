@@ -31,7 +31,7 @@ func (c *WorkflowCommand) String() string {
 }
 
 func (c *WorkflowCommand) GoString() string {
-	return fmt.Sprintf("&WorkflowCommand{%s}", c)
+	return "&WorkflowCommand{" + c.String() + "}"
 }
 
 func (c *WorkflowCommand) GetName() string {

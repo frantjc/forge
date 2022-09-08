@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/pkg/concourse2container"
 )
 
-func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Cast, error) {
+func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
 	container, err := concourse2container.CreateContainerForResource(ctx, containerRuntime, o.GetResource(), o.GetResourceType(), o.GetMethod())
 	if err != nil {
 		return nil, err

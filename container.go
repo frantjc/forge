@@ -10,6 +10,8 @@ import (
 type Container interface {
 	fmt.GoStringer
 
+	GetId() string
+
 	CopyTo(context.Context, string, io.Reader) error
 	CopyFrom(context.Context, string) (io.ReadCloser, error)
 

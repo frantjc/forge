@@ -56,40 +56,38 @@ func StdTerminalStreams() (*Streams, func() error) {
 // a shell inside of a Container.
 func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func() error, error) {
 	var (
-		fds    = []FileDescriptor{}
-		states = []*term.State{}
-	)
-
-	for _, fd := range []interface{}{stdin, stdout, stderr} {
-		if fd, ok := fd.(FileDescriptor); ok {
-			if term.IsTerminal(fd.Fd()) {
-				state, err := term.MakeRaw(fd.Fd())
-				if err != nil {
-					return nil, nil, err
-				}
-
-				states = append(states, state)
-				fds = append(fds, fd)
-			}
-
-		}
-	}
-
-	return &Streams{
-			In: stdin,
-			Drains: &Drains{
-				Out: stdout,
-				Err: stderr,
-				Tty: true,
-			},
-			DetachKeys: DefaultDetachKeys,
-		}, func() error {
-			for i, fd := range fds {
-				if err := term.RestoreTerminal(fd.Fd(), states[i]); err != nil {
+		states  = map[uintptr]*term.State{}
+		restore = func() error {
+			for fd, state := range states {
+				if err := term.RestoreTerminal(fd, state); err != nil {
 					return err
 				}
 			}
 
 			return nil
-		}, nil
+		}
+	)
+
+	for _, fd := range []any{stdin, stdout, stderr} {
+		if fd, ok := fd.(FileDescriptor); ok {
+			if term.IsTerminal(fd.Fd()) {
+				state, err := term.MakeRaw(fd.Fd())
+				if err != nil {
+					return nil, restore, err
+				}
+
+				states[fd.Fd()] = state
+			}
+		}
+	}
+
+	return &Streams{
+		In: stdin,
+		Drains: &Drains{
+			Out: stdout,
+			Err: stderr,
+			Tty: true,
+		},
+		DetachKeys: DefaultDetachKeys,
+	}, restore, nil
 }

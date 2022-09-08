@@ -1,13 +1,15 @@
 package events
 
-func NewContainerMetadata(id string) ContainerMetadata {
+import "github.com/frantjc/forge"
+
+func NewContainerMetadata(container forge.Container) ContainerMetadata {
 	m := ContainerMetadata{}
-	m["id"] = id
+	m["id"] = container.GetId()
 	return m
 }
 
 type ContainerMetadata map[string]string
 
-func (m ContainerMetadata) GetId() string { //nolint:revive // matching .proto style
+func (m ContainerMetadata) GetId() string { //nolint:revive // matching protobuf style
 	return m["id"]
 }

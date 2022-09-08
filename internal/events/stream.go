@@ -12,7 +12,7 @@ type Stream map[Type]Hooks
 func (s Stream) Emit(ctx context.Context, event *Event) {
 	for eventType, hooks := range s {
 		if eventType == Type(event.Type) {
-			hooks.Invoke(event)
+			hooks.Invoke(ctx, event)
 		}
 	}
 }

@@ -8,5 +8,5 @@ type Volume struct {
 }
 
 func (v *Volume) GoString() string {
-	return "&Volume{ID: " + v.ID + "}"
+	return "&Volume{" + v.ID + "}"
 }

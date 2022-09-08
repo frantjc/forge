@@ -16,6 +16,10 @@ const (
 	ShimPath = "/" + ShimName
 )
 
+var (
+	ShimEntrypoint = []string{ShimPath}
+)
+
 func init() {
 	_ = NewShimImage()
 }
