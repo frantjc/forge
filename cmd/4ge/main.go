@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/events"
+	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/pkg/basin/bucket"
 	"github.com/frantjc/forge/pkg/concourse"
 	"github.com/frantjc/forge/pkg/github/actions"
@@ -59,12 +59,7 @@ func main() {
 		_                *concourse.Input = nil
 	)
 
-	events.Listen(ctx, events.ContainerCreated, func(ctx context.Context, e *events.Event) {
-		// container, err := conatinerRuntime.GetContainer(ctx, events.ContainerMetadata(e.GetMetadata()).GetId())
-		// if err != nil {
-		// 	panic(err)
-		// }
-
+	hooks.ContainerStarted.Listen(func(ctx context.Context, container forge.Container) {
 		// streams, restore := forge.StdTerminalStreams()
 		// defer func() {
 		// 	if err = restore(); err != nil {
@@ -91,38 +86,38 @@ func main() {
 				// 	},
 				// 	GlobalContext: globalContext,
 				// },
-				&ore.Resource{
-					Method: "get",
-					Resource: &concourse.Resource{
-						Name: "github.com/frantjc/forge",
-						Type: "git",
-						Source: map[string]string{
-							"uri":    "https://github.com/frantjc/forge",
-							"branch": "main",
-						},
-					},
-					ResourceType: &concourse.ResourceType{
-						Name: "git",
-						Source: &concourse.Source{
-							Repository: "docker.io/concourse/git-resource",
-							Tag:        "alpine",
-						},
-					},
-				},
-				&ore.Pure{
-					Image:      "alpine",
-					Entrypoint: []string{"ls", "-al", "github.com/frantjc/forge"},
-				},
-				// &ore.Lava{
-				// 	From: &ore.Pure{
-				// 		Image:      "alpine",
-				// 		Entrypoint: []string{"echo", "hello"},
+				// &ore.Resource{
+				// 	Method: "get",
+				// 	Resource: &concourse.Resource{
+				// 		Name: "github.com/frantjc/forge",
+				// 		Type: "git",
+				// 		Source: map[string]string{
+				// 			"uri":    "https://github.com/frantjc/forge",
+				// 			"branch": "main",
+				// 		},
 				// 	},
-				// 	To: &ore.Pure{
-				// 		Image:      "alpine",
-				// 		Entrypoint: []string{"base64"},
+				// 	ResourceType: &concourse.ResourceType{
+				// 		Name: "git",
+				// 		Source: &concourse.Source{
+				// 			Repository: "docker.io/concourse/git-resource",
+				// 			Tag:        "alpine",
+				// 		},
 				// 	},
 				// },
+				&ore.Pure{
+					Image:      "alpine",
+					Entrypoint: []string{"ls", "-al"},
+				},
+				&ore.Lava{
+					From: &ore.Pure{
+						Image:      "alpine",
+						Entrypoint: []string{"echo", "hello"},
+					},
+					To: &ore.Pure{
+						Image:      "alpine",
+						Entrypoint: []string{"base64"},
+					},
+				},
 			},
 		},
 		forge.StdDrains(),

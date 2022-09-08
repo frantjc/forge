@@ -10,5 +10,7 @@ import (
 type Volume interface {
 	fmt.GoStringer
 
+	GetId() string
+
 	Remove(context.Context) error
 }

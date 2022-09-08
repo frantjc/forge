@@ -85,6 +85,7 @@ func mainE() error {
 		return json.NewEncoder(os.Stdout).Encode(m)
 	// sleep
 	case "-s":
+		os.Stdout.WriteString("zzz...") 
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs

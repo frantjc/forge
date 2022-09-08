@@ -13,11 +13,13 @@ import (
 )
 
 const (
-	ShimPath = "/" + ShimName
+	ShimPath  = "/" + ShimName
+	ImageName = "forge.dev/shim"
 )
 
 var (
-	ShimEntrypoint = []string{ShimPath}
+	ShimEntrypoint      = []string{ShimPath}
+	ShimSleepEntrypoint = append(ShimEntrypoint, "-s")
 )
 
 func init() {
@@ -34,7 +36,7 @@ func NewShimImage() *native.Image {
 }
 
 var (
-	reference = name.MustParseReference("forge.dev/shim")
+	reference = name.MustParseReference(ImageName)
 	baseImage = empty.Image
 )
 

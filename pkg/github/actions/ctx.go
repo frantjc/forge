@@ -245,7 +245,12 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		actor = u.Name
 	}
 
-	serverURL, err := url.Parse(os.Getenv(EnvVarServerURL))
+	rawServerURL := os.Getenv(EnvVarServerURL)
+	if rawServerURL == "" {
+		rawServerURL = DefaultURL.String()
+	}
+
+	serverURL, err := url.Parse(rawServerURL)
 	if err != nil {
 		serverURL = DefaultURL
 	}

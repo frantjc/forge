@@ -4,17 +4,28 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/pkg/concourse"
 	"github.com/frantjc/forge/pkg/concourse2container"
 )
 
 func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
-	container, err := concourse2container.CreateContainerForResource(ctx, containerRuntime, o.GetResource(), o.GetResourceType(), o.GetMethod())
+	image, err := concourse2container.PullImageForResourceType(ctx, containerRuntime, o.ResourceType)
 	if err != nil {
 		return nil, err
 	}
 
-	exitCode, err := container.Run(ctx, concourse2container.NewStreams(drains, &concourse.Input{
+	containerConfig := concourse2container.ResourceToConfig(o.Resource, o.ResourceType, o.Method)
+	containerConfig.Mounts = append(containerConfig.Mounts, contaminate.MountsFrom(ctx)...)
+
+	container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
+	if err != nil {
+		return nil, err
+	}
+	defer container.Stop(ctx)   //nolint:errcheck
+	defer container.Remove(ctx) //nolint:errcheck
+
+	exitCode, err := container.Exec(ctx, containerConfig, concourse2container.NewStreams(drains, &concourse.Input{
 		Params: o.GetParams(),
 		Source: o.GetResource().GetSource(),
 	}))

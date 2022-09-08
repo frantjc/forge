@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/pkg/actions2container"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
@@ -25,10 +26,14 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		defer volume.Remove(ctx) //nolint:errcheck
 	}
 
-	container, err := actions2container.CreateContainerForUses(ctx, containerRuntime, uses)
+	containerConfig := actions2container.UsesToConfig(uses)
+	containerConfig.Mounts = append(containerConfig.Mounts, contaminate.MountsFrom(ctx)...)
+
+	container, err := containerRuntime.CreateContainer(ctx, actions2container.UsesImage, containerConfig)
 	if err != nil {
 		return nil, err
 	}
+	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
 	var (
@@ -69,13 +74,15 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 
 	workflowCommandStreams := actions2container.NewWorkflowCommandStreams(o.GlobalContext, o.GetId(), drains)
 	for _, containerConfig := range conatinerConfigs {
-		container, err = actions2container.CreateContainer(ctx, containerRuntime, image, containerConfig)
+		containerConfig.Mounts = append(containerConfig.Mounts, contaminate.MountsFrom(ctx)...)
+		container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {
 			break
 		}
+		defer container.Stop(ctx)   //nolint:errcheck
 		defer container.Remove(ctx) //nolint:errcheck
 
-		exitCode, err = container.Run(ctx, workflowCommandStreams)
+		exitCode, err = container.Exec(ctx, containerConfig, workflowCommandStreams)
 		if err != nil {
 			break
 		}
