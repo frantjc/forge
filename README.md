@@ -1,6 +1,4 @@
-# forge
-
-[![ci](https://github.com/frantjc/forge/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions)
+# forge [![ci](https://github.com/frantjc/forge/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions)
 
 ## thoughts
 
