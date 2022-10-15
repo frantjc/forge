@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/go-js"
+	"github.com/frantjc/forge/pkg/fn"
 )
 
 var (
@@ -92,9 +92,9 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	}
 
-	hostConfig.Mounts = append(hostConfig.Mounts, js.Map(
+	hostConfig.Mounts = append(hostConfig.Mounts, fn.Map(
 		config.Mounts,
-		func(m *forge.ContainerConfig_Mount, _ int, _ []*forge.Mount) mount.Mount {
+		func(m *forge.ContainerConfig_Mount, _ int) mount.Mount {
 			var (
 				mountType = mount.TypeVolume
 			)

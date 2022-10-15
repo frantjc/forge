@@ -10,3 +10,5 @@ vendor/
 # dev
 __debug_bin
 .env
+bin/*
+!bin/.gitkeep

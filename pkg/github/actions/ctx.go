@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge/pkg/envconv"
-	"github.com/frantjc/go-js"
+	"github.com/frantjc/forge/pkg/fn"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -369,7 +369,7 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	}
 
 	if conf, err := r.Config(); err == nil {
-		c.GitHubContext.Actor = js.Coalesce(
+		c.GitHubContext.Actor = fn.Coalesce(
 			conf.User.Name,
 			conf.Author.Name,
 			conf.Committer.Name,

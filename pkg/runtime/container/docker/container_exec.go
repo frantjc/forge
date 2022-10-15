@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/channels"
+	"github.com/frantjc/forge/pkg/changroup"
 	"github.com/moby/term"
 )
 
@@ -102,9 +102,10 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		if _, ok := err.(term.EscapeError); ok {
 			err = nil
 		}
-	case <-ctx.Done():
-		err = ctx.Err()
-	case err = <-channels.Wait(ctx, inC, outC):
+	case settled := <-changroup.AllSettled(ctx, inC, outC):
+		if settledErr := settled.Err(); settledErr != nil {
+			err = settledErr
+		}
 	}
 
 	cei, inspectErr := c.ContainerExecInspect(ctx, idr.ID)

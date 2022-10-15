@@ -2,7 +2,7 @@ GO = go
 GOLANGCI-LINT = golangci-lint
 BUF = buf
 
-proto:
+protos:
 	@$(BUF) format -w
 	@$(BUF) generate .
 
@@ -15,5 +15,13 @@ download tidy vendor:
 lint:
 	@$(GOLANGCI-LINT) run
 
-.PHONY: fmt generate test download tidy vendor lint proto
+proto: protos
+buf: proto
+gen: generate
+dl: download
+td: tidy
+ven: vendor
+format: fmt
+	@$(BUF) format -w
 
+.PHONY: protos fmt generate test download tidy vendor lint proto buf gen dl td ven format

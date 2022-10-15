@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/docker/docker v20.10.17+incompatible
-	github.com/frantjc/go-js v0.0.0-20220523162213-f8b7cd811083
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-logr/logr v1.2.3
 	github.com/go-logr/zapr v1.2.3

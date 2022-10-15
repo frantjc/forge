@@ -12,8 +12,8 @@ import (
 // the logging library is desired to be swapped out.
 type Logger = logr.Logger
 
-// WithLogger returns a Context from the parent Context with the given
-// Logger inside of it.
+// WithLogger returns a Context from the parent Context
+// with the given Logger inside of it.
 func WithLogger(ctx context.Context, logger Logger) context.Context {
 	return logr.NewContext(ctx, logger)
 }

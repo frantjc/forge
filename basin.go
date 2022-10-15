@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-// Basin is a cache for Ores and their resulting Metals
+// Basin is a cache for Ores and their resulting Metals.
 type Basin interface {
 	fmt.GoStringer
 

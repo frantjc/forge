@@ -12,8 +12,8 @@ import (
 	"syscall"
 
 	"github.com/frantjc/forge/pkg/envconv"
+	"github.com/frantjc/forge/pkg/fn"
 	"github.com/frantjc/forge/pkg/github/actions"
-	"github.com/frantjc/go-js"
 )
 
 var (
@@ -132,7 +132,7 @@ func mainE() error {
 			}
 		}
 
-		if i := js.FindIndex(command.Env, func(s string, _ int, _ []string) bool {
+		if i := fn.FindIndex(command.Env, func(s string, _ int) bool {
 			spl := strings.Split(s, "=")
 			return len(spl) > 0 && strings.EqualFold(spl[0], "PATH")
 		}); i >= 0 {
