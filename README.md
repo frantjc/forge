@@ -1,5 +1,7 @@
 # forge
 
+[![ci](https://github.com/frantjc/forge/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions)
+
 ## thoughts
 
 the world is made up of CLIs. they're very powerful. they do a lot with a little. we want to use them a lot.
