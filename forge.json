@@ -11,7 +11,10 @@
   "resources": [
     {
       "name": "mock",
-      "type": "mock"
+      "type": "mock",
+      "source": {
+        "log": true
+      }
     }
   ]
 }
