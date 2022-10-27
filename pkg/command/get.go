@@ -1,8 +1,6 @@
 package command
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 func NewGet() *cobra.Command {
 	var (
