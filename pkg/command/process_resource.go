@@ -16,7 +16,7 @@ import (
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
 )
 
-func processResource(ctx context.Context, method, name string, params map[string]string) error {
+func processResource(ctx context.Context, method, name string, params, version map[string]string) error {
 	_ = forge.LoggerFrom(ctx)
 
 	wd, err := os.Getwd()
@@ -38,8 +38,9 @@ func processResource(ctx context.Context, method, name string, params map[string
 	}
 
 	o := &ore.Resource{
-		Method: method,
-		Params: params,
+		Method:  method,
+		Version: version,
+		Params:  params,
 	}
 	for _, r := range resources.GetResources() {
 		if r.GetName() == name {

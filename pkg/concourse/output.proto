@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package forge.concourse;
 
+// TODO import "google/protobuf/any.proto";
 option go_package = "github.com/frantjc/forge/pkg/concourse";
 
 message Output {

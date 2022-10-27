@@ -26,8 +26,9 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 	defer container.Remove(ctx) //nolint:errcheck
 
 	exitCode, err := container.Exec(ctx, containerConfig, concourse2container.NewStreams(drains, &concourse.Input{
-		Params: o.GetParams(),
-		Source: o.GetResource().GetSource(),
+		Params:  o.GetParams(),
+		Source:  o.GetResource().GetSource(),
+		Version: o.GetVersion(),
 	}))
 	if err != nil {
 		return nil, err
