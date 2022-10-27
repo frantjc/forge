@@ -7,13 +7,8 @@ import (
 	"gocloud.dev/blob"
 )
 
-func New(ctx context.Context, addr string) (*Bucket, error) {
-	bucket, err := blob.OpenBucket(ctx, addr)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Bucket{bucket}, nil
+func New(bucket *blob.Bucket) *Bucket {
+	return &Bucket{bucket}
 }
 
 type Bucket struct {

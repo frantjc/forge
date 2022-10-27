@@ -12,6 +12,8 @@ import (
 )
 
 func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
+	_ = forge.LoggerFrom(ctx)
+
 	uses, err := actions.Parse(o.Uses)
 	if err != nil {
 		return nil, err
@@ -74,7 +76,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 
 	workflowCommandStreams := actions2container.NewWorkflowCommandStreams(o.GlobalContext, o.GetId(), drains)
 	for _, containerConfig := range conatinerConfigs {
-		containerConfig.Mounts = append(containerConfig.Mounts, contaminate.MountsFrom(ctx)...)
+		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
 		container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {
 			break

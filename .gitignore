@@ -12,3 +12,7 @@ __debug_bin
 .env
 bin/*
 !bin/.gitkeep
+
+# concourse/mock-resource
+privileged
+version

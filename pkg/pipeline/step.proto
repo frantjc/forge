@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package forge.pipeline;
-
-option go_package = "github.com/frantjc/forge";
-
-message Step {}

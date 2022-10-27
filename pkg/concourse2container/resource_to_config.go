@@ -14,6 +14,11 @@ func ResourceToConfig(resource *concourse.Resource, resourceType *concourse.Reso
 		Entrypoint: ResourceMethod(method).Entrypoint(),
 		Cmd:        []string{DefaultRootPath + "/" + resource.GetName()},
 		Privileged: resourceType.GetPrivileged(),
+		Mounts: []*forge.Mount{
+			{
+				Destination: DefaultRootPath + "/" + resource.GetName(),
+			},
+		},
 	}
 }
 

@@ -9,6 +9,11 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// NewFoundry returns a Foundry.
+func NewFoundry(containerRuntime ContainerRuntime, basin Basin) *Foundry {
+	return &Foundry{containerRuntime, basin}
+}
+
 // Foundry is a wrapper around a ContainerRuntime
 // and a Basin meant to process and cache Ores.
 type Foundry struct {
@@ -86,7 +91,7 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal,
 		stderr = io.MultiWriter(stderr, stderrCache)
 	}
 
-	lava, err := ore.Liquify(ctx, f, f, &Drains{
+	cast, err := ore.Liquify(ctx, f, f, &Drains{
 		Out: stdout,
 		Err: stderr,
 		Tty: drains.Tty,
@@ -96,7 +101,7 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal,
 	}
 
 	metal := &Metal{
-		ExitCode: lava.GetExitCode(),
+		ExitCode: cast.GetExitCode(),
 	}
 
 	if f.Basin != nil {
@@ -114,5 +119,5 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal,
 
 // GoString implements fmt.GoStringer.
 func (f *Foundry) GoString() string {
-	return "&Foundry{ContainerRuntime: " + f.ContainerRuntime.GoString() + ", Basin: " + f.Basin.GoString() + "}"
+	return fmt.Sprint("&Foundry{ContainerRuntime: ", f.ContainerRuntime, ", Basin: ", f.Basin, "}")
 }

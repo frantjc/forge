@@ -4,14 +4,13 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/pkg/fn"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-type RunsUsing string
-
 var (
-	Node12ImageReference = "docker.io/library/node:12"
-	Node16ImageReference = "docker.io/library/node:16"
+	Node12ImageReference = "docker.io/library/node:12" // -alpine"
+	Node16ImageReference = "docker.io/library/node:16" // -alpine"
 )
 
 func PullImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *actions.Metadata) (forge.Image, error) {
@@ -27,16 +26,16 @@ func MetadataToImageReference(actionMetadata *actions.Metadata) string {
 		return ""
 	}
 
-	return RunsUsing(actionMetadata.Runs.Using).ImageReference(actionMetadata.Runs.Image)
+	return RunsUsingImage(actionMetadata.Runs.Using, actionMetadata.Runs.Image)
 }
 
-func (r RunsUsing) ImageReference(image string) string {
-	switch r {
+func RunsUsingImage(runsUsing string, fallbacks ...string) string {
+	switch runsUsing {
 	case actions.RunsUsingNode12:
 		return Node12ImageReference
 	case actions.RunsUsingNode16:
 		return Node16ImageReference
 	}
 
-	return image
+	return fn.Coalesce(fallbacks...)
 }

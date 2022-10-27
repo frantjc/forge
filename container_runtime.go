@@ -1,13 +1,8 @@
 package forge
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
 type ContainerRuntime interface {
-	fmt.GoStringer
-
 	GetContainer(context.Context, string) (Container, error)
 	CreateContainer(context.Context, Image, *ContainerConfig) (Container, error)
 	PullImage(context.Context, string) (Image, error)

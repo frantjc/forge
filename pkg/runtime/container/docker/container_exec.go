@@ -70,7 +70,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 			errC <- err
 		}
 
-		close(outC)
+		go close(outC)
 	}()
 
 	inC := make(chan any, 1)
@@ -93,8 +93,10 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 				errC <- hjr.CloseWrite()
 			}
 
-			close(inC)
+			go close(inC)
 		}()
+	} else {
+		go close(inC)
 	}
 
 	select {
@@ -102,10 +104,12 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		if _, ok := err.(term.EscapeError); ok {
 			err = nil
 		}
-	case settled := <-changroup.AllSettled(ctx, inC, outC):
-		if settledErr := settled.Err(); settledErr != nil {
-			err = settledErr
-		}
+	case <-ctx.Done():
+		err = ctx.Err()
+	case <-changroup.AllSettled(inC, outC):
+	}
+	if err != nil {
+		return -1, err
 	}
 
 	cei, inspectErr := c.ContainerExecInspect(ctx, idr.ID)

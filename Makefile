@@ -2,6 +2,9 @@ GO = go
 GOLANGCI-LINT = golangci-lint
 BUF = buf
 
+build:
+	@$(GO) $@ -o ./bin ./cmd/4ge
+
 protos:
 	@$(BUF) format -w
 	@$(BUF) generate .
@@ -24,4 +27,4 @@ ven: vendor
 format: fmt
 	@$(BUF) format -w
 
-.PHONY: protos fmt generate test download tidy vendor lint proto buf gen dl td ven format
+.PHONY: build protos fmt generate test download tidy vendor lint proto buf gen dl td ven format

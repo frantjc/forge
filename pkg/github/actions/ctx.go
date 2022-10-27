@@ -6,9 +6,11 @@ import (
 	"net/url"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/pkg/envconv"
 	"github.com/frantjc/forge/pkg/fn"
 	"github.com/go-git/go-git/v5"
@@ -340,12 +342,16 @@ var (
 
 func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext, error) {
 	var (
+		_             = forge.LoggerFrom(ctx)
 		c             = NewGlobalContextFromEnv()
 		currentBranch = DefaultBranch
 		currentRemote = DefaultRemote
 	)
 
 	r, err := git.PlainOpen(path)
+	for ; err != nil && path != "/"; r, err = git.PlainOpen(path) {
+		path = filepath.Dir(path)
+	}
 	if err != nil {
 		return nil, err
 	}

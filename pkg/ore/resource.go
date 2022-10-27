@@ -10,13 +10,13 @@ import (
 )
 
 func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (*forge.Cast, error) {
-	image, err := concourse2container.PullImageForResourceType(ctx, containerRuntime, o.ResourceType)
+	image, err := concourse2container.PullImageForResourceType(ctx, containerRuntime, o.GetResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	containerConfig := concourse2container.ResourceToConfig(o.Resource, o.ResourceType, o.Method)
-	containerConfig.Mounts = append(containerConfig.Mounts, contaminate.MountsFrom(ctx)...)
+	containerConfig := concourse2container.ResourceToConfig(o.GetResource(), o.GetResourceType(), o.GetMethod())
+	containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
 
 	container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 	if err != nil {
