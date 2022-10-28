@@ -1,4 +1,4 @@
-package actions2container
+package fa
 
 import "github.com/frantjc/forge/pkg/github/actions"
 

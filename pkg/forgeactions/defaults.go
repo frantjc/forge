@@ -1,6 +1,9 @@
-package actions2container
+package fa
 
-import "github.com/frantjc/forge"
+import (
+	"github.com/adrg/xdg"
+	"github.com/frantjc/forge"
+)
 
 var (
 	DefaultMap = &Map{
@@ -12,6 +15,7 @@ var (
 		GitHubPathPath:            DefaultGitHubPathPath,
 		GitHubEnvPath:             DefaultGitHubEnvPath,
 		RunnerToolCacheVolumeName: DefaultRunnerToolCacheVolumeName,
+		ActionCache:               DefaultActionCache,
 	}
 )
 
@@ -19,8 +23,9 @@ const (
 	DefaultRootPath        = forge.WorkingDir
 	DefaultWorkspace       = DefaultRootPath + "/workspace"
 	DefaultActionPath      = DefaultRootPath + "/action"
-	DefaultRunnerTemp      = DefaultRootPath + "/runner/tmp"
-	DefaultRunnerToolCache = DefaultRootPath + "/runner/toolcache"
+	DefaultRunnerPath      = DefaultRootPath + "/runner"
+	DefaultRunnerTemp      = DefaultRunnerPath + "/tmp"
+	DefaultRunnerToolCache = DefaultRunnerPath + "/toolcache"
 	DefaultGitHubPath      = DefaultRootPath + "/github"
 	DefaultGitHubPathPath  = DefaultGitHubPath + "/path.txt"
 	DefaultGitHubEnvPath   = DefaultGitHubPath + "/env.txt"
@@ -28,4 +33,8 @@ const (
 
 const (
 	DefaultRunnerToolCacheVolumeName = "runner-cache"
+)
+
+var (
+	DefaultActionCache = xdg.CacheHome
 )

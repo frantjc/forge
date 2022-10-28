@@ -13,11 +13,11 @@ type Lava struct {
 	To   *Pure     `json:"to,omitempty"`
 }
 
-func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, basin forge.Basin, drains *forge.Drains) (lava *forge.Cast, err error) {
+func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (lava *forge.Cast, err error) {
 	var (
 		buf = new(bytes.Buffer)
 	)
-	lava, err = o.From.Liquify(ctx, containerRuntime, basin, &forge.Drains{
+	lava, err = o.From.Liquify(ctx, containerRuntime, &forge.Drains{
 		Out: buf,
 		Err: drains.Err,
 		Tty: drains.Tty,
@@ -26,7 +26,7 @@ func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		return
 	}
 
-	return o.To.Liquify(contaminate.WithInput(ctx, buf.Bytes()), containerRuntime, basin, drains)
+	return o.To.Liquify(contaminate.WithInput(ctx, buf.Bytes()), containerRuntime, drains)
 }
 
 func (o *Lava) GetFrom() forge.Ore {

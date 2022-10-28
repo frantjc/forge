@@ -8,5 +8,5 @@ import "context"
 // should be the same. Because of this, Ores can be cached,
 // using said Digest as the key.
 type Ore interface {
-	Liquify(context.Context, ContainerRuntime, Basin, *Drains) (*Cast, error)
+	Liquify(context.Context, ContainerRuntime, *Drains) (*Cast, error)
 }

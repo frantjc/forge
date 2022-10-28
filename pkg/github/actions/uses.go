@@ -1,65 +1,98 @@
 package actions
 
 import (
+	"context"
 	"fmt"
+	"io"
+	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/frantjc/forge"
 )
 
-type Uses struct {
-	Owner      string
-	Repository string
-	Path       string
-	Version    string
+func (u *Uses) IsLocal() bool {
+	return strings.HasPrefix(u.Path, "./") || filepath.IsAbs(u.Path) || len(strings.Split(u.Path, "/")) < 2
 }
 
-func (u *Uses) String() string {
-	s := u.FullRepository()
-	if u.Path != "" {
-		s = fmt.Sprintf("%s/%s", s, u.Path)
+func (u *Uses) IsRemote() bool {
+	return !u.IsLocal()
+}
+
+func (u *Uses) Uses() string {
+	return u.GetPath() + "@" + u.GetVersion()
+}
+
+func (u *Uses) Repository() string {
+	if u.IsRemote() {
+		return strings.Join(strings.Split(u.Path, "/")[0:2], "/")
 	}
-	if u.Version != "" {
-		s = fmt.Sprintf("%s@%s", s, u.Version)
-	}
-	return s
+
+	return ""
 }
 
 func (u *Uses) GoString() string {
-	return "&Uses{" + u.String() + "}"
+	return "&Uses{" + u.Uses() + "}"
 }
 
-// TODO regexp.
 func Parse(uses string) (*Uses, error) {
 	r := &Uses{}
 
-	spl1 := strings.Split(uses, "@")
-	switch len(spl1) {
+	spl := strings.Split(uses, "@")
+	switch len(spl) {
 	case 2:
-		r.Version = spl1[1]
+		r.Version = spl[1]
+		fallthrough
 	case 1:
+		r.Path = spl[0]
 	default:
-		return r, fmt.Errorf("unable to parse uses: '%s'", uses)
-	}
-
-	spl2 := strings.Split(spl1[0], "/")
-	switch len(spl2) {
-	case 0, 1:
-		return r, fmt.Errorf("unable to parse uses: '%s'", uses)
-	default:
-		r.Owner = spl2[0]
-		r.Repository = spl2[1]
-		if len(spl2) > 2 {
-			r.Path = filepath.Join(spl2[2:]...)
-		}
+		return r, fmt.Errorf("parse uses: '%s'", uses)
 	}
 
 	return r, nil
 }
 
-func (u *Uses) FullRepository() string {
-	return fmt.Sprintf("%s/%s", u.Owner, u.Repository)
+func (u *Uses) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + u.Uses() + "\""), nil
 }
 
-func (u *Uses) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + u.String() + "\""), nil
+func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
+	var (
+		_ = forge.LoggerFrom(ctx)
+		u = GetGitHubURL()
+	)
+
+	if uses.IsRemote() {
+		return CloneUses(ctx, uses, &CloneOpts{
+			GitHubURL: u,
+			Insecure:  u.Scheme != "https",
+			Path:      path.Clean(dir),
+		})
+	}
+
+	r, err := OpenDirectoryMetadata(filepath.Clean(uses.Path))
+	if err != nil {
+		return nil, err
+	}
+
+	return NewMetadataFromReader(r)
+}
+
+func OpenUsesMetadata(uses *Uses) (io.Reader, error) {
+	if uses.IsRemote() {
+		return nil, fmt.Errorf("open remote action: %s", uses.Path)
+	}
+
+	return OpenDirectoryMetadata(filepath.Clean(uses.Path))
+}
+
+func OpenDirectoryMetadata(dir string) (_ io.Reader, err error) {
+	for _, filename := range ActionYAMLFilenames {
+		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
+			return f, nil
+		}
+	}
+
+	return nil, err
 }

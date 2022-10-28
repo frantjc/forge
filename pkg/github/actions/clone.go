@@ -3,14 +3,26 @@ package actions
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
+	"strings"
 
+	"github.com/frantjc/forge"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-func Clone(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error) {
+var (
+	ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
+)
+
+func CloneUses(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error) {
+	_ = forge.LoggerFrom(ctx)
+
+	if u.IsLocal() {
+		return nil, fmt.Errorf("cloning local action: %s", u.Path)
+	}
+
 	if opts == nil {
 		opts = &CloneOpts{}
 	}
@@ -19,7 +31,7 @@ func Clone(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error) {
 	if cloneURL == nil {
 		cloneURL = DefaultURL
 	}
-	cloneURL.Path = u.FullRepository()
+	cloneURL.Path = u.Repository()
 
 	if opts.Path == "" {
 		opts.Path = "."
@@ -57,21 +69,13 @@ func Clone(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error) {
 		return nil, err
 	}
 
-	var f *object.File
-	f, err = commit.File(filepath.Join(u.Path, "action.yml"))
-	if errors.Is(err, object.ErrFileNotFound) {
-		f, err = commit.File(filepath.Join(u.Path, "action.yaml"))
-		if err != nil {
-			return nil, ErrNotAnAction
+	for _, filename := range ActionYAMLFilenames {
+		if f, err := commit.File(filepath.Join(strings.TrimPrefix(u.Path, u.Repository()), filename)); err == nil {
+			if m, err := f.Reader(); err == nil {
+				return NewMetadataFromReader(m)
+			}
 		}
-	} else if err != nil {
-		return nil, err
 	}
 
-	m, err := f.Reader()
-	if err != nil {
-		return nil, err
-	}
-
-	return NewMetadataFromReader(m)
+	return nil, err
 }

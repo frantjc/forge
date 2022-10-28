@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/url"
+	"os"
 	"path"
 )
 
@@ -50,4 +51,33 @@ func GraphQLURLFromBaseURL(base *url.URL) (*url.URL, error) {
 	}
 	graphql.Path = path.Join(graphql.Path, "graphql")
 	return graphql, nil
+}
+
+func GetGitHubURL() *url.URL {
+	envVar := os.Getenv(EnvVarServerURL)
+	if u, err := url.Parse(envVar); err == nil && envVar != "" {
+		return u
+	}
+
+	return DefaultURL
+}
+
+func GetGitHubServerURL() *url.URL {
+	return GetGitHubURL()
+}
+
+func GetGitHubAPIURL() *url.URL {
+	if u, err := url.Parse(os.Getenv(EnvVarAPIURL)); err == nil {
+		return u
+	}
+
+	return DefaultAPIURL
+}
+
+func GetGraphQLURL() *url.URL {
+	if u, err := url.Parse(os.Getenv(EnvVarGraphQLURL)); err == nil {
+		return u
+	}
+
+	return DefaultGraphQLURL
 }

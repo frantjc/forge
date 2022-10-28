@@ -1,7 +1,8 @@
-package actions2container
+package fa
 
 import (
 	"context"
+	"strings"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/pkg/fn"
@@ -26,7 +27,7 @@ func MetadataToImageReference(actionMetadata *actions.Metadata) string {
 		return ""
 	}
 
-	return RunsUsingImage(actionMetadata.Runs.Using, actionMetadata.Runs.Image)
+	return RunsUsingImage(actionMetadata.Runs.Using, strings.TrimPrefix(actionMetadata.Runs.Image, actions.RunsUsingDockerImagePrefix))
 }
 
 func RunsUsingImage(runsUsing string, fallbacks ...string) string {

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package forge.actions2container;
+package forge.fa;
 
-option go_package = "github.com/frantjc/forge/pkg/actions2container";
+option go_package = "github.com/frantjc/forge/pkg/fa";
 
 message Map {
   string action_path = 1;
@@ -13,4 +13,5 @@ message Map {
   string git_hub_path_path = 6;
   string git_hub_env_path = 7;
   string runner_tool_cache_volume_name = 8;
+  string action_cache = 9;
 }

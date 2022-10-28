@@ -74,7 +74,7 @@ func mainE() error {
 			return err
 		}
 
-		m, err := actions.Clone(ctx, parsed, &actions.CloneOpts{
+		m, err := actions.CloneUses(ctx, parsed, &actions.CloneOpts{
 			Path:     path,
 			Insecure: true,
 		})

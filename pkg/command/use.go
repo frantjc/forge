@@ -6,7 +6,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
-	"github.com/frantjc/forge/pkg/actions2container"
+	a2f "github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
@@ -41,10 +41,10 @@ func NewUse() *cobra.Command {
 					return
 				}
 
-				if _, err = forge.NewFoundry(docker.New(c), nil).Process(
+				if _, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, &forge.Mount{
 						Source:      wd,
-						Destination: actions2container.DefaultWorkspace,
+						Destination: a2f.DefaultWorkspace,
 					}),
 					&ore.Action{
 						Uses:          args[0],

@@ -1,4 +1,4 @@
-package concourse2container
+package fc
 
 import (
 	"github.com/frantjc/forge"

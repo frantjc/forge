@@ -1,4 +1,4 @@
-package actions2container
+package fa
 
 import (
 	"path/filepath"
@@ -17,31 +17,36 @@ func (m *Map) ActionToConfigs(globalContext *actions.GlobalContext, uses *action
 	var (
 		containerConfigs = []*forge.ContainerConfig{}
 	)
-	globalContext = ConfigureGlobalContext(globalContext)
+	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	if actionMetadata != nil {
 		if actionMetadata.Runs != nil {
+			usesDir, err := m.UsesToDirectory(uses)
+			if err != nil {
+				return nil, err
+			}
+
 			var (
 				entrypoint = []string{bin.ShimPath, "-e"}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.GetRuns().GetEnv())...)
 				cmd        = actionMetadata.GetRuns().GetArgs()
-				mounts     = []*forge.ContainerConfig_Mount{
+				mounts     = []*forge.Mount{
 					{
-						Source:      UsesToVolumeName(uses),
-						Destination: m.ActionPath,
+						Source:      usesDir,
+						Destination: m.GetActionPath(),
 					},
 					{
-						Destination: m.Workspace,
+						Destination: m.GetWorkspace(),
 					},
 					{
-						Source:      m.RunnerToolCacheVolumeName,
-						Destination: m.RunnerToolCache,
+						Source:      m.GetRunnerToolCacheVolumeName(),
+						Destination: m.GetRunnerToolCache(),
 					},
 					{
-						Destination: m.RunnerTemp,
+						Destination: m.GetRunnerTemp(),
 					},
 					{
-						Destination: m.GitHubPath,
+						Destination: m.GetGitHubPath(),
 					},
 				}
 				entrypoints []string
@@ -51,11 +56,11 @@ func (m *Map) ActionToConfigs(globalContext *actions.GlobalContext, uses *action
 			case actions.RunsUsingNode12, actions.RunsUsingNode16:
 				entrypoint = append(entrypoint, "node")
 				if pre := actionMetadata.GetRuns().GetPre(); pre != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, pre))
+					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), pre))
 				}
 
 				if main := actionMetadata.GetRuns().GetMain(); main != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, main))
+					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), main))
 				}
 			default:
 				entrypoints = append(entrypoints, actionMetadata.GetRuns().GetPreEntrypoint(), actionMetadata.GetRuns().GetEntrypoint())
@@ -76,7 +81,7 @@ func (m *Map) ActionToConfigs(globalContext *actions.GlobalContext, uses *action
 
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
-			env = append(env, actions.EnvVarPath+"="+m.GitHubPathPath, actions.EnvVarEnv+"="+m.GitHubEnvPath)
+			env = append(env, actions.EnvVarPath+"="+m.GetGitHubPathPath(), actions.EnvVarEnv+"="+m.GetGitHubEnvPath())
 
 			for _, s := range entrypoints {
 				if s != "" {
