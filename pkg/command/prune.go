@@ -12,7 +12,7 @@ func NewPrune() *cobra.Command {
 		cmd = &cobra.Command{
 			Use: "prune",
 			Run: func(cmd *cobra.Command, args []string) {
-				if err := os.RemoveAll(hfs.ActionCache); err != nil {
+				if err := os.RemoveAll(hfs.ActionsCache); err != nil {
 					cmd.PrintErrln(err)
 				}
 			},

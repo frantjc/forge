@@ -18,7 +18,7 @@ jobs:
       - run: make test
       - run: make build
       - name: 4ge use remote
-        run: ./bin/4ge use actions/setup-go@v3 -w go-version=1.18
+        run: ./bin/4ge use frantjc/forge/testdata/actions@main
       - name: 4ge use local
         run: ./bin/4ge use ./testdata/actions/mock
       - name: 4ge get resource
