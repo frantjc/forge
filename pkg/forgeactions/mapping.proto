@@ -4,7 +4,7 @@ package forge.fa;
 
 option go_package = "github.com/frantjc/forge/pkg/fa";
 
-message Map {
+message Mapping {
   string action_path = 1;
   string workspace = 2;
   string runner_tool_cache = 3;
@@ -12,6 +12,4 @@ message Map {
   string git_hub_path = 5;
   string git_hub_path_path = 6;
   string git_hub_env_path = 7;
-  string runner_tool_cache_volume_name = 8;
-  string action_cache = 9;
 }

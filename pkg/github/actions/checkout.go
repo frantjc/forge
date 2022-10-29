@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/frantjc/forge"
 	"github.com/go-git/go-git/v5"
@@ -16,22 +15,22 @@ var (
 	ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 )
 
-func CloneUses(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error) {
+func CheckoutUses(ctx context.Context, u *Uses, opts *CheckoutOpts) (*Metadata, error) {
 	_ = forge.LoggerFrom(ctx)
 
 	if u.IsLocal() {
-		return nil, fmt.Errorf("cloning local action: %s", u.Path)
+		return nil, fmt.Errorf("clone local action: %s", u.Path)
 	}
 
 	if opts == nil {
-		opts = &CloneOpts{}
+		opts = &CheckoutOpts{}
 	}
 
 	cloneURL := opts.GitHubURL
 	if cloneURL == nil {
 		cloneURL = DefaultURL
 	}
-	cloneURL.Path = u.Repository()
+	cloneURL.Path = u.GetRepository()
 
 	if opts.Path == "" {
 		opts.Path = "."
@@ -39,7 +38,7 @@ func CloneUses(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error)
 
 	clopts := &git.CloneOptions{
 		URL:               cloneURL.String(),
-		ReferenceName:     plumbing.NewTagReferenceName(u.Version),
+		ReferenceName:     plumbing.NewTagReferenceName(u.GetVersion()),
 		SingleBranch:      true,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 		InsecureSkipTLS:   opts.Insecure,
@@ -52,7 +51,7 @@ func CloneUses(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error)
 			return nil, err
 		}
 	} else if err != nil {
-		clopts.ReferenceName = plumbing.NewBranchReferenceName(u.Version)
+		clopts.ReferenceName = plumbing.NewBranchReferenceName(u.GetVersion())
 		repo, err = git.PlainCloneContext(ctx, opts.Path, false, clopts)
 		if err != nil {
 			return nil, err
@@ -70,7 +69,7 @@ func CloneUses(ctx context.Context, u *Uses, opts *CloneOpts) (*Metadata, error)
 	}
 
 	for _, filename := range ActionYAMLFilenames {
-		if f, err := commit.File(filepath.Join(strings.TrimPrefix(u.Path, u.Repository()), filename)); err == nil {
+		if f, err := commit.File(filepath.Join(u.GetActionPath(), filename)); err == nil {
 			if m, err := f.Reader(); err == nil {
 				return NewMetadataFromReader(m)
 			}

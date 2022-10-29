@@ -13,11 +13,11 @@ type Lava struct {
 	To   *Pure     `json:"to,omitempty"`
 }
 
-func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (lava *forge.Cast, err error) {
+func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
 	var (
 		buf = new(bytes.Buffer)
 	)
-	lava, err = o.From.Liquify(ctx, containerRuntime, &forge.Drains{
+	metal, err = o.From.Liquify(ctx, containerRuntime, &forge.Drains{
 		Out: buf,
 		Err: drains.Err,
 		Tty: drains.Tty,

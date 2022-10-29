@@ -2,7 +2,7 @@ package actions
 
 import "net/url"
 
-type CloneOpts struct {
+type CheckoutOpts struct {
 	Path      string
 	Insecure  bool
 	GitHubURL *url.URL

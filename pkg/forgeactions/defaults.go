@@ -1,26 +1,21 @@
 package fa
 
-import (
-	"github.com/adrg/xdg"
-	"github.com/frantjc/forge"
-)
+import cfs "github.com/frantjc/forge/internal/containerfs"
 
 var (
-	DefaultMap = &Map{
-		Workspace:                 DefaultWorkspace,
-		ActionPath:                DefaultActionPath,
-		RunnerTemp:                DefaultRunnerTemp,
-		RunnerToolCache:           DefaultRunnerToolCache,
-		GitHubPath:                DefaultGitHubPath,
-		GitHubPathPath:            DefaultGitHubPathPath,
-		GitHubEnvPath:             DefaultGitHubEnvPath,
-		RunnerToolCacheVolumeName: DefaultRunnerToolCacheVolumeName,
-		ActionCache:               DefaultActionCache,
+	DefaultMapping = &Mapping{
+		Workspace:       DefaultWorkspace,
+		ActionPath:      DefaultActionPath,
+		RunnerTemp:      DefaultRunnerTemp,
+		RunnerToolCache: DefaultRunnerToolCache,
+		GitHubPath:      DefaultGitHubPath,
+		GitHubPathPath:  DefaultGitHubPathPath,
+		GitHubEnvPath:   DefaultGitHubEnvPath,
 	}
 )
 
-const (
-	DefaultRootPath        = forge.WorkingDir
+var (
+	DefaultRootPath        = cfs.WorkingDir
 	DefaultWorkspace       = DefaultRootPath + "/workspace"
 	DefaultActionPath      = DefaultRootPath + "/action"
 	DefaultRunnerPath      = DefaultRootPath + "/runner"
@@ -29,12 +24,4 @@ const (
 	DefaultGitHubPath      = DefaultRootPath + "/github"
 	DefaultGitHubPathPath  = DefaultGitHubPath + "/path.txt"
 	DefaultGitHubEnvPath   = DefaultGitHubPath + "/env.txt"
-)
-
-const (
-	DefaultRunnerToolCacheVolumeName = "runner-cache"
-)
-
-var (
-	DefaultActionCache = xdg.CacheHome
 )

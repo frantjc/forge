@@ -5,28 +5,26 @@ import (
 	"github.com/frantjc/forge/pkg/concourse"
 )
 
-const (
-	DefaultRootPath = forge.WorkingDir
-)
-
 func ResourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string) *forge.ContainerConfig {
+	return DefaultMapping.ResourceToConfig(resource, resourceType, method)
+}
+
+func (m *Mapping) ResourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string) *forge.ContainerConfig {
 	return &forge.ContainerConfig{
-		Entrypoint: ResourceMethod(method).Entrypoint(),
-		Cmd:        []string{DefaultRootPath + "/" + resource.GetName()},
+		Entrypoint: GetEntrypoint(method),
+		Cmd:        []string{m.GetRootPath() + "/" + resource.GetName()},
 		Privileged: resourceType.GetPrivileged(),
 		Mounts: []*forge.Mount{
 			{
-				Destination: DefaultRootPath + "/" + resource.GetName(),
+				Destination: m.GetRootPath() + "/" + resource.GetName(),
 			},
 		},
 	}
 }
 
-type ResourceMethod string
-
 const (
-	ResourceMethodGet ResourceMethod = "get"
-	ResourceMethodPut ResourceMethod = "put"
+	MethodGet = concourse.MethodGet
+	MethodPut = concourse.MethodPut
 )
 
 const (
@@ -34,11 +32,11 @@ const (
 	EntrypointPut = "/opt/resource/out"
 )
 
-func (m ResourceMethod) Entrypoint() []string {
-	switch m {
-	case ResourceMethodGet:
+func GetEntrypoint(method string) []string {
+	switch method {
+	case MethodGet:
 		return []string{EntrypointGet}
-	case ResourceMethodPut:
+	case MethodPut:
 		return []string{EntrypointPut}
 	}
 

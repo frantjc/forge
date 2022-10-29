@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package forge;
-
-option go_package = "github.com/frantjc/forge";
-
-message Cast {
-  int64 exit_code = 1;
-}

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package forge.config;
-
-option go_package = "github.com/frantjc/forge/pkg/config";
-
-message Step {}

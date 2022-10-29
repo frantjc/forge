@@ -9,7 +9,7 @@ import (
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Cast, error) {
+func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
 	var (
 		_        = forge.LoggerFrom(ctx)
 		exitCode = -1
@@ -37,31 +37,28 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		ctx = actions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
-	conatinerConfigs, err := fa.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)
+	containerConfigs, err := fa.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)
 	if err != nil {
 		return nil, err
 	}
 
 	workflowCommandStreams := fa.NewWorkflowCommandStreams(o.GetGlobalContext(), o.GetId(), drains)
-	for _, containerConfig := range conatinerConfigs {
+	for _, containerConfig := range containerConfigs {
 		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.GetMounts()...)
 		container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {
-			break
+			return nil, err
 		}
 		defer container.Stop(ctx)   //nolint:errcheck
 		defer container.Remove(ctx) //nolint:errcheck
 
 		exitCode, err = container.Exec(ctx, containerConfig, workflowCommandStreams)
 		if err != nil {
-			break
+			return nil, err
 		}
 	}
-	if err != nil {
-		return nil, err
-	}
 
-	return &forge.Cast{
+	return &forge.Metal{
 		ExitCode: int64(exitCode),
 	}, nil
 }

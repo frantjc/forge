@@ -5,30 +5,30 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
-	"github.com/frantjc/forge/pkg/config"
 	fc "github.com/frantjc/forge/pkg/forgeconcourse"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
 )
 
 func processResource(ctx context.Context, method, name string, params, version map[string]string) error {
-	_ = forge.LoggerFrom(ctx)
+	var (
+		_      = forge.LoggerFrom(ctx)
+		config = &fc.Config{}
+	)
 
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
-	resources := &config.Resources{}
 	for _, filename := range []string{"forge.json"} {
-		filepath := path.Join(wd, filename)
-		if file, err := os.Open(filepath); err == nil {
-			if err = json.NewDecoder(file).Decode(resources); err == nil {
+		if file, err := os.Open(filepath.Join(wd, filename)); err == nil {
+			if err = json.NewDecoder(file).Decode(config); err == nil {
 				break
 			}
 		}
@@ -42,7 +42,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 		Version: version,
 		Params:  params,
 	}
-	for _, r := range resources.GetResources() {
+	for _, r := range config.GetResources() {
 		if r.GetName() == name {
 			o.Resource = r
 		}
@@ -51,7 +51,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 		return errors.New("resource not found: " + name)
 	}
 
-	for _, t := range resources.GetResourceTypes() {
+	for _, t := range config.GetResourceTypes() {
 		if t.GetName() == o.GetResource().GetType() {
 			o.ResourceType = t
 		}
@@ -68,7 +68,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 	_, err = forge.NewFoundry(docker.New(c)).Process(
 		contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      wd,
-			Destination: fc.DefaultRootPath + "/" + o.GetResource().GetName(),
+			Destination: filepath.Join(fc.DefaultRootPath, o.GetResource().GetName()),
 		}), o, forge.StdDrains(),
 	)
 	return err

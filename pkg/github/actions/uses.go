@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -20,41 +19,61 @@ func (u *Uses) IsRemote() bool {
 	return !u.IsLocal()
 }
 
-func (u *Uses) Uses() string {
-	return u.GetPath() + "@" + u.GetVersion()
+func (u *Uses) GetUses() string {
+	uses := u.GetPath()
+	if v := u.GetVersion(); v != "" {
+		uses = uses + "@" + v
+	}
+	return uses
 }
 
-func (u *Uses) Repository() string {
+func (u *Uses) GetRepository() string {
 	if u.IsRemote() {
-		return strings.Join(strings.Split(u.Path, "/")[0:2], "/")
+		return filepath.Join(strings.Split(u.GetPath(), "/")[0:2]...)
+	}
+
+	return ""
+}
+
+func (u *Uses) GetActionPath() string {
+	if u.IsRemote() {
+		elements := strings.Split(u.GetPath(), "/")
+		if len(elements) > 2 {
+			return filepath.Join(elements[2:]...)
+		}
 	}
 
 	return ""
 }
 
 func (u *Uses) GoString() string {
-	return "&Uses{" + u.Uses() + "}"
+	return "&Uses{" + u.GetUses() + "}"
 }
 
+// TODO regexp.
 func Parse(uses string) (*Uses, error) {
 	r := &Uses{}
 
-	spl := strings.Split(uses, "@")
-	switch len(spl) {
-	case 2:
-		r.Version = spl[1]
-		fallthrough
-	case 1:
-		r.Path = spl[0]
+	switch {
+	case strings.HasPrefix(uses, "/"):
+		r.Path = filepath.Clean(uses)
+	case strings.HasPrefix(uses, "./"), strings.HasPrefix(uses, "../"):
+		r.Path = "./" + filepath.Clean(uses)
 	default:
-		return r, fmt.Errorf("parse uses: '%s'", uses)
+		spl := strings.Split(uses, "@")
+		if len(spl) != 2 {
+			return nil, fmt.Errorf("parsing uses: not a path or a versioned reference: %s", uses)
+		}
+
+		r.Path = filepath.Clean(spl[0])
+		r.Version = spl[1]
 	}
 
 	return r, nil
 }
 
 func (u *Uses) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + u.Uses() + "\""), nil
+	return []byte("\"" + u.GetUses() + "\""), nil
 }
 
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
@@ -64,14 +83,14 @@ func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, er
 	)
 
 	if uses.IsRemote() {
-		return CloneUses(ctx, uses, &CloneOpts{
+		return CheckoutUses(ctx, uses, &CheckoutOpts{
 			GitHubURL: u,
 			Insecure:  u.Scheme != "https",
-			Path:      path.Clean(dir),
+			Path:      filepath.Clean(dir),
 		})
 	}
 
-	r, err := OpenDirectoryMetadata(filepath.Clean(uses.Path))
+	r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath()))
 	if err != nil {
 		return nil, err
 	}

@@ -5,10 +5,11 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
+	cfs "github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
-func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Cast, error) {
+func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
 	image, err := containerRuntime.PullImage(ctx, o.GetImage())
 	if err != nil {
 		return nil, err
@@ -18,7 +19,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		Entrypoint: o.GetEntrypoint(),
 		Cmd:        o.GetCmd(),
 		Env:        o.GetEnv(),
-		WorkingDir: forge.WorkingDir,
+		WorkingDir: cfs.WorkingDir,
 		Mounts:     contaminate.MountsFrom(ctx),
 	}
 
@@ -39,7 +40,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		return nil, err
 	}
 
-	return &forge.Cast{
+	return &forge.Metal{
 		ExitCode: int64(exitCode),
 	}, nil
 }

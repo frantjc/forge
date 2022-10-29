@@ -10,18 +10,19 @@ import (
 )
 
 func ActionToConfigs(globalContext *actions.GlobalContext, uses *actions.Uses, with, environment map[string]string, actionMetadata *actions.Metadata) ([]*forge.ContainerConfig, error) {
-	return DefaultMap.ActionToConfigs(globalContext, uses, with, environment, actionMetadata)
+	return DefaultMapping.ActionToConfigs(globalContext, uses, with, environment, actionMetadata)
 }
 
-func (m *Map) ActionToConfigs(globalContext *actions.GlobalContext, uses *actions.Uses, with, environment map[string]string, actionMetadata *actions.Metadata) ([]*forge.ContainerConfig, error) {
+func (m *Mapping) ActionToConfigs(globalContext *actions.GlobalContext, uses *actions.Uses, with, environment map[string]string, actionMetadata *actions.Metadata) ([]*forge.ContainerConfig, error) {
 	var (
+		_                = forge.NewLogger()
 		containerConfigs = []*forge.ContainerConfig{}
 	)
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	if actionMetadata != nil {
 		if actionMetadata.Runs != nil {
-			usesDir, err := m.UsesToDirectory(uses)
+			actionDir, err := m.UsesToActionDirectory(uses)
 			if err != nil {
 				return nil, err
 			}
@@ -32,14 +33,13 @@ func (m *Map) ActionToConfigs(globalContext *actions.GlobalContext, uses *action
 				cmd        = actionMetadata.GetRuns().GetArgs()
 				mounts     = []*forge.Mount{
 					{
-						Source:      usesDir,
+						Source:      actionDir,
 						Destination: m.GetActionPath(),
 					},
 					{
 						Destination: m.GetWorkspace(),
 					},
 					{
-						Source:      m.GetRunnerToolCacheVolumeName(),
 						Destination: m.GetRunnerToolCache(),
 					},
 					{

@@ -16,3 +16,7 @@ bin/*
 # concourse/mock-resource
 privileged
 version
+
+# shim
+internal/bin/shim*
+!internal/bin/shim

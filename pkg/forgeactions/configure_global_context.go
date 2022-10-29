@@ -3,10 +3,10 @@ package fa
 import "github.com/frantjc/forge/pkg/github/actions"
 
 func ConfigureGlobalContext(globalContext *actions.GlobalContext) *actions.GlobalContext {
-	return DefaultMap.ConfigureGlobalContext(globalContext)
+	return DefaultMapping.ConfigureGlobalContext(globalContext)
 }
 
-func (m *Map) ConfigureGlobalContext(globalContext *actions.GlobalContext) *actions.GlobalContext {
+func (m *Mapping) ConfigureGlobalContext(globalContext *actions.GlobalContext) *actions.GlobalContext {
 	if globalContext == nil {
 		globalContext = actions.NewGlobalContextFromEnv()
 	}

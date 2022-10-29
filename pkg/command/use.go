@@ -6,7 +6,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
-	a2f "github.com/frantjc/forge/pkg/forgeactions"
+	hfs "github.com/frantjc/forge/internal/hostfs"
+	fa "github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
@@ -41,11 +42,28 @@ func NewUse() *cobra.Command {
 					return
 				}
 
+				for _, dir := range []string{hfs.RunnerTmp, hfs.RunnerToolcache} {
+					if err = os.MkdirAll(dir, 0755); err != nil {
+						cmd.PrintErrln(err)
+						return
+					}
+				}
+
 				if _, err = forge.NewFoundry(docker.New(c)).Process(
-					contaminate.WithMounts(ctx, &forge.Mount{
-						Source:      wd,
-						Destination: a2f.DefaultWorkspace,
-					}),
+					contaminate.WithMounts(ctx, []*forge.Mount{
+						{
+							Source:      wd,
+							Destination: fa.DefaultWorkspace,
+						},
+						{
+							Source:      hfs.RunnerTmp,
+							Destination: fa.DefaultRunnerTemp,
+						},
+						{
+							Source:      hfs.RunnerToolcache,
+							Destination: fa.DefaultRunnerToolCache,
+						},
+					}...),
 					&ore.Action{
 						Uses:          args[0],
 						With:          with,

@@ -10,7 +10,7 @@ func NewFoundry(containerRuntime ContainerRuntime) *Foundry {
 	return &Foundry{containerRuntime}
 }
 
-// Foundry is a wrapper around a ContainerRuntime.
+// Foundry is a wrapper around a ContainerRuntime for processing Ores.
 type Foundry struct {
 	ContainerRuntime
 }
@@ -24,23 +24,10 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal,
 	}
 
 	var (
-		_      = LoggerFrom(ctx)
-		stdout = drains.Out
-		stderr = drains.Err
+		_ = LoggerFrom(ctx)
 	)
 
-	cast, err := ore.Liquify(ctx, f, &Drains{
-		Out: stdout,
-		Err: stderr,
-		Tty: drains.Tty,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &Metal{
-		ExitCode: cast.GetExitCode(),
-	}, nil
+	return ore.Liquify(ctx, f, drains)
 }
 
 // GoString implements fmt.GoStringer.

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
+	cfs "github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/google/uuid"
 )
@@ -13,7 +14,7 @@ type Alloy struct {
 	Ores []forge.Ore `json:"ores,omitempty"`
 }
 
-func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (lava *forge.Cast, err error) {
+func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
 	var (
 		volumeName = o.GetId()
 	)
@@ -28,15 +29,15 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	defer volume.Remove(ctx) //nolint:errcheck
 
 	for _, ore := range o.GetOres() {
-		if lava, err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
+		if metal, err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      volumeName,
-			Destination: forge.WorkingDir,
+			Destination: cfs.WorkingDir,
 		}), containerRuntime, drains); err != nil {
 			break
 		}
 	}
 
-	return lava, err
+	return metal, err
 }
 
 //nolint:revive // matching protobuf style

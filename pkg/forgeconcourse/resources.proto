@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package forge.config;
+package forge.fc;
 
 import "pkg/concourse/resource.proto";
 import "pkg/concourse/resource_type.proto";
 
-option go_package = "github.com/frantjc/forge/pkg/config";
+option go_package = "github.com/frantjc/forge/pkg/fc";
 
-message Resources {
+message Config {
   repeated forge.concourse.ResourceType resource_types = 1;
   repeated forge.concourse.Resource resources = 2;
 }

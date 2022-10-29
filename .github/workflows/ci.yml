@@ -1,3 +1,4 @@
+name: CI
 on:
   push:
     branches:
@@ -15,3 +16,12 @@ jobs:
           go-version: 1.18
       - run: make dl
       - run: make test
+      - run: make build
+      - name: 4ge use remote
+        run: ./bin/4ge use actions/setup-go@v3 -w go-version=1.18
+      - name: 4ge use local
+        run: ./bin/4ge use ./testdata/actions/mock
+      - name: 4ge get resource
+        run: ./bin/4ge get mock
+      - name: 4ge prune
+        run: ./bin/4ge prune

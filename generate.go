@@ -12,12 +12,12 @@ package forge
 
 //go:generate golangci-lint run --fix
 
+// tidy up
+//go:generate go mod tidy
+
 // build the shim binary which is often copied into containers
 // and used as their entrypoint
 //go:generate env GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o ./internal/bin/shim ./internal/cmd/shim
 
 // package up the shim binary so that copy times are as fast as possible
 //go:generate upx --ultra-brute ./internal/bin/shim
-
-// tidy up
-//go:generate go mod tidy

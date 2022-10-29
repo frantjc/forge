@@ -74,7 +74,7 @@ func mainE() error {
 			return err
 		}
 
-		m, err := actions.CloneUses(ctx, parsed, &actions.CloneOpts{
+		m, err := actions.CheckoutUses(ctx, parsed, &actions.CheckoutOpts{
 			Path:     path,
 			Insecure: true,
 		})

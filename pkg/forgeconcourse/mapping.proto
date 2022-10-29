@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package forge.fc;
+
+option go_package = "github.com/frantjc/forge/pkg/fc";
+
+message Mapping {
+  string root_path = 1;
+}
