@@ -16,6 +16,8 @@ func NewRoot() *cobra.Command {
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				cmd.SetContext(forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)))
 			},
+			SilenceErrors: true,
+			SilenceUsage:  true,
 		}
 	)
 

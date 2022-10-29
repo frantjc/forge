@@ -2,14 +2,11 @@ package forge
 
 import (
 	"context"
-	"fmt"
 	"io"
 )
 
 // Container represents a container created by a ContainerRuntime.
 type Container interface {
-	fmt.GoStringer
-
 	GetId() string
 
 	CopyTo(context.Context, string, io.Reader) error

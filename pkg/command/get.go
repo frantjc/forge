@@ -9,11 +9,8 @@ func NewGet() *cobra.Command {
 		cmd     = &cobra.Command{
 			Use:  "get",
 			Args: cobra.ExactArgs(1),
-			Run: func(cmd *cobra.Command, args []string) {
-				if err := processResource(cmd.Context(), cmd.Use, args[0], params, version); err != nil {
-					cmd.PrintErrln(err)
-					return
-				}
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return processResource(cmd.Context(), cmd.Use, args[0], params, version)
 			},
 		}
 	)

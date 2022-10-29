@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package forge;
+
+option go_package = "github.com/frantjc/forge";
+
+message Mount {
+  string source = 1;
+  string destination = 2;
+}

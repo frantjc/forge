@@ -10,5 +10,9 @@ import (
 )
 
 func main() {
-	os.Exit(errbubble.ExitCode(command.NewRoot().Execute()))
+	err := command.NewRoot().Execute()
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+	}
+	os.Exit(errbubble.ExitCode(err))
 }

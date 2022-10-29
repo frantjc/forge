@@ -21,35 +21,31 @@ func NewUse() *cobra.Command {
 		cmd  = &cobra.Command{
 			Use:  "use",
 			Args: cobra.ExactArgs(1),
-			Run: func(cmd *cobra.Command, args []string) {
+			RunE: func(cmd *cobra.Command, args []string) error {
 				ctx := cmd.Context()
 
 				wd, err := os.Getwd()
 				if err != nil {
-					cmd.PrintErrln(err)
-					return
+					return err
 				}
 
 				globalContext, err := actions.NewGlobalContextFromPath(ctx, wd)
 				if err != nil {
-					cmd.PrintErrln(err)
-					return
+					return err
 				}
 
 				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 				if err != nil {
-					cmd.PrintErrln(err)
-					return
+					return err
 				}
 
 				for _, dir := range []string{hfs.RunnerTmp, hfs.RunnerToolcache} {
 					if err = os.MkdirAll(dir, 0755); err != nil {
-						cmd.PrintErrln(err)
-						return
+						return err
 					}
 				}
 
-				if _, err = forge.NewFoundry(docker.New(c)).Process(
+				_, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, []*forge.Mount{
 						{
 							Source:      wd,
@@ -71,9 +67,8 @@ func NewUse() *cobra.Command {
 						GlobalContext: globalContext,
 					},
 					forge.StdDrains(),
-				); err != nil {
-					cmd.PrintErrln(err)
-				}
+				)
+				return err
 			},
 		}
 	)

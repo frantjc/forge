@@ -62,7 +62,7 @@ func Parse(uses string) (*Uses, error) {
 	default:
 		spl := strings.Split(uses, "@")
 		if len(spl) != 2 {
-			return nil, fmt.Errorf("parsing uses: not a path or a versioned reference: %s", uses)
+			return nil, fmt.Errorf("parse uses: not a path or a versioned reference: %s", uses)
 		}
 
 		r.Path = filepath.Clean(spl[0])

@@ -22,7 +22,7 @@ download tidy vendor:
 	@$(GO) mod $@
 
 lint:
-	@$(GOLANGCI-LINT) run
+	@$(GOLANGCI-LINT) run --fix
 
 proto: protos
 buf: proto
