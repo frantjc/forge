@@ -18,7 +18,7 @@ Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as
 
 That is to say, after running the above command, `go` should be installed to `${XDG_CACHE_HOME}/.forge/runner/toolcache`.
 
-You can also use local GitHub Actions, signified by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
+You can also use local GitHub Actions by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
 
 ```sh
 4ge use ./testdata/actions/mock
