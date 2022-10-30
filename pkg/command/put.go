@@ -16,7 +16,7 @@ func NewPut() *cobra.Command {
 	)
 
 	cmd.Flags().StringToStringVarP(&params, "param", "p", make(map[string]string), "params")
-	cmd.Flags().StringToStringVarP(&version, "version", "w", make(map[string]string), "version")
+	cmd.Flags().StringToStringVarP(&version, "version", "i", make(map[string]string), "version")
 
 	return cmd
 }
