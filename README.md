@@ -18,9 +18,15 @@ Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as
 
 That is to say, after running the above command, `go` should be installed to `${XDG_CACHE_HOME}/.forge/runner/toolcache`.
 
+You can also use local GitHub Actions, signified by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
+
+```sh
+4ge use ./testdata/actions/mock
+```
+
 ### Concourse Resources
 
-For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.json`](forge.json) file.
+For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.json`](forge.json).
 
 ```sh
 4ge get mock -w version=v0.0.0
