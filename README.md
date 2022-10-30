@@ -14,13 +14,19 @@ For GitHub Actions, Forge will try to source the GitHub Actions variables from t
 4ge use actions/setup-go@v3 -w go-version=1.19
 ```
 
-Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XGD Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
+Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
 
 That is to say, after running the above command, `go` should be installed to `${XDG_CACHE_HOME}/.forge/runner/toolcache`.
 
+You can also use local GitHub Actions, signified by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
+
+```sh
+4ge use ./testdata/actions/mock
+```
+
 ### Concourse Resources
 
-For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.json`](forge.json) file.
+For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.json`](forge.json).
 
 ```sh
 4ge get mock -i version=v0.0.0
