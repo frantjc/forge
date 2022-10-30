@@ -14,7 +14,7 @@ For GitHub Actions, Forge will try to source the GitHub Actions variables from t
 4ge use actions/setup-go@v3 -w go-version=1.19
 ```
 
-Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XGD Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
+Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
 
 That is to say, after running the above command, `go` should be installed to `${XDG_CACHE_HOME}/.forge/runner/toolcache`.
 
