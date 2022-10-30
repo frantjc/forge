@@ -24,7 +24,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: v${{ steps.get-semver.outputs.semver }}
           draft: true
-          prerelease: ${{ steps.get-semver.outputs.prerelease != "" }}
+          prerelease: ${{ steps.get-semver.outputs.prerelease != '' }}
     outputs:
       upload-url: ${{ steps.create-release.outputs.upload_url }}
       semver: ${{ steps.get-semver.outputs.semver }}
