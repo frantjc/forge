@@ -20,3 +20,5 @@ version
 # shim
 internal/bin/shim*
 !internal/bin/shim
+
+dist/
