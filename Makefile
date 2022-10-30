@@ -28,7 +28,7 @@ protos:
 fmt generate test:
 	@$(GO) $@ ./...
 
-download tidy vendor:
+download vendor:
 	@$(GO) mod $@
 
 lint:
@@ -38,9 +38,8 @@ proto: protos
 buf: proto
 gen: generate
 dl: download
-td: tidy
 ven: vendor
 format: fmt
 	@$(BUF) format -w
 
-.PHONY: install build protos fmt generate test download tidy vendor lint proto buf gen dl td ven format
+.PHONY: install build protos fmt generate test download vendor lint proto buf gen dl ven format

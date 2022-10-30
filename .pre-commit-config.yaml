@@ -5,7 +5,6 @@ repos:
       - id: go-fmt
       - id: golangci-lint
       - id: go-build
-      - id: go-mod-tidy
       - id: go-test
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
