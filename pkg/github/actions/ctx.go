@@ -307,7 +307,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 			Ref:             os.Getenv(EnvVarRef),
 			RefName:         os.Getenv(EnvVarRefName),
 			RefProtected:    refProtected,
-			RefType:         RefType(os.Getenv(EnvVarRefType)).String(),
+			RefType:         os.Getenv(EnvVarRefType),
 			Repository:      os.Getenv(EnvVarRepository),
 			RepositoryOwner: os.Getenv(EnvVarRepositoryOwner),
 			RunId:           os.Getenv(EnvVarRunID),
@@ -368,9 +368,9 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 
 		if ref.Name().IsBranch() {
 			currentBranch = ref.Name().Short()
-			c.GitHubContext.RefType = RefTypeBranch.String()
+			c.GitHubContext.RefType = RefTypeBranch
 		} else {
-			c.GitHubContext.RefType = RefTypeTag.String()
+			c.GitHubContext.RefType = RefTypeTag
 		}
 	}
 
@@ -404,7 +404,7 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 		currentRemote = branch.Remote
 		c.GitHubContext.RefName = branch.Name
 		c.GitHubContext.Ref = "refs/heads/" + branch.Name
-		c.GitHubContext.RefType = RefTypeBranch.String()
+		c.GitHubContext.RefType = RefTypeBranch
 	}
 
 	if remote, err := r.Remote(currentRemote); err == nil {

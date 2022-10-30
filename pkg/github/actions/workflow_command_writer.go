@@ -23,7 +23,7 @@ func (w *workflowCommandWriter) Write(p []byte) (int, error) {
 			a = []byte{'\n'}
 		}
 
-		if len(line) == 0 {
+		if len(line) == 0 || strings.HasPrefix(line, "##[add-matcher]") {
 		} else if c, err := ParseWorkflowCommandString(line); err == nil {
 			if b := w.callback(c); len(b) != 0 {
 				if _, err = w.w.Write(append(b, a...)); err != nil {

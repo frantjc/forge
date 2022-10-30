@@ -5,11 +5,21 @@ INSTALL = sudo install
 
 BIN = /usr/local/bin
 
+VERSION ?= 0.0.0
+PRERELEASE ?=
+
 install: build
 	@$(INSTALL) ./bin/4ge $(BIN)
 
 build:
-	@$(GO) $@ -o ./bin ./cmd/4ge
+	@$(GO) $@ \
+		-ldflags " \
+			-s -w \
+			-X github.com/frantjc/forge.Version=$(VERSION) \
+			-X github.com/frantjc/forge.Prerelease=$(PRERELEASE) \
+		" \
+		-o ./bin \
+		./cmd/4ge
 
 protos:
 	@$(BUF) format -w
