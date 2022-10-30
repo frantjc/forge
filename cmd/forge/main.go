@@ -25,7 +25,7 @@ func main() {
 		cancel()
 	}()
 
-	if err = command.NewRoot().ExecuteContext(ctx); err != nil {
+	if err = command.New().ExecuteContext(ctx); err != nil {
 		os.Stderr.WriteString(err.Error())
 	}
 

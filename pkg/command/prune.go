@@ -10,7 +10,8 @@ import (
 func NewPrune() *cobra.Command {
 	var (
 		cmd = &cobra.Command{
-			Use: "prune",
+			Use:   "prune",
+			Short: "Prune the Forge cache",
 			RunE: func(cmd *cobra.Command, args []string) error {
 				return os.RemoveAll(hfs.ActionsCache)
 			},

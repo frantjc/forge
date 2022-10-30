@@ -10,8 +10,6 @@ vendor/
 # dev
 __debug_bin
 .env
-bin/*
-!bin/.gitkeep
 
 # concourse/mock-resource
 privileged
@@ -21,4 +19,5 @@ version
 internal/bin/shim*
 !internal/bin/shim
 
+# goreleaser
 dist/

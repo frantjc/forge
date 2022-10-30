@@ -2,26 +2,23 @@ GO = go
 GOLANGCI-LINT = golangci-lint
 BUF = buf
 INSTALL = sudo install
+GORELEASER = goreleaser
 
 BIN = /usr/local/bin
 
 VERSION ?= 0.0.0
 PRERELEASE ?=
 
+GOOS = $(shell $(GO) env GOOS)
+GOARCH = $(shell $(GO) env GOARCH)
+
 .DEFAULT: install
 
 install: build
-	@$(INSTALL) ./bin/4ge $(BIN)
+	@$(INSTALL) ./dist/forge_$(GOOS)_$(GOARCH)/forge $(BIN)
 
 build:
-	@$(GO) $@ \
-		-ldflags " \
-			-s -w \
-			-X github.com/frantjc/forge.Version=$(VERSION) \
-			-X github.com/frantjc/forge.Prerelease=$(PRERELEASE) \
-		" \
-		-o ./bin \
-		./cmd/4ge
+	@$(GORELEASER) release --snapshot --rm-dist
 
 protos:
 	@$(BUF) format -w

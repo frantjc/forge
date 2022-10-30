@@ -7,8 +7,9 @@ func NewGet() *cobra.Command {
 		params  = map[string]string{}
 		version = map[string]string{}
 		cmd     = &cobra.Command{
-			Use:  "get",
-			Args: cobra.ExactArgs(1),
+			Use:   "get",
+			Short: "Get a Concourse Resource",
+			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				return processResource(cmd.Context(), cmd.Use, args[0], params, version)
 			},

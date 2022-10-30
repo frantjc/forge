@@ -16,12 +16,18 @@ jobs:
           go-version: 1.19
       - run: make dl
       - run: make test
-      - run: make build
-      - name: 4ge use remote
-        run: ./bin/4ge use frantjc/forge/testdata/actions/mock@main
-      - name: 4ge use local
-        run: ./bin/4ge use ./testdata/actions/mock
-      - name: 4ge get resource
-        run: ./bin/4ge get mock
-      - name: 4ge prune
-        run: ./bin/4ge prune
+      - uses: goreleaser/goreleaser-action@v3
+        with:
+          install-only: true
+      - run: make install
+        env:
+          INSTALL: install
+          BIN: ./
+      - name: forge use remote
+        run: ./forge use frantjc/forge/testdata/actions/mock@main
+      - name: forge use local
+        run: ./forge use ./testdata/actions/mock
+      - name: forge get resource
+        run: ./forge get mock
+      - name: forge prune
+        run: ./forge prune

@@ -7,8 +7,9 @@ func NewPut() *cobra.Command {
 		params  = map[string]string{}
 		version = map[string]string{}
 		cmd     = &cobra.Command{
-			Use:  "put",
-			Args: cobra.ExactArgs(1),
+			Use:   "put",
+			Short: "Put a Concourse Resource",
+			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				return processResource(cmd.Context(), cmd.Use, args[0], params, version)
 			},

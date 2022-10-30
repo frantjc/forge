@@ -19,8 +19,9 @@ func NewUse() *cobra.Command {
 		env  = map[string]string{}
 		with = map[string]string{}
 		cmd  = &cobra.Command{
-			Use:  "use",
-			Args: cobra.ExactArgs(1),
+			Use:   "use",
+			Short: "Use a GitHub Action",
+			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				ctx := cmd.Context()
 

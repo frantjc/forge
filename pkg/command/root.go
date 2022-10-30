@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRoot() *cobra.Command {
+func New() *cobra.Command {
 	var (
 		verbosity int
 		cmd       = &cobra.Command{
-			Use:     "4ge",
+			Use:     "forge",
 			Version: forge.Semver(),
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				cmd.SetContext(forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)))

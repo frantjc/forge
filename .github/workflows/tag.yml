@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 jobs:
-  create-release:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
