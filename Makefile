@@ -8,6 +8,8 @@ BIN = /usr/local/bin
 VERSION ?= 0.0.0
 PRERELEASE ?=
 
+.DEFAULT: install
+
 install: build
 	@$(INSTALL) ./bin/4ge $(BIN)
 
