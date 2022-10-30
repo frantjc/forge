@@ -30,7 +30,7 @@ protos:
 fmt generate test:
 	@$(GO) $@ ./...
 
-download vendor:
+download vendor verify:
 	@$(GO) mod $@
 
 lint:
