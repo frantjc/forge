@@ -3,6 +3,7 @@ GOLANGCI-LINT = golangci-lint
 BUF = buf
 INSTALL = sudo install
 GORELEASER = goreleaser
+UPX = upx
 
 BIN = /usr/local/bin
 
@@ -33,6 +34,10 @@ download vendor verify:
 lint:
 	@$(GOLANGCI-LINT) run --fix
 
+shim:
+	@GOOS=linux GOARCH=amd64 $(GO) build -ldflags "-s -w" -o ./internal/bin/shim ./internal/cmd/shim
+	@$(UPX) --ultra-brute ./internal/bin/shim
+
 proto: protos
 buf: proto
 gen: generate
@@ -42,4 +47,4 @@ ver: verify
 format: fmt
 	@$(BUF) format -w
 
-.PHONY: install build protos fmt generate test download vendor verify lint proto buf gen dl ven ver format
+.PHONY: install build protos fmt generate test download vendor verify lint shim proto buf gen dl ven ver format
