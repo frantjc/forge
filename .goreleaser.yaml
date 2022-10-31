@@ -9,8 +9,3 @@ builds:
       - darwin
     goarch:
       - amd64
-archives:
-  - replacements:
-      amd64: x86_64
-changelog:
-  sort: asc

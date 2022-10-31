@@ -15,7 +15,7 @@ GOARCH = $(shell $(GO) env GOARCH)
 .DEFAULT: install
 
 install: build
-	@$(INSTALL) ./dist/forge_$(GOOS)_$(GOARCH)/forge $(BIN)
+	@$(INSTALL) ./dist/forge_$(GOOS)_$(GOARCH)*/forge $(BIN)
 
 build:
 	@$(GORELEASER) release --snapshot --rm-dist
