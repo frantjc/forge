@@ -21,6 +21,8 @@ jobs:
           install-only: true
       - name: make install
         run: make install INSTALL=install BIN=$RUNNER_TOOL_CACHE
+      - name: path
+        run: echo $RUNNER_TOOL_CACHE >> $GITHUB_PATH
       - name: forge use remote
         run: forge use frantjc/forge/testdata/actions/mock@main
       - name: forge use local
