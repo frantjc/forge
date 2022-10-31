@@ -16,7 +16,7 @@ forge use actions/setup-go@v3 -w go-version=1.19
 
 Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
 
-That is to say, after running the above command, `go` should be installed to `${XDG_CACHE_HOME}/.forge/runner/toolcache`.
+That is to say, after running the above command, `go` should be installed to `$XDG_CACHE_HOME/.forge/runner/toolcache`.
 
 You can also use local GitHub Actions by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
 
