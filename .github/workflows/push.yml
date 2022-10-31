@@ -29,5 +29,5 @@ jobs:
       - name: forge use local
         run: forge use ./testdata/actions/mock
       - name: forge get resource
-        run: forge get mock
+        run: forge get mock -i version=v0.0.0
       - run: forge prune
