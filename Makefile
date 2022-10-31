@@ -38,7 +38,8 @@ buf: proto
 gen: generate
 dl: download
 ven: vendor
+ver: verify
 format: fmt
 	@$(BUF) format -w
 
-.PHONY: install build protos fmt generate test download vendor lint proto buf gen dl ven format
+.PHONY: install build protos fmt generate test download vendor verify lint proto buf gen dl ven ver format

@@ -14,6 +14,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.19
+          cache: true
       - run: make dl
       - run: make test
       - uses: goreleaser/goreleaser-action@v3
