@@ -1,4 +1,4 @@
-package hfs
+package hostfs
 
 import (
 	"path/filepath"

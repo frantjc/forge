@@ -1,14 +1,8 @@
 package actions
 
-type Arch string
-
 const (
-	ArchX86   Arch = "X86"
-	ArchX64   Arch = "X64"
-	ArchARM   Arch = "ARM"
-	ArchARM64 Arch = "ARM64"
+	ArchX86   = "X86"
+	ArchX64   = "X64"
+	ArchARM   = "ARM"
+	ArchARM64 = "ARM64"
 )
-
-func (a Arch) String() string {
-	return string(a)
-}

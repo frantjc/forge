@@ -1,4 +1,4 @@
-package fa
+package forgeactions
 
 import (
 	"path/filepath"

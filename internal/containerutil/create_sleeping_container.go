@@ -1,4 +1,4 @@
-package ore
+package containerutil
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package cfs
+package containerfs
 
 import (
 	"github.com/google/uuid"

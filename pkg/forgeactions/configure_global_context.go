@@ -1,4 +1,4 @@
-package fa
+package forgeactions
 
 import "github.com/frantjc/forge/pkg/github/actions"
 

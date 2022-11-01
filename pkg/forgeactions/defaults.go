@@ -1,6 +1,6 @@
-package fa
+package forgeactions
 
-import cfs "github.com/frantjc/forge/internal/containerfs"
+import "github.com/frantjc/forge/internal/containerfs"
 
 var (
 	DefaultMapping = &Mapping{
@@ -15,7 +15,7 @@ var (
 )
 
 var (
-	DefaultRootPath        = cfs.WorkingDir
+	DefaultRootPath        = containerfs.WorkingDir
 	DefaultWorkspace       = DefaultRootPath + "/workspace"
 	DefaultActionPath      = DefaultRootPath + "/action"
 	DefaultRunnerPath      = DefaultRootPath + "/runner"

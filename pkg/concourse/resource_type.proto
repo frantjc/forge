@@ -2,15 +2,12 @@ syntax = "proto3";
 
 package forge.concourse;
 
+import "pkg/concourse/source.proto";
+
 option go_package = "github.com/frantjc/forge/pkg/concourse";
 
 message ResourceType {
-  message Source {
-    string repository = 1;
-    string tag = 2;
-  }
-
   string name = 1;
-  Source source = 2;
+  forge.concourse.Source source = 2;
   bool privileged = 3;
 }

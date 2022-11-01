@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 	fa "github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
@@ -45,7 +46,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 	workflowCommandStreams := fa.NewWorkflowCommandStreams(o.GetGlobalContext(), o.GetId(), drains)
 	for _, containerConfig := range containerConfigs {
 		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.GetMounts()...)
-		container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
+		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {
 			return nil, err
 		}

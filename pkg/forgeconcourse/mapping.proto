@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package forge.fc;
+package forge.forgeconcourse;
 
-option go_package = "github.com/frantjc/forge/pkg/fc";
+option go_package = "github.com/frantjc/forge/pkg/forgeconcourse";
 
 message Mapping {
   string root_path = 1;

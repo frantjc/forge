@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package forge.fa;
+package forge.forgeactions;
 
-option go_package = "github.com/frantjc/forge/pkg/fa";
+option go_package = "github.com/frantjc/forge/pkg/forgeactions";
 
 message Mapping {
   string action_path = 1;

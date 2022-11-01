@@ -6,8 +6,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
-	hfs "github.com/frantjc/forge/internal/hostfs"
-	fa "github.com/frantjc/forge/pkg/forgeactions"
+	"github.com/frantjc/forge/internal/hostfs"
+	"github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
@@ -40,7 +40,7 @@ func NewUse() *cobra.Command {
 					return err
 				}
 
-				for _, dir := range []string{hfs.RunnerTmp, hfs.RunnerToolcache} {
+				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolcache} {
 					if err = os.MkdirAll(dir, 0755); err != nil {
 						return err
 					}
@@ -50,15 +50,15 @@ func NewUse() *cobra.Command {
 					contaminate.WithMounts(ctx, []*forge.Mount{
 						{
 							Source:      wd,
-							Destination: fa.DefaultWorkspace,
+							Destination: forgeactions.DefaultWorkspace,
 						},
 						{
-							Source:      hfs.RunnerTmp,
-							Destination: fa.DefaultRunnerTemp,
+							Source:      hostfs.RunnerTmp,
+							Destination: forgeactions.DefaultRunnerTemp,
 						},
 						{
-							Source:      hfs.RunnerToolcache,
-							Destination: fa.DefaultRunnerToolCache,
+							Source:      hostfs.RunnerToolcache,
+							Destination: forgeactions.DefaultRunnerToolCache,
 						},
 					}...),
 					&ore.Action{

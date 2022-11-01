@@ -1,26 +1,17 @@
 package errbubble
 
-type Bubble struct {
-	error
-	exitCode, httpStatusCode int
+type ExitCoder interface {
+	ExitCode() int
 }
 
-func (b *Bubble) ExitCode() int {
-	return b.exitCode
+func ExitCode(err error) int {
+	return New(err).ExitCode()
 }
 
-func (b *Bubble) HTTPStatusCode() int {
-	return b.httpStatusCode
+type HTTPStatusCoder interface {
+	HTTPStatusCode() int
 }
 
-func New(err error, exitCode, statusCode int) error {
-	return &Bubble{err, exitCode, statusCode}
-}
-
-func NewExitCode(err error, exitCode int) error {
-	return New(err, exitCode, 0)
-}
-
-func NewHTTPStatusCode(err error, statusCode int) error {
-	return New(err, 0, statusCode)
+func HTTPStatusCode(err error) int {
+	return New(err).HTTPStatusCode()
 }

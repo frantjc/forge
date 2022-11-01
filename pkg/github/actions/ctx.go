@@ -257,12 +257,12 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		serverURL = DefaultURL
 	}
 
-	runnerOS := OS(os.Getenv(EnvVarRunnerOS))
+	runnerOS := os.Getenv(EnvVarRunnerOS)
 	if runnerOS == "" {
 		runnerOS = OSLinux
 	}
 
-	runnerArch := Arch(os.Getenv(EnvVarRunnerArch))
+	runnerArch := os.Getenv(EnvVarRunnerArch)
 	if runnerArch == "" {
 		runnerArch = ArchX86
 	}
@@ -324,8 +324,8 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		StepsContext: make(map[string]*StepContext),
 		RunnerContext: &RunnerContext{
 			Name:      runnerName,
-			Os:        runnerOS.String(),
-			Arch:      runnerArch.String(),
+			Os:        runnerOS,
+			Arch:      runnerArch,
 			Temp:      runnerTemp,
 			ToolCache: runnerToolCache,
 		},
@@ -335,7 +335,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 	}
 }
 
-var (
+const (
 	DefaultBranch = "main"
 	DefaultRemote = "origin"
 )
@@ -409,8 +409,7 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 
 	if remote, err := r.Remote(currentRemote); err == nil {
 		for _, u := range remote.Config().URLs {
-			_, err := url.Parse(u)
-			if err == nil {
+			if _, err := url.Parse(u); err == nil {
 				// TODO override default github urls
 				break
 			}
@@ -459,7 +458,7 @@ func (c *GlobalContext) envMap() map[string]string {
 	}
 
 	if c.EnvContext != nil {
-		for k, v := range c.EnvContext {
+		for k, v := range c.GetEnvContext() {
 			env[k] = v
 		}
 	}

@@ -19,6 +19,7 @@ func TestMapFromArr(t *testing.T) {
 	for k, v := range actual {
 		if expected[k] != v {
 			t.Error("key", k, "actual value", v, "does not equal expected value", expected[k])
+			t.FailNow()
 		}
 	}
 }

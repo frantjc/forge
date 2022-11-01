@@ -6,6 +6,7 @@ import (
 
 	"github.com/frantjc/forge"
 	cfs "github.com/frantjc/forge/internal/containerfs"
+	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
@@ -23,7 +24,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		Mounts:     contaminate.MountsFrom(ctx),
 	}
 
-	container, err := CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
+	container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 	if err != nil {
 		return nil, err
 	}

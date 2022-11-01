@@ -5,7 +5,7 @@ import "strings"
 type ExpandFunc func(string) string
 
 type Expander struct {
-	ExpandFunc ExpandFunc
+	ExpandFunc
 }
 
 func NewExpander(f ExpandFunc) *Expander {

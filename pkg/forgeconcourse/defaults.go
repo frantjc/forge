@@ -1,6 +1,6 @@
-package fc
+package forgeconcourse
 
-import cfs "github.com/frantjc/forge/internal/containerfs"
+import "github.com/frantjc/forge/internal/containerfs"
 
 var (
 	DefaultMapping = &Mapping{
@@ -9,5 +9,5 @@ var (
 )
 
 var (
-	DefaultRootPath = cfs.WorkingDir
+	DefaultRootPath = containerfs.WorkingDir
 )

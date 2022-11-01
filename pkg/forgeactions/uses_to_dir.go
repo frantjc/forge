@@ -1,9 +1,9 @@
-package fa
+package forgeactions
 
 import (
 	"path/filepath"
 
-	hfs "github.com/frantjc/forge/internal/hostfs"
+	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
@@ -16,7 +16,7 @@ func (m *Mapping) UsesToRootDirectory(uses *actions.Uses) (string, error) {
 		return filepath.Abs(uses.GetPath())
 	}
 
-	return filepath.Join(hfs.ActionCache, uses.GetRepository(), uses.GetVersion()), nil
+	return filepath.Join(hostfs.ActionCache, uses.GetRepository(), uses.GetVersion()), nil
 }
 
 func UsesToActionDirectory(uses *actions.Uses) (string, error) {
@@ -28,5 +28,5 @@ func (m *Mapping) UsesToActionDirectory(uses *actions.Uses) (string, error) {
 		return m.UsesToRootDirectory(uses)
 	}
 
-	return filepath.Join(hfs.ActionCache, uses.GetRepository(), uses.GetVersion(), uses.GetActionPath()), nil
+	return filepath.Join(hostfs.ActionCache, uses.GetRepository(), uses.GetVersion(), uses.GetActionPath()), nil
 }
