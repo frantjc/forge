@@ -43,7 +43,7 @@ var (
 func newShimImage() (*native.Image, error) {
 	shimLayer, err := tarball.LayerFromOpener(func() (io.ReadCloser, error) {
 		return io.NopCloser(NewShimTarArchive()), nil
-	}, tarball.WithCompressionLevel(TarArchiveCompression))
+	}, tarball.WithCompressionLevel(TarArchiveCompression), tarball.WithCompressedCaching)
 	if err != nil {
 		return nil, err
 	}
