@@ -6,7 +6,7 @@ import (
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
-	fa "github.com/frantjc/forge/pkg/forgeactions"
+	"github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
@@ -21,12 +21,12 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return nil, err
 	}
 
-	actionMetadata, err := fa.GetUsesMetadata(ctx, uses)
+	actionMetadata, err := forgeactions.GetUsesMetadata(ctx, uses)
 	if err != nil {
 		return nil, err
 	}
 
-	image, err := fa.PullImageForMetadata(ctx, containerRuntime, actionMetadata)
+	image, err := forgeactions.PullImageForMetadata(ctx, containerRuntime, actionMetadata)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +38,12 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		ctx = actions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
-	containerConfigs, err := fa.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)
+	containerConfigs, err := forgeactions.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)
 	if err != nil {
 		return nil, err
 	}
 
-	workflowCommandStreams := fa.NewWorkflowCommandStreams(o.GetGlobalContext(), o.GetId(), drains)
+	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(o.GetGlobalContext(), o.GetId(), drains)
 	for _, containerConfig := range containerConfigs {
 		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.GetMounts()...)
 		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)

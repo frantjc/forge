@@ -7,16 +7,17 @@ import (
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/pkg/concourse"
-	fc "github.com/frantjc/forge/pkg/forgeconcourse"
+	"github.com/frantjc/forge/pkg/fn"
+	"github.com/frantjc/forge/pkg/forgeconcourse"
 )
 
 func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
-	image, err := fc.PullImageForResourceType(ctx, containerRuntime, o.GetResourceType())
+	image, err := forgeconcourse.PullImageForResourceType(ctx, containerRuntime, o.GetResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	containerConfig := fc.ResourceToConfig(o.GetResource(), o.GetResourceType(), o.GetMethod())
+	containerConfig := forgeconcourse.ResourceToConfig(o.GetResource(), o.GetResourceType(), o.GetMethod())
 	containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.GetMounts()...)
 
 	container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
@@ -26,10 +27,16 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
-	exitCode, err := container.Exec(ctx, containerConfig, fc.NewStreams(drains, &concourse.Input{
-		Params:  o.GetParams(),
-		Source:  o.GetResource().GetSource(),
-		Version: o.GetVersion(),
+	exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(drains, &concourse.Input{
+		Params: fn.Ternary(
+			o.GetMethod() == forgeconcourse.MethodCheck,
+			nil, o.GetParams(),
+		),
+		Source: o.GetResource().GetSource(),
+		Version: fn.Ternary(
+			o.GetMethod() == forgeconcourse.MethodPut,
+			nil, o.GetVersion(),
+		),
 	}))
 	if err != nil {
 		return nil, err

@@ -23,13 +23,15 @@ func (m *Mapping) ResourceToConfig(resource *concourse.Resource, resourceType *c
 }
 
 const (
-	MethodGet = concourse.MethodGet
-	MethodPut = concourse.MethodPut
+	MethodGet   = concourse.MethodGet
+	MethodPut   = concourse.MethodPut
+	MethodCheck = concourse.MethodCheck
 )
 
 const (
-	EntrypointGet = "/opt/resource/in"
-	EntrypointPut = "/opt/resource/out"
+	EntrypointGet   = "/opt/resource/in"
+	EntrypointPut   = "/opt/resource/out"
+	EntrypointCheck = "/opt/resource/check"
 )
 
 func GetEntrypoint(method string) []string {
@@ -38,6 +40,8 @@ func GetEntrypoint(method string) []string {
 		return []string{EntrypointGet}
 	case MethodPut:
 		return []string{EntrypointPut}
+	case MethodCheck:
+		return []string{EntrypointCheck}
 	}
 
 	return nil

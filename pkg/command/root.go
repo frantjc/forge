@@ -23,7 +23,7 @@ func New() *cobra.Command {
 
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbosity")
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
-	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewPrune())
+	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewPrune())
 
 	return cmd
 }

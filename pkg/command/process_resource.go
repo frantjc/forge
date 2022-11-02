@@ -10,7 +10,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
-	fc "github.com/frantjc/forge/pkg/forgeconcourse"
+	"github.com/frantjc/forge/pkg/forgeconcourse"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/container/docker"
 )
@@ -18,7 +18,7 @@ import (
 func processResource(ctx context.Context, method, name string, params, version map[string]string) error {
 	var (
 		_      = forge.LoggerFrom(ctx)
-		config = &fc.Config{}
+		config = &forgeconcourse.Config{}
 	)
 
 	wd, err := os.Getwd()
@@ -68,7 +68,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 	_, err = forge.NewFoundry(docker.New(c)).Process(
 		contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      wd,
-			Destination: filepath.Join(fc.DefaultRootPath, o.GetResource().GetName()),
+			Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.GetResource().GetName()),
 		}), o, forge.StdDrains(),
 	)
 	return err

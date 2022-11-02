@@ -1,6 +1,7 @@
 package concourse
 
 const (
-	MethodGet = "get"
-	MethodPut = "put"
+	MethodGet   = "get"
+	MethodPut   = "put"
+	MethodCheck = "check"
 )
