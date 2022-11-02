@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -48,7 +48,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 		}
 	}
 	if o.GetResource() == nil {
-		return errors.New("resource not found: " + name)
+		return fmt.Errorf("resource not found: %s", name)
 	}
 
 	for _, t := range config.GetResourceTypes() {
@@ -57,7 +57,7 @@ func processResource(ctx context.Context, method, name string, params, version m
 		}
 	}
 	if o.GetResourceType() == nil {
-		return errors.New("resource type not found: " + o.GetResource().GetType())
+		return fmt.Errorf("resource type not found: %s", o.GetResource().GetType())
 	}
 
 	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
