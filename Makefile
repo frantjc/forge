@@ -13,6 +13,8 @@ PRERELEASE ?=
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
+-include docs/docs.mk
+
 .DEFAULT: install
 
 install: build
