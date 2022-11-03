@@ -9,3 +9,24 @@ builds:
       - darwin
     goarch:
       - amd64
+changelog:
+  use: github
+  filters:
+    exclude:
+      - merge conflict
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+brews:
+  - tap:
+      owner: frantjc
+      name: homebrew-tap
+    folder: forge
+    skip_upload: auto
+    homepage:  https://github.com/frantjc/forge
+    description: Easily run reusable steps from proprietary CI systems
+    license: MIT
+    test: |
+      system "#{bin}/forge --version"
+    dependencies:
+      - name: git
