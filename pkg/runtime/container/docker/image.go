@@ -1,4 +1,4 @@
-package native
+package docker
 
 import (
 	"compress/gzip"
