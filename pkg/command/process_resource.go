@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,20 +13,19 @@ import (
 	"github.com/frantjc/forge/pkg/forgeconcourse"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/docker"
-	"gopkg.in/yaml.v3"
 )
 
 func processResource(ctx context.Context, method, name string, params, version map[string]string) error {
 	var (
-		logr   = forge.LoggerFrom(ctx)
+		_      = forge.LoggerFrom(ctx)
 		config = &forgeconcourse.Config{}
 		wd     = WorkdirFrom(ctx)
 		err    error
 	)
 
-	for _, filename := range []string{"forge.yml", "forge.yaml", "forge.json"} {
+	for _, filename := range []string{"forge.json"} {
 		if file, err := os.Open(filepath.Join(wd, filename)); err == nil {
-			if err = yaml.NewDecoder(file).Decode(config); err == nil {
+			if err = json.NewDecoder(file).Decode(config); err == nil {
 				break
 			}
 		}
@@ -33,8 +33,6 @@ func processResource(ctx context.Context, method, name string, params, version m
 	if err != nil {
 		return err
 	}
-
-	logr.Info("config", "go", config)
 
 	o := &ore.Resource{
 		Method:  method,
