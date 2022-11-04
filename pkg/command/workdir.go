@@ -12,7 +12,7 @@ func WithWorkdir(ctx context.Context, workdir string) context.Context {
 }
 
 func WorkdirFrom(ctx context.Context) string {
-	if wd, ok := ctx.Value(workdirKey{}).(string); ok {
+	if wd, ok := ctx.Value(workdirKey{}).(string); ok && wd != "" {
 		return wd
 	}
 
