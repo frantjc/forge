@@ -10,7 +10,7 @@ import (
 	"github.com/frantjc/forge/pkg/forgeactions"
 	"github.com/frantjc/forge/pkg/github/actions"
 	"github.com/frantjc/forge/pkg/ore"
-	"github.com/frantjc/forge/pkg/runtime/container/docker"
+	"github.com/frantjc/forge/pkg/runtime/docker"
 	"github.com/spf13/cobra"
 )
 
@@ -23,12 +23,10 @@ func NewUse() *cobra.Command {
 			Short: "Use a GitHub Action",
 			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := cmd.Context()
-
-				wd, err := os.Getwd()
-				if err != nil {
-					return err
-				}
+				var (
+					ctx = cmd.Context()
+					wd  = WorkdirFrom(ctx)
+				)
 
 				globalContext, err := actions.NewGlobalContextFromPath(ctx, wd)
 				if err != nil {

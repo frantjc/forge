@@ -15,15 +15,15 @@ func (m *Mapping) ConfigureGlobalContext(globalContext *actions.GlobalContext) *
 		globalContext.GitHubContext = &actions.GitHubContext{}
 	}
 
-	globalContext.GitHubContext.Workspace = m.Workspace
-	globalContext.GitHubContext.ActionPath = m.ActionPath
+	globalContext.GitHubContext.Workspace = m.GetWorkspace()
+	globalContext.GitHubContext.ActionPath = m.GetActionPath()
 
 	if globalContext.RunnerContext == nil {
 		globalContext.RunnerContext = &actions.RunnerContext{}
 	}
 
-	globalContext.RunnerContext.Temp = m.RunnerTemp
-	globalContext.RunnerContext.ToolCache = m.RunnerToolCache
+	globalContext.RunnerContext.Temp = m.GetRunnerTemp()
+	globalContext.RunnerContext.ToolCache = m.GetRunnerToolCache()
 
 	return globalContext
 }

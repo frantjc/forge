@@ -4,7 +4,7 @@ import (
 	"context"
 	"os/exec"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
@@ -55,7 +55,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		containerConfig.Env = append(containerConfig.Env, "DOCKER_HOST=/var/run/docker.sock")
 	}
 
-	if runtime.GOOS == "linux" {
+	if goruntime.GOOS == "linux" {
 		if docker, err := exec.LookPath("docker"); err == nil {
 			hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 				Source: docker,
