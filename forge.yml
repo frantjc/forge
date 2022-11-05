@@ -7,4 +7,4 @@ resources:
   - name: mock
     type: mock
     source:
-        log: true
+      log: true
