@@ -29,9 +29,10 @@ func New() *cobra.Command {
 		}
 	)
 
+	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
 	cmd.PersistentFlags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
-	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
+	_ = cmd.MarkFlagDirname("workdir")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewPrune())
 
 	return cmd

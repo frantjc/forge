@@ -40,6 +40,9 @@ shim:
 	@GOOS=linux GOARCH=amd64 $(GO) build -ldflags "-s -w" -o ./internal/bin/shim ./internal/cmd/shim
 	@$(UPX) --ultra-brute ./internal/bin/shim
 
+clean:
+	@rm -rf dist/ privileged version
+
 proto: protos
 buf: proto
 gen: generate
@@ -49,4 +52,4 @@ ver: verify
 format: fmt
 	@$(BUF) format -w
 
-.PHONY: install build protos fmt generate test download vendor verify lint shim proto buf gen dl ven ver format
+.PHONY: install build protos fmt generate test download vendor verify lint shim clean proto buf gen dl ven ver format

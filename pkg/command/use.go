@@ -16,12 +16,13 @@ import (
 
 func NewUse() *cobra.Command {
 	var (
-		env  = map[string]string{}
-		with = map[string]string{}
-		cmd  = &cobra.Command{
-			Use:   "use",
-			Short: "Use a GitHub Action",
-			Args:  cobra.ExactArgs(1),
+		env, with map[string]string
+		cmd       = &cobra.Command{
+			Use:           "use",
+			Short:         "Use a GitHub Action",
+			Args:          cobra.ExactArgs(1),
+			SilenceErrors: true,
+			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx = cmd.Context()
@@ -72,8 +73,8 @@ func NewUse() *cobra.Command {
 		}
 	)
 
-	cmd.Flags().StringToStringVarP(&with, "env", "e", make(map[string]string), "env values")
-	cmd.Flags().StringToStringVarP(&with, "with", "w", make(map[string]string), "with values")
+	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
+	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 
 	return cmd
 }

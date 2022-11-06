@@ -26,7 +26,7 @@ func main() {
 	}()
 
 	if err = command.New().ExecuteContext(ctx); err != nil {
-		os.Stderr.WriteString(err.Error())
+		os.Stderr.WriteString(err.Error() + "\n")
 	}
 
 	os.Exit(errbubble.ExitCode(err))
