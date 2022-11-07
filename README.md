@@ -38,7 +38,7 @@ forge use ./testdata/actions/mock
 
 ### Concourse Resources
 
-For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml).
+For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`).
 
 ```sh
 forge get mock -i version=v0.0.0
