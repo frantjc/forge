@@ -1,7 +1,6 @@
 package command
 
 import (
-	"os"
 	"runtime"
 
 	"github.com/frantjc/forge"
@@ -12,7 +11,6 @@ func New() *cobra.Command {
 	var (
 		workdir   string
 		verbosity int
-		wd, _     = os.Getwd()
 		cmd       = &cobra.Command{
 			Use:     "forge",
 			Version: forge.Semver(),
@@ -31,7 +29,7 @@ func New() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
-	cmd.PersistentFlags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
+	cmd.PersistentFlags().StringVarP(&workdir, "workdir", "d", "", "working directory for forge")
 	_ = cmd.MarkFlagDirname("workdir")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewPrune())
 
