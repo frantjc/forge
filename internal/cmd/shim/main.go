@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/frantjc/forge/pkg/envconv"
+	"github.com/frantjc/forge/pkg/errbubble"
 	"github.com/frantjc/forge/pkg/fn"
 	"github.com/frantjc/forge/pkg/github/actions"
 )
@@ -19,9 +19,8 @@ import (
 var (
 	errHelp = errors.New("help")
 	help    = fmt.Sprintf(`
-%s [-c|-s|-e|-h] [args]
+%s [-s|-e|-h] [args]
 
-  -c   clone the given GitHub Action to the given path (default ".")
   -s   sleep
   -e   execute the given command after sourcing $GITHUB_PATH and $GITHUB_ENV
   -h   help
@@ -30,22 +29,26 @@ var (
 )
 
 func main() {
-	if err := mainE(); err != nil {
+	var (
+		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+		err       error
+	)
+
+	if err := mainE(ctx); err != nil {
 		if errors.Is(err, errHelp) {
 			os.Stderr.WriteString(help)
-			os.Exit(0)
+			err = nil
+		} else {
+			os.Stderr.WriteString(err.Error() + "\n")
 		}
-
-		os.Stderr.WriteString(err.Error())
-		os.Exit(1)
 	}
 
-	os.Exit(0)
+	stop()
+	os.Exit(errbubble.ExitCode(err))
 }
 
-func mainE() error {
+func mainE(ctx context.Context) error {
 	var (
-		ctx  = context.Background()
 		args = os.Args
 	)
 
@@ -54,44 +57,11 @@ func mainE() error {
 	}
 
 	switch args[1] {
-	// clone
-	case "-c":
-		if len(args) < 3 {
-			return errHelp
-		}
-
-		var (
-			usesStr = args[2]
-			path    = "."
-		)
-
-		if len(args) > 3 {
-			path = args[3]
-		}
-
-		parsed, err := actions.Parse(usesStr)
-		if err != nil {
-			return err
-		}
-
-		m, err := actions.CheckoutUses(ctx, parsed, &actions.CheckoutOpts{
-			Path:     path,
-			Insecure: true,
-		})
-		if err != nil {
-			return err
-		}
-
-		return json.NewEncoder(os.Stdout).Encode(m)
 	// sleep
 	case "-s":
-		os.Stdout.WriteString("zzz...")
-		sigs := make(chan os.Signal, 1)
-		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-		<-sigs
-		close(sigs)
-		_, err := os.Stdout.WriteString("\n")
-		return err
+		_, _ = os.Stdout.WriteString("zzz...\n")
+		<-ctx.Done()
+		return ctx.Err()
 	// exec
 	case "-e":
 		if len(args) < 3 {
@@ -100,8 +70,8 @@ func mainE() error {
 
 		var (
 			command        = exec.CommandContext(ctx, args[2], args[3:]...) //nolint:gosec
-			githubEnvFile  = os.Getenv(actions.EnvVarEnv)
-			githubPathFile = os.Getenv(actions.EnvVarPath)
+			githubEnvPath  = os.Getenv(actions.EnvVarEnv)
+			githubPathPath = os.Getenv(actions.EnvVarPath)
 		)
 
 		command.Env = os.Environ()
@@ -109,10 +79,10 @@ func mainE() error {
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
 
-		if githubEnv, err := envconv.ArrFromFile(githubEnvFile); err == nil {
+		if githubEnv, err := envconv.ArrFromFile(githubEnvPath); err == nil {
 			command.Env = append(command.Env, githubEnv...)
 		} else {
-			if _, err = os.Create(githubEnvFile); err != nil {
+			if _, err = os.Create(githubEnvPath); err != nil {
 				return err
 			}
 		}
@@ -124,10 +94,10 @@ func mainE() error {
 			path += ":" + runnerToolCache
 		}
 
-		if githubPath, err := envconv.PathFromFile(githubPathFile); err == nil && githubPath != "" {
+		if githubPath, err := envconv.PathFromFile(githubPathPath); err == nil && githubPath != "" {
 			path += ":" + githubPath
 		} else {
-			if _, err = os.Create(githubPathFile); err != nil {
+			if _, err = os.Create(githubPathPath); err != nil {
 				return err
 			}
 		}

@@ -14,20 +14,14 @@ import (
 
 func main() {
 	var (
-		ctx, cancel = context.WithCancel(context.Background())
-		sigC        = make(chan os.Signal, 1)
-		err         error
+		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+		err       error
 	)
-	signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
-
-	go func() {
-		<-sigC
-		cancel()
-	}()
 
 	if err = command.New().ExecuteContext(ctx); err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 	}
 
+	stop()
 	os.Exit(errbubble.ExitCode(err))
 }
