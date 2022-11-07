@@ -13,7 +13,7 @@ func New() *cobra.Command {
 		verbosity int
 		cmd       = &cobra.Command{
 			Use:     "forge",
-			Version: forge.Semver(),
+			Version: forge.GetSemver(),
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				cmd.SetContext(
 					WithWorkdir(

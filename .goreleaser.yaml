@@ -1,7 +1,7 @@
 builds:
   - main: ./cmd/forge
     ldflags:
-      - -s -w -X github.com/frantjc/forge.Version={{ .RawVersion }} -X github.com/frantjc/forge.Prerelease={{ .Prerelease }}
+      - -s -w -X github.com/frantjc/forge.Semver={{ .Version }}
     env:
       - CGO_ENABLED=0
     goos:
