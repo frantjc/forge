@@ -53,3 +53,14 @@ In an effort to make their platform easier to use and to refactor the shared fun
 The shame is that, unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult depending on the complexity of the protocol that the designers created (e.g. GitHub Actions are _much_ more complicated to execute than Concourse Resources). This makes debugging the use of these plugins painful, with long feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
 
 Forge aims to remedy this.
+
+## developing
+
+- `make` is recommended - version 3.81 is tested
+- `golang` is _required_ - version 1.18.x or above is required for [generics](https://go.dev/doc/tutorial/generics)
+- `docker` is _required_ - version 20.10.x is tested
+- [`buf`](https://github.com/bufbuild/buf) is _required if_ modifying proto - version 1.4.x is tested
+- [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
+- [`protoc`](https://grpc.io/docs/protoc-installation) is _required if_ modifying proto - version 3.19.x is tested
+  - [`protoc-gen-go`](https://developers.google.com/protocol-buffers/docs/reference/go-generated) - version 1.26.x is tested
+  
