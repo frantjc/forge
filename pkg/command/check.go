@@ -6,5 +6,5 @@ import (
 )
 
 func NewCheck() *cobra.Command {
-	return newResource(concourse.MethodCheck)
+	return newResource(concourse.MethodCheck, true)
 }

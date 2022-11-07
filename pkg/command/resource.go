@@ -18,21 +18,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func newNonCheckResource(method string) *cobra.Command {
-	var (
-		params map[string]string
-		cmd    = newResource(method)
-	)
-
-	cmd.Flags().StringToStringVarP(&params, "param", "p", nil, "params for resource")
-
-	return cmd
-}
-
-func newResource(method string) *cobra.Command {
+func newResource(method string, check bool) *cobra.Command {
 	var (
 		conf            string
-		params, version map[string]string
+		version, params map[string]string
 		cmd             = &cobra.Command{
 			Use:           method,
 			Short:         fmt.Sprintf("%s a Concourse resource", cases.Title(language.English).String(method)),
@@ -48,6 +37,11 @@ func newResource(method string) *cobra.Command {
 					wd     = WorkdirFrom(ctx)
 					file   io.Reader
 					err    error
+					o      = &ore.Resource{
+						Method:  method,
+						Version: version,
+						Params:  params,
+					}
 				)
 
 				if filepath.IsAbs(conf) {
@@ -64,11 +58,6 @@ func newResource(method string) *cobra.Command {
 					return err
 				}
 
-				o := &ore.Resource{
-					Method:  method,
-					Version: version,
-					Params:  params,
-				}
 				for _, r := range config.GetResources() {
 					if r.GetName() == name {
 						o.Resource = r
@@ -103,6 +92,9 @@ func newResource(method string) *cobra.Command {
 		}
 	)
 
+	if !check {
+		cmd.Flags().StringToStringVarP(&params, "params", "p", nil, "params for resource")
+	}
 	cmd.Flags().StringToStringVarP(&version, "version", "i", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf")

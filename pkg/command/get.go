@@ -6,5 +6,5 @@ import (
 )
 
 func NewGet() *cobra.Command {
-	return newNonCheckResource(concourse.MethodGet)
+	return newResource(concourse.MethodGet, false)
 }

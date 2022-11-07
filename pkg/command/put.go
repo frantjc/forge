@@ -6,5 +6,5 @@ import (
 )
 
 func NewPut() *cobra.Command {
-	return newNonCheckResource(concourse.MethodPut)
+	return newResource(concourse.MethodPut, false)
 }
