@@ -8,7 +8,7 @@ import (
 
 func TestWorkflowCommandToString(t *testing.T) {
 	var (
-		command = &actions.WorkflowCommand{
+		wc = &actions.WorkflowCommand{
 			Command: "set-output",
 			Parameters: map[string]string{
 				"name":       "var",
@@ -17,7 +17,7 @@ func TestWorkflowCommandToString(t *testing.T) {
 			Value: "value",
 		}
 		expected = "::set-output name=var,otherParam=param::value"
-		actual   = command.String()
+		actual   = wc.CommandString()
 	)
 
 	if actual != expected {

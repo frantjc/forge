@@ -5,22 +5,23 @@ import (
 	"github.com/frantjc/forge/pkg/github/actions"
 )
 
-type DiscardWorkflowCommandWriter struct {
+type WorkflowCommandWriter struct {
 	*actions.GlobalContext
 	ID                 string
 	StopCommandsTokens map[string]bool
 	State              map[string]string
+	Debug              bool
 }
 
-func (w *DiscardWorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []byte {
-	if _, ok := w.StopCommandsTokens[wc.Command]; ok {
-		w.StopCommandsTokens[wc.Command] = false
+func (w *WorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []byte {
+	if _, ok := w.StopCommandsTokens[wc.GetCommand()]; ok {
+		w.StopCommandsTokens[wc.GetCommand()] = false
 		return make([]byte, 0)
 	}
 
 	for _, stop := range w.StopCommandsTokens {
 		if stop {
-			return []byte(wc.String())
+			return []byte(wc.CommandString())
 		}
 	}
 
@@ -32,11 +33,21 @@ func (w *DiscardWorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []b
 			}
 		}
 
-		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.Value
+		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.GetValue()
 	case actions.CommandStopCommands:
-		w.StopCommandsTokens[wc.Value] = true
+		w.StopCommandsTokens[wc.GetValue()] = true
 	case actions.CommandSaveState:
-		w.State[wc.GetName()] = wc.Value
+		w.State[wc.GetName()] = wc.GetValue()
+	case actions.CommandEcho:
+		w.Debug = !w.Debug
+	case actions.CommandEndGroup:
+		return []byte("[endgroup]")
+	case actions.CommandDebug:
+		if w.Debug {
+			return []byte("[debug] " + wc.GetValue())
+		}
+	default:
+		return []byte("[" + wc.GetCommand() + "] " + wc.GetValue())
 	}
 
 	return make([]byte, 0)
@@ -47,11 +58,12 @@ func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, 
 		globalContext = ConfigureGlobalContext(actions.NewGlobalContextFromEnv())
 	}
 
-	w := &DiscardWorkflowCommandWriter{
+	w := &WorkflowCommandWriter{
 		GlobalContext:      globalContext,
 		ID:                 id,
 		StopCommandsTokens: map[string]bool{},
 		State:              map[string]string{},
+		Debug:              globalContext.SecretsContext[actions.SecretActionsStepDebug] == actions.SecretDebugValue,
 	}
 
 	return &forge.Streams{

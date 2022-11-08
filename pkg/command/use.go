@@ -2,6 +2,7 @@ package command
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
@@ -34,15 +35,19 @@ func NewUse() *cobra.Command {
 					return err
 				}
 
-				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-				if err != nil {
-					return err
+				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
+					globalContext.SecretsContext[actions.SecretActionsStepDebug] = actions.SecretDebugValue
 				}
 
 				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolcache} {
 					if err = os.MkdirAll(dir, 0755); err != nil {
 						return err
 					}
+				}
+
+				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+				if err != nil {
+					return err
 				}
 
 				_, err = forge.NewFoundry(docker.New(c)).Process(
@@ -75,6 +80,8 @@ func NewUse() *cobra.Command {
 
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
+	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
+	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")
 
 	return cmd
 }

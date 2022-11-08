@@ -6,13 +6,7 @@ import (
 	"github.com/frantjc/forge/pkg/rangemap"
 )
 
-type WorkflowCommand struct {
-	Command    string
-	Parameters map[string]string
-	Value      string
-}
-
-func (c *WorkflowCommand) String() string {
+func (c *WorkflowCommand) CommandString() string {
 	s := fmt.Sprintf("::%s", c.Command)
 
 	paramSpl := " "
@@ -31,7 +25,7 @@ func (c *WorkflowCommand) String() string {
 }
 
 func (c *WorkflowCommand) GoString() string {
-	return "&WorkflowCommand{" + c.String() + "}"
+	return "&WorkflowCommand{" + c.CommandString() + "}"
 }
 
 func (c *WorkflowCommand) GetName() string {
