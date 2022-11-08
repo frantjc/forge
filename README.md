@@ -46,11 +46,11 @@ forge get mock -i version=v0.0.0
 
 ## why?
 
-Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some CI system that executes that script, for example, on every commit to a repository's `main` branch. Such CI systems often identify that all of the scripts that they are executing often do a lot of the same things--checkout a repository, setup a tool and so on.
+Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some CI system that executes that script, for example, on every commit to a repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
 
-In an effort to make their platform easier to use and to refactor the shared functionality out of all of the aforementioned scripts, they often introduce reusable "plugins"/"Actions"/"Resources" which take minimal configuration to do some complex task. Take GitHub Actions' [`actions/checkout`](https://github.com/actions/checkout) for example: it takes one short line of code to invoke and accepts a lot of optional configuration to modify its functionality to fulfill many related use cases.
+In an effort to make their platform easier to use and to refactor the shared functionality out of all of the aforementioned scripts, Ci systems in the past have introduced reusable "plugins"/"Actions"/"Resources" which take minimal configuration to do a complex task. GitHub Actions' [`actions/checkout`](https://github.com/actions/checkout), for example, takes one short line of code to invoke and accepts much optional configuration to modify its functionality to fulfill many related use cases.
 
-The shame is that, unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult depending on the complexity of the protocol that the designers created (e.g. GitHub Actions are _much_ more complicated to execute than Concourse Resources). This makes debugging the use of these plugins painful, with long feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
+Unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult. This makes debugging the use of these plugins require long, painful feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
 
 Forge aims to remedy this.
 
