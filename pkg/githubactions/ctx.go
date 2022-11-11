@@ -12,7 +12,7 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/pkg/envconv"
-	"github.com/frantjc/forge/pkg/fn"
+	"github.com/frantjc/go-fn"
 	"github.com/go-git/go-git/v5"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/fn"
+	"github.com/frantjc/go-fn"
 )
 
 type mountKey struct{}

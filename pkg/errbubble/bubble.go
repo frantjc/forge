@@ -3,7 +3,7 @@ package errbubble
 import (
 	"net/http"
 
-	"github.com/frantjc/forge/pkg/fn"
+	"github.com/frantjc/go-fn"
 )
 
 type Bubble struct {

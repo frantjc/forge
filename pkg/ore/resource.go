@@ -7,8 +7,8 @@ import (
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/pkg/concourse"
-	"github.com/frantjc/forge/pkg/fn"
 	"github.com/frantjc/forge/pkg/forgeconcourse"
+	"github.com/frantjc/go-fn"
 )
 
 func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {

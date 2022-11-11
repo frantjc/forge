@@ -10,7 +10,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/fn"
+	"github.com/frantjc/go-fn"
 )
 
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {

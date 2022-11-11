@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/fn"
 	"github.com/frantjc/forge/pkg/githubactions"
+	"github.com/frantjc/go-fn"
 )
 
 const (
