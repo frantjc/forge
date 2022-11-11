@@ -13,7 +13,7 @@ import (
 	"github.com/frantjc/forge/pkg/envconv"
 	"github.com/frantjc/forge/pkg/errbubble"
 	"github.com/frantjc/forge/pkg/fn"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 var (
@@ -70,8 +70,8 @@ func mainE(ctx context.Context) error {
 
 		var (
 			command        = exec.CommandContext(ctx, args[2], args[3:]...) //nolint:gosec
-			githubEnvPath  = os.Getenv(actions.EnvVarEnv)
-			githubPathPath = os.Getenv(actions.EnvVarPath)
+			githubEnvPath  = os.Getenv(githubactions.EnvVarEnv)
+			githubPathPath = os.Getenv(githubactions.EnvVarPath)
 		)
 
 		command.Env = os.Environ()
@@ -90,7 +90,7 @@ func mainE(ctx context.Context) error {
 		var (
 			path = "PATH=" + os.Getenv("PATH")
 		)
-		if runnerToolCache := os.Getenv(actions.EnvVarRunnerToolCache); runnerToolCache != "" {
+		if runnerToolCache := os.Getenv(githubactions.EnvVarRunnerToolCache); runnerToolCache != "" {
 			path += ":" + runnerToolCache
 		}
 

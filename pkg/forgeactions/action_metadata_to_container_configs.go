@@ -6,14 +6,14 @@ import (
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/bin"
 	"github.com/frantjc/forge/pkg/envconv"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
-func ActionToConfigs(globalContext *actions.GlobalContext, uses *actions.Uses, with, environment map[string]string, actionMetadata *actions.Metadata) ([]*forge.ContainerConfig, error) {
+func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata) ([]*forge.ContainerConfig, error) {
 	return DefaultMapping.ActionToConfigs(globalContext, uses, with, environment, actionMetadata)
 }
 
-func (m *Mapping) ActionToConfigs(globalContext *actions.GlobalContext, uses *actions.Uses, with, environment map[string]string, actionMetadata *actions.Metadata) ([]*forge.ContainerConfig, error) {
+func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata) ([]*forge.ContainerConfig, error) {
 	var (
 		_                = forge.NewLogger()
 		containerConfigs = []*forge.ContainerConfig{}
@@ -53,7 +53,7 @@ func (m *Mapping) ActionToConfigs(globalContext *actions.GlobalContext, uses *ac
 			)
 
 			switch actionMetadata.GetRuns().GetUsing() {
-			case actions.RunsUsingNode12, actions.RunsUsingNode16:
+			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16:
 				entrypoint = append(entrypoint, "node")
 				if pre := actionMetadata.GetRuns().GetPre(); pre != "" {
 					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), pre))
@@ -73,7 +73,7 @@ func (m *Mapping) ActionToConfigs(globalContext *actions.GlobalContext, uses *ac
 
 			var (
 				inputs   = make(map[string]string, len(unexpandedInputs))
-				expander = actions.NewExpander(globalContext.GetString)
+				expander = githubactions.NewExpander(globalContext.GetString)
 			)
 			for k, v := range unexpandedInputs {
 				inputs[k] = expander.ExpandString(v)
@@ -81,7 +81,7 @@ func (m *Mapping) ActionToConfigs(globalContext *actions.GlobalContext, uses *ac
 
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
-			env = append(env, actions.EnvVarPath+"="+m.GetGitHubPathPath(), actions.EnvVarEnv+"="+m.GetGitHubEnvPath())
+			env = append(env, githubactions.EnvVarPath+"="+m.GetGitHubPathPath(), githubactions.EnvVarEnv+"="+m.GetGitHubEnvPath())
 
 			for _, s := range entrypoints {
 				if s != "" {

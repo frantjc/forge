@@ -1,4 +1,4 @@
-package actions
+package githubactions
 
 import (
 	"net/url"
@@ -14,19 +14,17 @@ var (
 
 func init() {
 	var err error
-	DefaultURL, err = url.Parse("https://github.com/")
-	if err != nil {
-		panic("github.com/frantjc/sequence/github.DefaultURL is not a valid URL")
+	if DefaultURL, err = url.Parse("https://github.com/"); err != nil {
+		panic("github.com/frantjc/forge/pkg/githubactions.DefaultURL is not a valid URL")
 	}
 
-	DefaultAPIURL, err = APIURLFromBaseURL(DefaultURL)
-	if err != nil {
-		panic("github.com/frantjc/sequence/github.DefaultAPIURL is not a valid URL")
+	if DefaultAPIURL, err = APIURLFromBaseURL(DefaultURL); err != nil {
+		panic("github.com/frantjc/forge/pkg/githubactionsDefaultAPIURL is not a valid URL")
 	}
 
 	DefaultGraphQLURL, err = GraphQLURLFromBaseURL(DefaultURL)
 	if err != nil {
-		panic("github.com/frantjc/sequence/github.DefaultGraphQLURL is not a valid URL")
+		panic("github.com/frantjc/forge/pkg/githubactions.DefaultGraphQLURL is not a valid URL")
 	}
 }
 

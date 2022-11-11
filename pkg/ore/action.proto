@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package forge.ore;
 
-import "pkg/github/actions/ctx.proto";
+import "pkg/githubactions/ctx.proto";
 
 option go_package = "github.com/frantjc/forge/pkg/ore";
 

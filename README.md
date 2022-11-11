@@ -28,17 +28,17 @@ forge use actions/setup-go@v3 -w go-version=1.19
 
 Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
 
-That is to say, after running the above command, `go` should be installed to `$XDG_CACHE_HOME/.forge/runner/toolcache`.
+That is to say, after running the above command, `go` should be installed to `XDG_CACHE_HOME/.forge/runner/toolcache`.
 
 You can also use local GitHub Actions by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
 
 ```sh
-forge use ./testdata/actions/mock
+forge use ./testdata/actions/mock/docker
 ```
 
 ### Concourse Resources
 
-For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`).
+For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with Concourse's [pipeline](https://concourse-ci.org/pipelines.html) schema.
 
 ```sh
 forge get mock -i version=v0.0.0
@@ -63,4 +63,3 @@ Forge aims to remedy this.
 - [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
 - [`protoc`](https://grpc.io/docs/protoc-installation) is _required if_ modifying proto - version 3.19.x is tested
   - [`protoc-gen-go`](https://developers.google.com/protocol-buffers/docs/reference/go-generated) - version 1.26.x is tested
-  

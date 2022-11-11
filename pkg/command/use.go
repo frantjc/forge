@@ -9,7 +9,7 @@ import (
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/pkg/forgeactions"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 	"github.com/frantjc/forge/pkg/ore"
 	"github.com/frantjc/forge/pkg/runtime/docker"
 	"github.com/spf13/cobra"
@@ -30,13 +30,13 @@ func NewUse() *cobra.Command {
 					wd  = WorkdirFrom(ctx)
 				)
 
-				globalContext, err := actions.NewGlobalContextFromPath(ctx, wd)
+				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, wd)
 				if err != nil {
 					return err
 				}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
-					globalContext.SecretsContext[actions.SecretActionsStepDebug] = actions.SecretDebugValue
+					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
 				}
 
 				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolcache} {

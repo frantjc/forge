@@ -1,0 +1,7 @@
+name: Mock
+description: |
+  Mock action
+author: frantjc
+runs:
+  using: node16
+  main: index.js

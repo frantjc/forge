@@ -2,18 +2,18 @@ package forgeactions
 
 import (
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 type WorkflowCommandWriter struct {
-	*actions.GlobalContext
+	*githubactions.GlobalContext
 	ID                 string
 	StopCommandsTokens map[string]bool
 	State              map[string]string
 	Debug              bool
 }
 
-func (w *WorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []byte {
+func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []byte {
 	if _, ok := w.StopCommandsTokens[wc.GetCommand()]; ok {
 		w.StopCommandsTokens[wc.GetCommand()] = false
 		return make([]byte, 0)
@@ -26,23 +26,23 @@ func (w *WorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []byte {
 	}
 
 	switch wc.Command {
-	case actions.CommandSetOutput:
+	case githubactions.CommandSetOutput:
 		if w.GlobalContext.StepsContext[w.ID] == nil {
-			w.GlobalContext.StepsContext[w.ID] = &actions.StepContext{
+			w.GlobalContext.StepsContext[w.ID] = &githubactions.StepContext{
 				Outputs: map[string]string{},
 			}
 		}
 
 		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.GetValue()
-	case actions.CommandStopCommands:
+	case githubactions.CommandStopCommands:
 		w.StopCommandsTokens[wc.GetValue()] = true
-	case actions.CommandSaveState:
+	case githubactions.CommandSaveState:
 		w.State[wc.GetName()] = wc.GetValue()
-	case actions.CommandEcho:
+	case githubactions.CommandEcho:
 		w.Debug = !w.Debug
-	case actions.CommandEndGroup:
+	case githubactions.CommandEndGroup:
 		return []byte("[endgroup]")
-	case actions.CommandDebug:
+	case githubactions.CommandDebug:
 		if w.Debug {
 			return []byte("[debug] " + wc.GetValue())
 		}
@@ -53,9 +53,9 @@ func (w *WorkflowCommandWriter) Callback(wc *actions.WorkflowCommand) []byte {
 	return make([]byte, 0)
 }
 
-func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
+func NewWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
 	if globalContext == nil {
-		globalContext = ConfigureGlobalContext(actions.NewGlobalContextFromEnv())
+		globalContext = ConfigureGlobalContext(githubactions.NewGlobalContextFromEnv())
 	}
 
 	w := &WorkflowCommandWriter{
@@ -63,13 +63,13 @@ func NewWorkflowCommandStreams(globalContext *actions.GlobalContext, id string, 
 		ID:                 id,
 		StopCommandsTokens: map[string]bool{},
 		State:              map[string]string{},
-		Debug:              globalContext.SecretsContext[actions.SecretActionsStepDebug] == actions.SecretDebugValue,
+		Debug:              globalContext.SecretsContext[githubactions.SecretActionsStepDebug] == githubactions.SecretDebugValue,
 	}
 
 	return &forge.Streams{
 		Drains: &forge.Drains{
-			Out: actions.NewWorkflowCommandWriter(w.Callback, drains.Out),
-			Err: actions.NewWorkflowCommandWriter(w.Callback, drains.Err),
+			Out: githubactions.NewWorkflowCommandWriter(w.Callback, drains.Out),
+			Err: githubactions.NewWorkflowCommandWriter(w.Callback, drains.Err),
 			Tty: drains.Tty,
 		},
 	}

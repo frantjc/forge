@@ -7,7 +7,7 @@ import (
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/pkg/forgeactions"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
@@ -16,7 +16,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		exitCode = -1
 	)
 
-	uses, err := actions.Parse(o.Uses)
+	uses, err := githubactions.Parse(o.Uses)
 	if err != nil {
 		return nil, err
 	}
@@ -32,10 +32,10 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 	}
 
 	if o.GetGlobalContext() == nil {
-		o.GlobalContext = actions.NewGlobalContextFromEnv()
+		o.GlobalContext = githubactions.NewGlobalContextFromEnv()
 	}
 	defer func() {
-		ctx = actions.WithGlobalContext(ctx, o.GlobalContext)
+		ctx = githubactions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
 	containerConfigs, err := forgeactions.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)

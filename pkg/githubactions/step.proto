@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package forge.github.actions;
 
-option go_package = "github.com/frantjc/forge/pkg/github/actions";
+option go_package = "github.com/frantjc/forge/pkg/githubactions";
 
 message Step {
   string shell = 1;

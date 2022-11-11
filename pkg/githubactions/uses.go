@@ -1,4 +1,4 @@
-package actions
+package githubactions
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func (u *Uses) IsRemote() bool {
 	return !u.IsLocal()
 }
 
-func (u *Uses) GetUses() string {
+func (u *Uses) UsesString() string {
 	uses := u.GetPath()
 	if v := u.GetVersion(); v != "" {
 		uses = uses + "@" + v
@@ -47,7 +47,7 @@ func (u *Uses) GetActionPath() string {
 }
 
 func (u *Uses) GoString() string {
-	return "&Uses{" + u.GetUses() + "}"
+	return "&Uses{" + u.UsesString() + "}"
 }
 
 // TODO regexp.
@@ -73,7 +73,7 @@ func Parse(uses string) (*Uses, error) {
 }
 
 func (u *Uses) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + u.GetUses() + "\""), nil
+	return []byte("\"" + u.UsesString() + "\""), nil
 }
 
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {

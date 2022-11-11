@@ -1,14 +1,14 @@
-package actions_test
+package githubactions_test
 
 import (
 	"testing"
 
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 func TestWorkflowCommandToString(t *testing.T) {
 	var (
-		wc = &actions.WorkflowCommand{
+		wc = &githubactions.WorkflowCommand{
 			Command: "set-output",
 			Parameters: map[string]string{
 				"name":       "var",

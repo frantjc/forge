@@ -1,20 +1,20 @@
-package actions_test
+package githubactions_test
 
 import (
 	"testing"
 
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 func TestParseCommandNoParams(t *testing.T) {
 	var (
 		command  = "::debug::hello there"
-		expected = &actions.WorkflowCommand{
+		expected = &githubactions.WorkflowCommand{
 			Command:    "debug",
 			Parameters: map[string]string{},
 			Value:      "hello there",
 		}
-		actual, err = actions.ParseWorkflowCommandString(command)
+		actual, err = githubactions.ParseWorkflowCommandString(command)
 	)
 	if err != nil {
 		t.Error(err)
@@ -30,14 +30,14 @@ func TestParseCommandNoParams(t *testing.T) {
 func TestParseCommandOneParam(t *testing.T) {
 	var (
 		command  = "::save-state name=isPost::true"
-		expected = &actions.WorkflowCommand{
+		expected = &githubactions.WorkflowCommand{
 			Command: "save-state",
 			Parameters: map[string]string{
 				"name": "isPost",
 			},
 			Value: "true",
 		}
-		actual, err = actions.ParseWorkflowCommandString(command)
+		actual, err = githubactions.ParseWorkflowCommandString(command)
 	)
 	if err != nil {
 		t.Error(err)
@@ -53,7 +53,7 @@ func TestParseCommandOneParam(t *testing.T) {
 func TestParseCommandManyParams(t *testing.T) {
 	var (
 		command  = "::save-state name=isPost,otherParam=1::true"
-		expected = &actions.WorkflowCommand{
+		expected = &githubactions.WorkflowCommand{
 			Command: "save-state",
 			Parameters: map[string]string{
 				"name":       "isPost",
@@ -61,7 +61,7 @@ func TestParseCommandManyParams(t *testing.T) {
 			},
 			Value: "true",
 		}
-		actual, err = actions.ParseWorkflowCommandString(command)
+		actual, err = githubactions.ParseWorkflowCommandString(command)
 	)
 	if err != nil {
 		t.Error(err)
@@ -77,14 +77,14 @@ func TestParseCommandManyParams(t *testing.T) {
 func TestParseCommandNoValue(t *testing.T) {
 	var (
 		command  = "::save-state name=isPost::"
-		expected = &actions.WorkflowCommand{
+		expected = &githubactions.WorkflowCommand{
 			Command: "save-state",
 			Parameters: map[string]string{
 				"name": "isPost",
 			},
 			Value: "",
 		}
-		actual, err = actions.ParseWorkflowCommandString(command)
+		actual, err = githubactions.ParseWorkflowCommandString(command)
 	)
 	if err != nil {
 		t.Error(err)

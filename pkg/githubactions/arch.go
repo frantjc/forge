@@ -1,4 +1,4 @@
-package actions
+package githubactions
 
 const (
 	ArchX86   = "X86"

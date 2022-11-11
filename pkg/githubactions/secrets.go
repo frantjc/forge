@@ -1,4 +1,4 @@
-package actions
+package githubactions
 
 const (
 	SecretActionsStepDebug   = "ACTIONS_STEP_DEBUG"

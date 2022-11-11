@@ -80,7 +80,7 @@ records:
   - delay: 5
     content: *prompt
   - delay: 1000
-    content: forge use ./testdata/actions/mock
+    content: forge use ./testdata/actions/mock/docker
   - delay: 1000
     content: *nl
   - delay: 6000

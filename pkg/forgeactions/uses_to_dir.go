@@ -4,14 +4,14 @@ import (
 	"path/filepath"
 
 	"github.com/frantjc/forge/internal/hostfs"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
-func UsesToRootDirectory(uses *actions.Uses) (string, error) {
+func UsesToRootDirectory(uses *githubactions.Uses) (string, error) {
 	return DefaultMapping.UsesToRootDirectory(uses)
 }
 
-func (m *Mapping) UsesToRootDirectory(uses *actions.Uses) (string, error) {
+func (m *Mapping) UsesToRootDirectory(uses *githubactions.Uses) (string, error) {
 	if uses.IsLocal() {
 		return filepath.Abs(uses.GetPath())
 	}
@@ -19,11 +19,11 @@ func (m *Mapping) UsesToRootDirectory(uses *actions.Uses) (string, error) {
 	return filepath.Join(hostfs.ActionCache, uses.GetRepository(), uses.GetVersion()), nil
 }
 
-func UsesToActionDirectory(uses *actions.Uses) (string, error) {
+func UsesToActionDirectory(uses *githubactions.Uses) (string, error) {
 	return DefaultMapping.UsesToActionDirectory(uses)
 }
 
-func (m *Mapping) UsesToActionDirectory(uses *actions.Uses) (string, error) {
+func (m *Mapping) UsesToActionDirectory(uses *githubactions.Uses) (string, error) {
 	if uses.IsLocal() {
 		return m.UsesToRootDirectory(uses)
 	}

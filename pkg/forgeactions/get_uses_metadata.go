@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
-func GetUsesMetadata(ctx context.Context, uses *actions.Uses) (*actions.Metadata, error) {
+func GetUsesMetadata(ctx context.Context, uses *githubactions.Uses) (*githubactions.Metadata, error) {
 	return DefaultMapping.GetUsesMetadata(ctx, uses)
 }
 
-func (m *Mapping) GetUsesMetadata(ctx context.Context, uses *actions.Uses) (*actions.Metadata, error) {
+func (m *Mapping) GetUsesMetadata(ctx context.Context, uses *githubactions.Uses) (*githubactions.Metadata, error) {
 	_ = forge.LoggerFrom(ctx)
 
 	dir, err := m.UsesToRootDirectory(uses)
@@ -19,5 +19,5 @@ func (m *Mapping) GetUsesMetadata(ctx context.Context, uses *actions.Uses) (*act
 		return nil, err
 	}
 
-	return actions.GetUsesMetadata(ctx, uses, dir)
+	return githubactions.GetUsesMetadata(ctx, uses, dir)
 }

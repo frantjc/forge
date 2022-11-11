@@ -1,4 +1,4 @@
-package actions
+package githubactions
 
 const (
 	RefTypeTag    = "tag"

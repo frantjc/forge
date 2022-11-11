@@ -6,7 +6,7 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/pkg/fn"
-	"github.com/frantjc/forge/pkg/github/actions"
+	"github.com/frantjc/forge/pkg/githubactions"
 )
 
 const (
@@ -29,11 +29,11 @@ var (
 	Node16ImageReference = DefaultNode16ImageReference
 )
 
-func PullImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *actions.Metadata) (forge.Image, error) {
+func PullImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *githubactions.Metadata) (forge.Image, error) {
 	return containerRuntime.PullImage(ctx, MetadataToImageReference(actionMetadata))
 }
 
-func MetadataToImageReference(actionMetadata *actions.Metadata) string {
+func MetadataToImageReference(actionMetadata *githubactions.Metadata) string {
 	if actionMetadata == nil {
 		return ""
 	}
@@ -42,14 +42,14 @@ func MetadataToImageReference(actionMetadata *actions.Metadata) string {
 		return ""
 	}
 
-	return RunsUsingImage(actionMetadata.Runs.Using, strings.TrimPrefix(actionMetadata.Runs.Image, actions.RunsUsingDockerImagePrefix))
+	return RunsUsingImage(actionMetadata.Runs.Using, strings.TrimPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix))
 }
 
 func RunsUsingImage(runsUsing string, fallbacks ...string) string {
 	switch runsUsing {
-	case actions.RunsUsingNode12:
+	case githubactions.RunsUsingNode12:
 		return Node12ImageReference
-	case actions.RunsUsingNode16:
+	case githubactions.RunsUsingNode16:
 		return Node16ImageReference
 	}
 
