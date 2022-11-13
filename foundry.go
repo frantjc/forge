@@ -15,9 +15,7 @@ type Foundry struct {
 	ContainerRuntime
 }
 
-// Process checks if its Basin already has the result of an Ore.
-// If so, it returns the Metal from the Depoist. Otherwise,
-// it Liquifies the Ore, caches the Metal and returns it.
+// Process Liquifies the Ore and returns the resulting Metal.
 func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal, error) {
 	if f.ContainerRuntime == nil {
 		return nil, fmt.Errorf("nil ContainerRuntime")

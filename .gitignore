@@ -1,4 +1,5 @@
 # IDE
+.idea/
 .vscode/
 
 # macOS
@@ -15,7 +16,7 @@ __debug_bin
 privileged
 version
 
-# shim
+# upx
 internal/bin/shim*
 !internal/bin/shim
 
