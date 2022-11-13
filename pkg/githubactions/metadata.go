@@ -16,9 +16,7 @@ const (
 	RunsUsingNode16            = "node16"
 )
 
-var (
-	ErrMissingRequiredInput = errors.New("required input missing")
-)
+var ErrMissingRequiredInput = errors.New("required input missing")
 
 func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
 	m := &Metadata{}

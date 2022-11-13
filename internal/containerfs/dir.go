@@ -6,7 +6,5 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
-	// WorkingDir is the directory Ores are ran from the context of.
-	WorkingDir = filepath.Join("/forge", uuid.NewString())
-)
+// WorkingDir is the directory Ores are ran from the context of.
+var WorkingDir = filepath.Join("/forge", uuid.NewString())

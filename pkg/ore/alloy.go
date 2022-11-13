@@ -15,9 +15,7 @@ type Alloy struct {
 }
 
 func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
-	var (
-		volumeName = o.GetId()
-	)
+	volumeName := o.GetId()
 	if volumeName == "" {
 		volumeName = uuid.NewString()
 	}

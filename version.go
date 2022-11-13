@@ -2,11 +2,9 @@ package forge
 
 import "runtime/debug"
 
-var (
-	// Semver is the semantic version of forge.
-	// Meant to be be overridden at build time.
-	Semver = "0.0.0"
-)
+// Semver is the semantic version of forge.
+// Meant to be be overridden at build time.
+var Semver = "0.0.0"
 
 // GetSemver returns the semantic version of Forge as built from
 // Semver and debug build info.

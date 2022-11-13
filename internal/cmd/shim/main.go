@@ -48,9 +48,7 @@ func main() {
 }
 
 func mainE(ctx context.Context) error {
-	var (
-		args = os.Args
-	)
+	args := os.Args
 
 	if len(args) < 2 {
 		return errHelp
@@ -87,9 +85,7 @@ func mainE(ctx context.Context) error {
 			}
 		}
 
-		var (
-			path = "PATH=" + os.Getenv("PATH")
-		)
+		path := "PATH=" + os.Getenv("PATH")
 		if runnerToolCache := os.Getenv(githubactions.EnvVarRunnerToolCache); runnerToolCache != "" {
 			path += ":" + runnerToolCache
 		}

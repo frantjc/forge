@@ -40,7 +40,7 @@ func NewUse() *cobra.Command {
 				}
 
 				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolcache} {
-					if err = os.MkdirAll(dir, 0755); err != nil {
+					if err = os.MkdirAll(dir, 0o755); err != nil {
 						return err
 					}
 				}

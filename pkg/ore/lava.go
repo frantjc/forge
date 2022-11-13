@@ -14,9 +14,7 @@ type Lava struct {
 }
 
 func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
-	var (
-		buf = new(bytes.Buffer)
-	)
+	buf := new(bytes.Buffer)
 	metal, err = o.From.Liquify(ctx, containerRuntime, &forge.Drains{
 		Out: buf,
 		Err: drains.Err,

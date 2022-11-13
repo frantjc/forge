@@ -13,9 +13,9 @@ const (
 )
 
 var (
-	modTime = time.Date(1985, time.October, 26, 8, 15, 00, 0, time.UTC)
+	modTime = time.Date(1985, time.October, 26, 8, 15, 0o0, 0, time.UTC)
 	size    = int64(len(shim))
-	mode    = int64(0777)
+	mode    = int64(0o777)
 )
 
 func NewShimTarArchive() io.Reader {

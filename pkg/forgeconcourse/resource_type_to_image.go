@@ -7,9 +7,7 @@ import (
 	"github.com/frantjc/forge/pkg/concourse"
 )
 
-var (
-	DefaultTag = "latest"
-)
+var DefaultTag = "latest"
 
 func PullImageForResourceType(ctx context.Context, containerRuntime forge.ContainerRuntime, resourceType *concourse.ResourceType) (forge.Image, error) {
 	return containerRuntime.PullImage(ctx, ResourceTypeToImageReference(resourceType))

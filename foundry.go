@@ -23,9 +23,7 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal,
 		return nil, fmt.Errorf("nil ContainerRuntime")
 	}
 
-	var (
-		_ = LoggerFrom(ctx)
-	)
+	_ = LoggerFrom(ctx)
 
 	return ore.Liquify(ctx, f, drains)
 }

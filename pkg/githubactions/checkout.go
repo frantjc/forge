@@ -11,9 +11,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
-var (
-	ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
-)
+var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 
 func CheckoutUses(ctx context.Context, u *Uses, opts *CheckoutOpts) (*Metadata, error) {
 	_ = forge.LoggerFrom(ctx)

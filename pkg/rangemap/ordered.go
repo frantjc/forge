@@ -20,11 +20,9 @@ func ordered[T1 constraints.Ordered, T2 any](m map[T1]T2, f func(T1, T2), asc bo
 		close(keysC)
 	}()
 
-	var (
-		less = func(i, j int) bool {
-			return keys[i] > keys[j]
-		}
-	)
+	less := func(i, j int) bool {
+		return keys[i] > keys[j]
+	}
 	if asc {
 		less = func(i, j int) bool {
 			return keys[i] < keys[j]

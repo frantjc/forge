@@ -2,17 +2,15 @@ package forgeactions
 
 import "github.com/frantjc/forge/internal/containerfs"
 
-var (
-	DefaultMapping = &Mapping{
-		Workspace:       DefaultWorkspace,
-		ActionPath:      DefaultActionPath,
-		RunnerTemp:      DefaultRunnerTemp,
-		RunnerToolCache: DefaultRunnerToolCache,
-		GitHubPath:      DefaultGitHubPath,
-		GitHubPathPath:  DefaultGitHubPathPath,
-		GitHubEnvPath:   DefaultGitHubEnvPath,
-	}
-)
+var DefaultMapping = &Mapping{
+	Workspace:       DefaultWorkspace,
+	ActionPath:      DefaultActionPath,
+	RunnerTemp:      DefaultRunnerTemp,
+	RunnerToolCache: DefaultRunnerToolCache,
+	GitHubPath:      DefaultGitHubPath,
+	GitHubPathPath:  DefaultGitHubPathPath,
+	GitHubEnvPath:   DefaultGitHubEnvPath,
+}
 
 var (
 	DefaultRootPath        = containerfs.WorkingDir

@@ -25,12 +25,5 @@ linters:
     - gofmt
     - goimports
     - misspell
-    # pass locally but not as a part of
-    # uses: golangci/golangci-lint-action@v3.2.0
-    # - gofumpt
-    # - whitespace
-  # disabled because of go 1.18
-  # track support at
-  # https://github.com/golangci/golangci-lint/issues/2649
-  disable:
-    - structcheck
+    - gofumpt
+    - whitespace

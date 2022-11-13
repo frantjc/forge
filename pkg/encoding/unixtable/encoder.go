@@ -9,9 +9,7 @@ import (
 	"text/tabwriter"
 )
 
-var (
-	ErrTypeNotSupported = errors.New("type not supported")
-)
+var ErrTypeNotSupported = errors.New("type not supported")
 
 func NewEncoder(w io.Writer) *Encoder {
 	return &Encoder{tabwriter.NewWriter(w, DefaultMinWidth, DefaultTabWidth, DefaultPadding, ' ', tabwriter.DiscardEmptyColumns), false, false}
@@ -32,9 +30,7 @@ func (e *Encoder) Encode(a any) error {
 	k := v.Kind()
 	switch k {
 	case reflect.Array, reflect.Slice:
-		var (
-			numFields = v.Len()
-		)
+		numFields := v.Len()
 
 		if numFields == 0 {
 			return nil

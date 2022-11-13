@@ -7,12 +7,10 @@ import (
 	"github.com/moby/term"
 )
 
-var (
-	// DefaultDetachKeys are the default key combinations
-	// to use when detaching from a Container that has
-	// been attached to.
-	DefaultDetachKeys = "ctrl-d"
-)
+// DefaultDetachKeys are the default key combinations
+// to use when detaching from a Container that has
+// been attached to.
+var DefaultDetachKeys = "ctrl-d"
 
 // Streams represents streams to and from a process
 // inside of a Container.
