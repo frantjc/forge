@@ -12,13 +12,8 @@ func NewStreams(drains *forge.Drains, input *concourse.Input) *forge.Streams {
 	in := new(bytes.Buffer)
 
 	if err := json.NewEncoder(in).Encode(input); err != nil {
-		return &forge.Streams{
-			Drains: drains,
-		}
+		return drains.ToStreams(nil)
 	}
 
-	return &forge.Streams{
-		In:     in,
-		Drains: drains,
-	}
+	return drains.ToStreams(in)
 }
