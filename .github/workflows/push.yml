@@ -23,12 +23,14 @@ jobs:
           install-only: true
       - name: make install
         run: make install INSTALL=install BIN=$RUNNER_TEMP
-      - name: path
+      - name: set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       - name: forge use remote
         run: forge use frantjc/forge/testdata/actions/mock/docker@main
       - name: forge use local
         run: forge use ./testdata/actions/mock/node
+      - name: forge use dockerfile
+        run: forge use ./testdata/actions/mock/dockerfile
       - name: forge check resource
         run: forge check mock -i version=v0.0.0
       - name: forge get resource
