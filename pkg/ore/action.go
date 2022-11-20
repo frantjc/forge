@@ -26,7 +26,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return nil, err
 	}
 
-	image, err := forgeactions.PullImageForMetadata(ctx, containerRuntime, actionMetadata)
+	image, err := forgeactions.GetImageForMetadata(ctx, containerRuntime, actionMetadata, uses)
 	if err != nil {
 		return nil, err
 	}

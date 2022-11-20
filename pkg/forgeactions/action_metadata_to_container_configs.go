@@ -21,7 +21,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	if actionMetadata != nil {
-		if actionMetadata.Runs != nil {
+		if actionMetadata.GetRuns() != nil {
 			actionDir, err := m.UsesToActionDirectory(uses)
 			if err != nil {
 				return nil, err
@@ -62,7 +62,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 				if main := actionMetadata.GetRuns().GetMain(); main != "" {
 					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), main))
 				}
-			default:
+			case githubactions.RunsUsingDocker:
 				entrypoints = append(entrypoints, actionMetadata.GetRuns().GetPreEntrypoint(), actionMetadata.GetRuns().GetEntrypoint())
 			}
 

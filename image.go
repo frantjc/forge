@@ -11,6 +11,7 @@ import (
 // Used to create Containers from.
 type Image interface {
 	Manifest() (*imagespecsv1.Manifest, error)
+	Config() (*imagespecsv1.ImageConfig, error)
 	Digest() (digest.Digest, error)
 	Blob() io.Reader
 	Name() string

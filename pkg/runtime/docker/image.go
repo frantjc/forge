@@ -36,6 +36,29 @@ func (i *Image) Manifest() (manifest *imagespecsv1.Manifest, _ error) {
 	return manifest, json.Unmarshal(rawManifest, manifest)
 }
 
+func (i *Image) Config() (config *imagespecsv1.ImageConfig, _ error) {
+	// RawConfigFile returns the JSON that has this structure:
+	//
+	// {
+	// 	...
+	// 	"config": { ... }
+	// }
+	//
+	rawConfig, err := i.RawConfigFile()
+	if err != nil {
+		return nil, err
+	}
+
+	// We want "config" from the above JSON, so we create
+	// this struct containing our ImageConfig where
+	// the "config" will be unmarshaled to.
+	return config, json.Unmarshal(rawConfig, &struct {
+		Config *imagespecsv1.ImageConfig `json:"config"`
+	}{
+		Config: config,
+	})
+}
+
 func (i *Image) MarshalJSON() ([]byte, error) {
 	d, err := i.Digest()
 	if err != nil {

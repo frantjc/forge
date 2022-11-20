@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	RunsUsingDockerfileImage   = "Dockerfile"
 	RunsUsingDockerImagePrefix = "docker://"
 	RunsUsingDocker            = "docker"
 	RunsUsingComposite         = "composite"
@@ -41,5 +42,9 @@ func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, er
 }
 
 func (m *Metadata) IsComposite() bool {
-	return m.Runs.Using == RunsUsingComposite
+	return m.GetRuns().GetUsing() == RunsUsingComposite
+}
+
+func (m *Metadata) IsDockerfile() bool {
+	return m.GetRuns().GetUsing() == RunsUsingDocker && m.GetRuns().GetImage() == RunsUsingDockerfileImage
 }

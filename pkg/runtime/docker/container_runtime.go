@@ -1,11 +1,8 @@
 package docker
 
-import (
-	"github.com/docker/docker/client"
-	"github.com/frantjc/forge"
-)
+import "github.com/docker/docker/client"
 
-func New(c *client.Client) forge.ContainerRuntime {
+func New(c *client.Client) *ContainerRuntime {
 	return &ContainerRuntime{c}
 }
 

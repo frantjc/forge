@@ -1,0 +1,11 @@
+name: Mock
+description: |
+  Mock action
+author: frantjc
+runs:
+  using: docker
+  image: Dockerfile
+  entrypoint: curl
+  args:
+    - -sI
+    - https://github.com/frantjc/forge
