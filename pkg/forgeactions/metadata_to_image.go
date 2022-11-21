@@ -45,7 +45,7 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 			reference = path.Join("forge.dev", strings.ToLower(actionMetadata.GetName()))
 		}
 
-		return containerRuntime.BuildImage(ctx, dir, reference)
+		return containerRuntime.BuildDockerfile(ctx, dir, reference)
 	}
 
 	return containerRuntime.PullImage(ctx, MetadataToImageReference(actionMetadata))

@@ -13,7 +13,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
 )
 
-func (d *ContainerRuntime) BuildImage(ctx context.Context, dir, reference string) (forge.Image, error) {
+func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dir, reference string) (forge.Image, error) {
 	ref, err := name.ParseReference(reference)
 	if err != nil {
 		return nil, err

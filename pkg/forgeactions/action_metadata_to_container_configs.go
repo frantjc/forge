@@ -2,6 +2,7 @@ package forgeactions
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/bin"
@@ -9,11 +10,11 @@ import (
 	"github.com/frantjc/forge/pkg/githubactions"
 )
 
-func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata) ([]*forge.ContainerConfig, error) {
-	return DefaultMapping.ActionToConfigs(globalContext, uses, with, environment, actionMetadata)
+func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]*forge.ContainerConfig, error) {
+	return DefaultMapping.ActionToConfigs(globalContext, uses, with, environment, actionMetadata, image)
 }
 
-func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata) ([]*forge.ContainerConfig, error) {
+func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]*forge.ContainerConfig, error) {
 	var (
 		_                = forge.NewLogger()
 		containerConfigs = []*forge.ContainerConfig{}
@@ -63,7 +64,20 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), main))
 				}
 			case githubactions.RunsUsingDocker:
-				entrypoints = append(entrypoints, actionMetadata.GetRuns().GetPreEntrypoint(), actionMetadata.GetRuns().GetEntrypoint())
+				if pre := actionMetadata.GetRuns().GetPreEntrypoint(); pre != "" {
+					entrypoints = append(entrypoints, pre)
+				}
+
+				if main := actionMetadata.GetRuns().GetMain(); main != "" {
+					entrypoints = append(entrypoints, main)
+				} else {
+					config, err := image.Config()
+					if err != nil {
+						return nil, err
+					}
+
+					entrypoints = append(entrypoints, strings.Join(config.Entrypoint, " "))
+				}
 			}
 
 			unexpandedInputs, err := actionMetadata.InputsFromWith(with)

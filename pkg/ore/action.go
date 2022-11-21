@@ -38,7 +38,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		ctx = githubactions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
-	containerConfigs, err := forgeactions.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata)
+	containerConfigs, err := forgeactions.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata, image)
 	if err != nil {
 		return nil, err
 	}
