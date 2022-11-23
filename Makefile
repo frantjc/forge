@@ -7,9 +7,6 @@ UPX = upx
 
 BIN = /usr/local/bin
 
-VERSION ?= 0.0.0
-PRERELEASE ?=
-
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
