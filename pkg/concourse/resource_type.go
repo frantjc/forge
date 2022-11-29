@@ -12,3 +12,9 @@ func ResourceTypesFrom(ctx context.Context) (resourceTypes []*ResourceType, ok b
 	resourceTypes, ok = ctx.Value(resourceTypesKey{}).([]*ResourceType)
 	return
 }
+
+type ResourceType struct {
+	Name       string  `json:"name,omitempty"`
+	Source     *Source `json:"source,omitempty"`
+	Privileged bool    `json:"privileged,omitempty"`
+}

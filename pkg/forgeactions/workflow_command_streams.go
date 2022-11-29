@@ -14,14 +14,14 @@ type WorkflowCommandWriter struct {
 }
 
 func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []byte {
-	if _, ok := w.StopCommandsTokens[wc.GetCommand()]; ok {
-		w.StopCommandsTokens[wc.GetCommand()] = false
+	if _, ok := w.StopCommandsTokens[wc.Command]; ok {
+		w.StopCommandsTokens[wc.Command] = false
 		return make([]byte, 0)
 	}
 
 	for _, stop := range w.StopCommandsTokens {
 		if stop {
-			return []byte(wc.CommandString())
+			return []byte(wc.String())
 		}
 	}
 
@@ -33,21 +33,21 @@ func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []by
 			}
 		}
 
-		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.GetValue()
+		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.Value
 	case githubactions.CommandStopCommands:
-		w.StopCommandsTokens[wc.GetValue()] = true
+		w.StopCommandsTokens[wc.Value] = true
 	case githubactions.CommandSaveState:
-		w.State[wc.GetName()] = wc.GetValue()
+		w.State[wc.GetName()] = wc.Value
 	case githubactions.CommandEcho:
 		w.Debug = !w.Debug
 	case githubactions.CommandEndGroup:
 		return []byte("[endgroup]")
 	case githubactions.CommandDebug:
 		if w.Debug {
-			return []byte("[debug] " + wc.GetValue())
+			return []byte("[debug] " + wc.Value)
 		}
 	default:
-		return []byte("[" + wc.GetCommand() + "] " + wc.GetValue())
+		return []byte("[" + wc.Command + "] " + wc.Value)
 	}
 
 	return make([]byte, 0)

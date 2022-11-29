@@ -11,6 +11,11 @@ import (
 	"github.com/frantjc/forge"
 )
 
+type Uses struct {
+	Path    string `json:"path,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
 func (u *Uses) IsLocal() bool {
 	return strings.HasPrefix(u.Path, "./") || filepath.IsAbs(u.Path) || len(strings.Split(u.Path, "/")) < 2
 }
@@ -20,8 +25,8 @@ func (u *Uses) IsRemote() bool {
 }
 
 func (u *Uses) UsesString() string {
-	uses := u.GetPath()
-	if v := u.GetVersion(); v != "" {
+	uses := u.Path
+	if v := u.Version; v != "" {
 		uses = uses + "@" + v
 	}
 	return uses
@@ -29,7 +34,7 @@ func (u *Uses) UsesString() string {
 
 func (u *Uses) GetRepository() string {
 	if u.IsRemote() {
-		return filepath.Join(strings.Split(u.GetPath(), "/")[0:2]...)
+		return filepath.Join(strings.Split(u.Path, "/")[0:2]...)
 	}
 
 	return ""
@@ -37,7 +42,7 @@ func (u *Uses) GetRepository() string {
 
 func (u *Uses) GetActionPath() string {
 	if u.IsRemote() {
-		elements := strings.Split(u.GetPath(), "/")
+		elements := strings.Split(u.Path, "/")
 		if len(elements) > 2 {
 			return filepath.Join(elements[2:]...)
 		}

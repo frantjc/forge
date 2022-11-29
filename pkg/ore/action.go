@@ -10,6 +10,14 @@ import (
 	"github.com/frantjc/forge/pkg/githubactions"
 )
 
+type Action struct {
+	ID            string                       `json:"id,omitempty"`
+	Uses          string                       `json:"uses,omitempty"`
+	With          map[string]string            `json:"with,omitempty"`
+	Env           map[string]string            `json:"env,omitempty"`
+	GlobalContext *githubactions.GlobalContext `json:"global_context,omitempty"`
+}
+
 func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
 	var (
 		_        = forge.LoggerFrom(ctx)
@@ -31,21 +39,21 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return nil, err
 	}
 
-	if o.GetGlobalContext() == nil {
+	if o.GlobalContext == nil {
 		o.GlobalContext = githubactions.NewGlobalContextFromEnv()
 	}
 	defer func() {
 		ctx = githubactions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
 
-	containerConfigs, err := forgeactions.ActionToConfigs(o.GetGlobalContext(), uses, o.GetWith(), o.GetEnv(), actionMetadata, image)
+	containerConfigs, err := forgeactions.ActionToConfigs(o.GlobalContext, uses, o.With, o.Env, actionMetadata, image)
 	if err != nil {
 		return nil, err
 	}
 
-	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(o.GetGlobalContext(), o.GetId(), drains)
+	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(o.GlobalContext, o.ID, drains)
 	for _, containerConfig := range containerConfigs {
-		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.GetMounts()...)
+		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
 		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 		if err != nil {
 			return nil, err

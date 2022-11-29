@@ -7,8 +7,7 @@ type Volume struct {
 	*client.Client
 }
 
-//nolint:revive // matching protobuf style
-func (v *Volume) GetId() string {
+func (v *Volume) GetID() string {
 	return v.ID
 }
 

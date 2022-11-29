@@ -10,16 +10,24 @@ import (
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
+type Pure struct {
+	Image      string   `json:"image,omitempty"`
+	Entrypoint []string `json:"entrypoint,omitempty"`
+	Cmd        []string `json:"cmd,omitempty"`
+	Env        []string `json:"env,omitempty"`
+	Input      []byte   `json:"input,omitempty"`
+}
+
 func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
-	image, err := containerRuntime.PullImage(ctx, o.GetImage())
+	image, err := containerRuntime.PullImage(ctx, o.Image)
 	if err != nil {
 		return nil, err
 	}
 
 	containerConfig := &forge.ContainerConfig{
-		Entrypoint: o.GetEntrypoint(),
-		Cmd:        o.GetCmd(),
-		Env:        o.GetEnv(),
+		Entrypoint: o.Entrypoint,
+		Cmd:        o.Cmd,
+		Env:        o.Env,
 		WorkingDir: cfs.WorkingDir,
 		Mounts:     contaminate.MountsFrom(ctx),
 	}

@@ -14,8 +14,8 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 
 	container, err := containerRuntime.CreateContainer(ctx, image, &forge.ContainerConfig{
 		Entrypoint: bin.ShimSleepEntrypoint,
-		Mounts:     containerConfig.GetMounts(),
-		Env:        containerConfig.GetEnv(),
+		Mounts:     containerConfig.Mounts,
+		Env:        containerConfig.Env,
 	})
 	if err != nil {
 		return nil, err
@@ -26,12 +26,7 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 	}
 
 	hooks.ContainerCreated.Dispatch(ctx, container)
+	defer hooks.ContainerStarted.Dispatch(ctx, container)
 
-	if err = container.Start(ctx); err != nil {
-		return nil, err
-	}
-
-	hooks.ContainerStarted.Dispatch(ctx, container)
-
-	return container, nil
+	return container, container.Start(ctx)
 }

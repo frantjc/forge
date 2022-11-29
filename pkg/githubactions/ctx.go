@@ -33,7 +33,7 @@ func (c *GlobalContext) GetString(key string) string {
 		switch keys[0] {
 		case "github":
 			if len(keys) > 1 {
-				return c.GetGitHubContext().GetString(strings.Join(keys[1:], "."))
+				return c.GitHubContext.GetString(strings.Join(keys[1:], "."))
 			}
 		case "env":
 			if len(keys) > 1 {
@@ -43,7 +43,7 @@ func (c *GlobalContext) GetString(key string) string {
 			}
 		case "job":
 			if len(keys) > 1 {
-				return c.GetJobContext().GetString(strings.Join(keys[1:], "."))
+				return c.JobContext.GetString(strings.Join(keys[1:], "."))
 			}
 		case "steps":
 			if len(keys) > 2 {
@@ -53,7 +53,7 @@ func (c *GlobalContext) GetString(key string) string {
 			}
 		case "runner":
 			if len(keys) > 1 {
-				return c.GetRunnerContext().GetString(strings.Join(keys[1:], "."))
+				return c.RunnerContext.GetString(strings.Join(keys[1:], "."))
 			}
 		case "inputs":
 			if len(keys) > 1 {
@@ -84,51 +84,51 @@ func (c *GitHubContext) GetString(key string) string {
 	if len(keys) > 0 {
 		switch keys[0] {
 		case "action":
-			return c.GetAction()
+			return c.Action
 		case "action_path":
-			return c.GetActionPath()
+			return c.ActionPath
 		case "actor":
-			return c.GetActor()
+			return c.Actor
 		case "base_ref":
-			return c.GetBaseRef()
+			return c.BaseRef
 		case "event":
-			return c.GetEvent()
+			return c.Event
 		case "event_name":
-			return c.GetEventName()
+			return c.EventName
 		case "event_path":
-			return c.GetEventPath()
+			return c.EventPath
 		case "head_ref":
-			return c.GetHeadRef()
+			return c.HeadRef
 		case "job":
-			return c.GetJob()
+			return c.Job
 		case "ref":
-			return c.GetRef()
+			return c.Ref
 		case "ref_name":
-			return c.GetRefName()
+			return c.RefName
 		case "ref_protected":
-			return fmt.Sprint(c.GetRefProtected())
+			return fmt.Sprint(c.RefProtected)
 		case "ref_type":
-			return c.GetRefType()
+			return c.RefType
 		case "repository":
-			return c.GetRepository()
+			return c.Repository
 		case "repository_owner":
-			return c.GetRepositoryOwner()
+			return c.RepositoryOwner
 		case "run_id":
-			return c.GetRunId()
+			return c.RunID
 		case "run_number":
-			return fmt.Sprint(c.GetRunNumber())
+			return fmt.Sprint(c.RunNumber)
 		case "run_attempt":
-			return fmt.Sprint(c.GetRunAttempt())
+			return fmt.Sprint(c.RunAttempt)
 		case "server_url":
-			return c.GetServerUrl()
+			return c.ServerURL
 		case "sha":
-			return c.GetSha()
+			return c.Sha
 		case "token":
-			return c.GetToken()
+			return c.Token
 		case "workflow":
-			return c.GetWorkflow()
+			return c.Workflow
 		case "workspace":
-			return c.GetWorkspace()
+			return c.Workspace
 		}
 	}
 
@@ -143,7 +143,7 @@ func (c *JobContext) GetString(key string) string {
 			if len(keys) > 1 {
 				switch keys[1] {
 				case "id":
-					return c.Container.Id
+					return c.Container.ID
 				case "network":
 					return c.Container.Network
 				}
@@ -154,7 +154,7 @@ func (c *JobContext) GetString(key string) string {
 					if len(keys) > 2 {
 						switch keys[2] {
 						case "id":
-							return v.Id
+							return v.ID
 						case "network":
 							return v.Network
 						case "ports":
@@ -186,9 +186,9 @@ func (c *StepContext) GetString(key string) string {
 				}
 			}
 		case "outcome":
-			return c.GetOutcome()
+			return c.Outcome
 		case "conclusion":
-			return c.GetConclusion()
+			return c.Conclusion
 		}
 	}
 
@@ -200,15 +200,15 @@ func (c *RunnerContext) GetString(key string) string {
 	if len(keys) > 0 {
 		switch keys[0] {
 		case "name":
-			return c.GetName()
+			return c.Name
 		case "os":
-			return c.GetOs()
+			return c.OS
 		case "arch":
-			return c.GetArch()
+			return c.Arch
 		case "temp":
-			return c.GetTemp()
+			return c.Temp
 		case "tool_cache":
-			return c.GetToolCache()
+			return c.ToolCache
 		}
 	}
 
@@ -310,10 +310,10 @@ func NewGlobalContextFromEnv() *GlobalContext {
 			RefType:         os.Getenv(EnvVarRefType),
 			Repository:      os.Getenv(EnvVarRepository),
 			RepositoryOwner: os.Getenv(EnvVarRepositoryOwner),
-			RunId:           os.Getenv(EnvVarRunID),
+			RunID:           os.Getenv(EnvVarRunID),
 			RunNumber:       int64(runNumber),
 			RunAttempt:      int64(runAttempt),
-			ServerUrl:       serverURL.String(),
+			ServerURL:       serverURL.String(),
 			Sha:             os.Getenv(EnvVarSha),
 			Token:           os.Getenv(EnvVarToken),
 			Workflow:        os.Getenv(EnvVarWorkflow),
@@ -324,7 +324,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		StepsContext: make(map[string]*StepContext),
 		RunnerContext: &RunnerContext{
 			Name:      runnerName,
-			Os:        runnerOS,
+			OS:        runnerOS,
 			Arch:      runnerArch,
 			Temp:      runnerTemp,
 			ToolCache: runnerToolCache,
@@ -357,7 +357,7 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	}
 
 	if ref, err := r.Head(); err == nil {
-		c.GetGitHubContext().Sha = ref.Hash().String()
+		c.GitHubContext.Sha = ref.Hash().String()
 		if shaBranch := strings.Split(ref.String(), " "); len(shaBranch) > 1 {
 			c.GitHubContext.RefName = strings.TrimPrefix(shaBranch[1], "refs/heads/")
 			c.GitHubContext.Ref = shaBranch[1]
@@ -382,18 +382,18 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 			conf.User.Email,
 			conf.Author.Email,
 			conf.Committer.Email,
-			c.GetGitHubContext().GetActor(),
+			c.GitHubContext.Actor,
 		)
 
 		for _, remote := range conf.Remotes {
 			for _, rurl := range remote.URLs {
 				prurl, err := url.Parse(rurl)
 				if err == nil {
-					c.GetGitHubContext().Repository = strings.TrimSuffix(
+					c.GitHubContext.Repository = strings.TrimSuffix(
 						strings.TrimPrefix(prurl.Path, "/"),
 						".git",
 					)
-					c.GetGitHubContext().RepositoryOwner = strings.Split(c.GetGitHubContext().Repository, "/")[0]
+					c.GitHubContext.RepositoryOwner = strings.Split(c.GitHubContext.Repository, "/")[0]
 					break
 				}
 			}
@@ -420,51 +420,51 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 }
 
 func (c *GlobalContext) envMap() map[string]string {
-	serverURL, _ := url.Parse(c.GetGitHubContext().GetServerUrl())
+	serverURL, _ := url.Parse(c.GitHubContext.ServerURL)
 	apiURL, _ := APIURLFromBaseURL(serverURL)
 	graphqlURL, _ := GraphQLURLFromBaseURL(serverURL)
 	env := map[string]string{
 		EnvVarCI:              fmt.Sprint(true),
-		EnvVarWorkflow:        c.GetGitHubContext().GetWorkflow(),
-		EnvVarRunID:           c.GetGitHubContext().GetRunId(),
-		EnvVarRunNumber:       fmt.Sprint(c.GetGitHubContext().GetRunNumber()),
-		EnvVarRunAttempt:      fmt.Sprint(c.GetGitHubContext().GetRunAttempt()),
-		EnvVarJob:             c.GetGitHubContext().GetJob(),
-		EnvVarAction:          c.GetGitHubContext().GetAction(),
-		EnvVarActionPath:      c.GetGitHubContext().GetActionPath(),
+		EnvVarWorkflow:        c.GitHubContext.Workflow,
+		EnvVarRunID:           c.GitHubContext.RunID,
+		EnvVarRunNumber:       fmt.Sprint(c.GitHubContext.RunNumber),
+		EnvVarRunAttempt:      fmt.Sprint(c.GitHubContext.RunAttempt),
+		EnvVarJob:             c.GitHubContext.Job,
+		EnvVarAction:          c.GitHubContext.Action,
+		EnvVarActionPath:      c.GitHubContext.ActionPath,
 		EnvVarActions:         fmt.Sprint(true),
-		EnvVarActor:           c.GetGitHubContext().GetActor(),
-		EnvVarRepository:      c.GetGitHubContext().GetRepository(),
-		EnvVarEventName:       c.GetGitHubContext().GetEventName(),
-		EnvVarEventPath:       c.GetGitHubContext().GetEventPath(),
-		EnvVarWorkspace:       c.GetGitHubContext().GetWorkspace(),
-		EnvVarSha:             c.GetGitHubContext().GetSha(),
-		EnvVarRef:             c.GetGitHubContext().GetRef(),
-		EnvVarRefName:         c.GetGitHubContext().GetRefName(),
-		EnvVarRefProtected:    fmt.Sprint(c.GetGitHubContext().GetRefProtected()),
-		EnvVarRefType:         c.GetGitHubContext().GetRefType(),
-		EnvVarHeadRef:         c.GetGitHubContext().GetHeadRef(),
-		EnvVarBaseRef:         c.GetGitHubContext().GetBaseRef(),
-		EnvVarServerURL:       c.GetGitHubContext().GetServerUrl(),
+		EnvVarActor:           c.GitHubContext.Actor,
+		EnvVarRepository:      c.GitHubContext.Repository,
+		EnvVarEventName:       c.GitHubContext.EventName,
+		EnvVarEventPath:       c.GitHubContext.EventPath,
+		EnvVarWorkspace:       c.GitHubContext.Workspace,
+		EnvVarSha:             c.GitHubContext.Sha,
+		EnvVarRef:             c.GitHubContext.Ref,
+		EnvVarRefName:         c.GitHubContext.RefName,
+		EnvVarRefProtected:    fmt.Sprint(c.GitHubContext.RefProtected),
+		EnvVarRefType:         c.GitHubContext.RefType,
+		EnvVarHeadRef:         c.GitHubContext.HeadRef,
+		EnvVarBaseRef:         c.GitHubContext.BaseRef,
+		EnvVarServerURL:       c.GitHubContext.ServerURL,
 		EnvVarAPIURL:          apiURL.String(),
 		EnvVarGraphQLURL:      graphqlURL.String(),
-		EnvVarRunnerName:      c.GetRunnerContext().GetName(),
-		EnvVarRunnerOS:        c.GetRunnerContext().GetOs(),
-		EnvVarRunnerArch:      c.GetRunnerContext().GetArch(),
-		EnvVarRunnerTemp:      c.GetRunnerContext().GetTemp(),
-		EnvVarRunnerToolCache: c.GetRunnerContext().GetToolCache(),
-		EnvVarToken:           c.GetGitHubContext().GetToken(),
-		EnvVarRepositoryOwner: c.GetGitHubContext().GetRepositoryOwner(),
+		EnvVarRunnerName:      c.RunnerContext.Name,
+		EnvVarRunnerOS:        c.RunnerContext.OS,
+		EnvVarRunnerArch:      c.RunnerContext.Arch,
+		EnvVarRunnerTemp:      c.RunnerContext.Temp,
+		EnvVarRunnerToolCache: c.RunnerContext.ToolCache,
+		EnvVarToken:           c.GitHubContext.Token,
+		EnvVarRepositoryOwner: c.GitHubContext.RepositoryOwner,
 	}
 
 	if c.EnvContext != nil {
-		for k, v := range c.GetEnvContext() {
+		for k, v := range c.EnvContext {
 			env[k] = v
 		}
 	}
 
 	if c.InputsContext != nil {
-		for k, v := range c.GetInputsContext() {
+		for k, v := range c.InputsContext {
 			if v != "" {
 				env[fmt.Sprintf("INPUT_%s", strings.ReplaceAll(strings.ToUpper(k), " ", "_"))] = v
 			}
@@ -476,4 +476,76 @@ func (c *GlobalContext) envMap() map[string]string {
 
 func (c *GlobalContext) Env() []string {
 	return envconv.MapToArr(c.envMap())
+}
+
+type GlobalContext struct {
+	GitHubContext  *GitHubContext          `json:"git_hub_context,omitempty"`
+	EnvContext     map[string]string       `json:"env_context,omitempty"`
+	JobContext     *JobContext             `json:"job_context,omitempty"`
+	StepsContext   map[string]*StepContext `json:"steps_context,omitempty"`
+	RunnerContext  *RunnerContext          `json:"runner_context,omitempty"`
+	InputsContext  map[string]string       `json:"inputs_context,omitempty"`
+	SecretsContext map[string]string       `json:"secrets_context,omitempty"`
+	NeedsContext   map[string]*NeedContext `json:"needs_context,omitempty"`
+}
+
+type GitHubContext struct {
+	Action          string `json:"action,omitempty"`
+	ActionPath      string `json:"action_path,omitempty"`
+	Actor           string `json:"actor,omitempty"`
+	BaseRef         string `json:"base_ref,omitempty"`
+	Event           string `json:"event,omitempty"`
+	EventName       string `json:"event_name,omitempty"`
+	EventPath       string `json:"event_path,omitempty"`
+	HeadRef         string `json:"head_ref,omitempty"`
+	Job             string `json:"job,omitempty"`
+	Ref             string `json:"ref,omitempty"`
+	RefName         string `json:"ref_name,omitempty"`
+	RefProtected    bool   `json:"ref_protected,omitempty"`
+	RefType         string `json:"ref_type,omitempty"`
+	Repository      string `json:"repository,omitempty"`
+	RepositoryOwner string `json:"repository_owner,omitempty"`
+	RunID           string `json:"run_id,omitempty"`
+	RunNumber       int64  `json:"run_number,omitempty"`
+	RunAttempt      int64  `json:"run_attempt,omitempty"`
+	ServerURL       string `json:"server_url,omitempty"`
+	Sha             string `json:"sha,omitempty"`
+	Token           string `json:"token,omitempty"`
+	Workflow        string `json:"workflow,omitempty"`
+	Workspace       string `json:"workspace,omitempty"`
+}
+
+type JobContext struct {
+	Container *JobContextContainer          `json:"container,omitempty"`
+	Services  map[string]*JobContextService `json:"services,omitempty"`
+	Status    string                        `json:"status,omitempty"`
+}
+
+type StepContext struct {
+	Outputs    map[string]string `json:"outputs,omitempty"`
+	Conclusion string            `json:"conclusion,omitempty"`
+	Outcome    string            `json:"outcome,omitempty"`
+}
+
+type RunnerContext struct {
+	Name      string `json:"name,omitempty"`
+	OS        string `json:"os,omitempty"`
+	Arch      string `json:"arch,omitempty"`
+	Temp      string `json:"temp,omitempty"`
+	ToolCache string `json:"tool_cache,omitempty"`
+}
+
+type NeedContext struct {
+	Outputs map[string]string `json:"outputs,omitempty"`
+}
+
+type JobContextContainer struct {
+	ID      string `json:"id,omitempty"`
+	Network string `json:"network,omitempty"`
+}
+
+type JobContextService struct {
+	ID      string            `json:"id,omitempty"`
+	Network string            `json:"network,omitempty"`
+	Ports   map[string]string `json:"ports,omitempty"`
 }

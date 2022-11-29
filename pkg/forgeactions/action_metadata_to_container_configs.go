@@ -22,7 +22,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	if actionMetadata != nil {
-		if actionMetadata.GetRuns() != nil {
+		if actionMetadata.Runs != nil {
 			actionDir, err := m.UsesToActionDirectory(uses)
 			if err != nil {
 				return nil, err
@@ -30,45 +30,45 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			var (
 				entrypoint = []string{bin.ShimPath, "-e"}
-				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.GetRuns().GetEnv())...)
-				cmd        = actionMetadata.GetRuns().GetArgs()
+				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
+				cmd        = actionMetadata.Runs.Args
 				mounts     = []*forge.Mount{
 					{
 						Source:      actionDir,
-						Destination: m.GetActionPath(),
+						Destination: m.ActionPath,
 					},
 					{
-						Destination: m.GetWorkspace(),
+						Destination: m.Workspace,
 					},
 					{
-						Destination: m.GetRunnerToolCache(),
+						Destination: m.RunnerToolCache,
 					},
 					{
-						Destination: m.GetRunnerTemp(),
+						Destination: m.RunnerTemp,
 					},
 					{
-						Destination: m.GetGitHubPath(),
+						Destination: m.GitHubPath,
 					},
 				}
 				entrypoints []string
 			)
 
-			switch actionMetadata.GetRuns().GetUsing() {
+			switch actionMetadata.Runs.Using {
 			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16:
 				entrypoint = append(entrypoint, "node")
-				if pre := actionMetadata.GetRuns().GetPre(); pre != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), pre))
+				if pre := actionMetadata.Runs.Pre; pre != "" {
+					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, pre))
 				}
 
-				if main := actionMetadata.GetRuns().GetMain(); main != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.GetActionPath(), main))
+				if main := actionMetadata.Runs.Main; main != "" {
+					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, main))
 				}
 			case githubactions.RunsUsingDocker:
-				if pre := actionMetadata.GetRuns().GetPreEntrypoint(); pre != "" {
+				if pre := actionMetadata.Runs.PreEntrypoint; pre != "" {
 					entrypoints = append(entrypoints, pre)
 				}
 
-				if main := actionMetadata.GetRuns().GetMain(); main != "" {
+				if main := actionMetadata.Runs.Main; main != "" {
 					entrypoints = append(entrypoints, main)
 				} else {
 					config, err := image.Config()
@@ -95,7 +95,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
-			env = append(env, githubactions.EnvVarPath+"="+m.GetGitHubPathPath(), githubactions.EnvVarEnv+"="+m.GetGitHubEnvPath())
+			env = append(env, githubactions.EnvVarPath+"="+m.GitHubPathPath, githubactions.EnvVarEnv+"="+m.GitHubEnvPath)
 
 			for _, s := range entrypoints {
 				if s != "" {

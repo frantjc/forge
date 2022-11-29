@@ -58,22 +58,22 @@ func newResource(method string, check bool) *cobra.Command {
 					return err
 				}
 
-				for _, r := range config.GetResources() {
-					if r.GetName() == name {
+				for _, r := range config.Resources {
+					if r.Name == name {
 						o.Resource = r
 					}
 				}
-				if o.GetResource() == nil {
+				if o.Resource == nil {
 					return fmt.Errorf("resource not found: %s", name)
 				}
 
-				for _, t := range config.GetResourceTypes() {
-					if t.GetName() == o.GetResource().GetType() {
+				for _, t := range config.ResourceTypes {
+					if t.Name == o.Resource.Type {
 						o.ResourceType = t
 					}
 				}
-				if o.GetResourceType() == nil {
-					return fmt.Errorf("resource type not found: %s", o.GetResource().GetType())
+				if o.ResourceType == nil {
+					return fmt.Errorf("resource type not found: %s", o.Resource.Type)
 				}
 
 				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -84,7 +84,7 @@ func newResource(method string, check bool) *cobra.Command {
 				_, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, &forge.Mount{
 						Source:      wd,
-						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.GetResource().GetName()),
+						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
 					}), o, forge.StdDrains(),
 				)
 				return err

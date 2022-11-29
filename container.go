@@ -7,7 +7,7 @@ import (
 
 // Container represents a container created by a ContainerRuntime.
 type Container interface {
-	GetId() string
+	GetID() string
 
 	CopyTo(context.Context, string, io.Reader) error
 	CopyFrom(context.Context, string) (io.ReadCloser, error)

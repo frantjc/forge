@@ -1,6 +1,5 @@
 GO = go
 GOLANGCI-LINT = golangci-lint
-BUF = buf
 INSTALL = sudo install
 GORELEASER = goreleaser
 UPX = upx
@@ -20,10 +19,6 @@ install: build
 build:
 	@$(GORELEASER) release --snapshot --rm-dist
 
-protos:
-	@$(BUF) format -w
-	@$(BUF) generate .
-
 fmt generate test:
 	@$(GO) $@ ./...
 
@@ -40,13 +35,10 @@ shim:
 clean:
 	@rm -rf dist/ privileged version
 
-proto: protos
-buf: proto
 gen: generate
 dl: download
 ven: vendor
 ver: verify
 format: fmt
-	@$(BUF) format -w
 
-.PHONY: install build protos fmt generate test download vendor verify lint shim clean proto buf gen dl ven ver format
+.PHONY: install build fmt generate test download vendor verify lint shim clean gen dl ven ver format

@@ -70,16 +70,16 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		func(m *forge.Mount, _ int) mount.Mount {
 			mountType := mount.TypeVolume
 			switch {
-			case m.GetSource() == "":
+			case m.Source == "":
 				mountType = mount.TypeTmpfs
-			case filepath.IsAbs(m.GetSource()):
+			case filepath.IsAbs(m.Source):
 				mountType = mount.TypeBind
 			}
 
 			return mount.Mount{
 				Type:   mountType,
-				Source: m.GetSource(),
-				Target: m.GetDestination(),
+				Source: m.Source,
+				Target: m.Destination,
 			}
 		},
 	)...)

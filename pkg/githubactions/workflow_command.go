@@ -6,7 +6,13 @@ import (
 	"github.com/frantjc/forge/pkg/rangemap"
 )
 
-func (c *WorkflowCommand) CommandString() string {
+type WorkflowCommand struct {
+	Command    string            `json:"command,omitempty"`
+	Parameters map[string]string `json:"parameters,omitempty"`
+	Value      string            `json:"value,omitempty"`
+}
+
+func (c *WorkflowCommand) String() string {
 	s := fmt.Sprintf("::%s", c.Command)
 
 	paramSpl := " "
@@ -25,7 +31,7 @@ func (c *WorkflowCommand) CommandString() string {
 }
 
 func (c *WorkflowCommand) GoString() string {
-	return "&WorkflowCommand{" + c.CommandString() + "}"
+	return "&WorkflowCommand{" + c.String() + "}"
 }
 
 func (c *WorkflowCommand) GetName() string {

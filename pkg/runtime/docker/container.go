@@ -7,11 +7,10 @@ type Container struct {
 	*client.Client
 }
 
-//nolint:revive // matching protobuf style
-func (c *Container) GetId() string {
+func (c *Container) GetID() string {
 	return c.ID
 }
 
 func (c *Container) GoString() string {
-	return "&Container{" + c.GetId() + "}"
+	return "&Container{" + c.GetID() + "}"
 }

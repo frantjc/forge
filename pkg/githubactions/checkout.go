@@ -36,7 +36,7 @@ func CheckoutUses(ctx context.Context, u *Uses, opts *CheckoutOpts) (*Metadata, 
 
 	clopts := &git.CloneOptions{
 		URL:               cloneURL.String(),
-		ReferenceName:     plumbing.NewTagReferenceName(u.GetVersion()),
+		ReferenceName:     plumbing.NewTagReferenceName(u.Version),
 		SingleBranch:      true,
 		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
 		InsecureSkipTLS:   opts.Insecure,
@@ -49,7 +49,7 @@ func CheckoutUses(ctx context.Context, u *Uses, opts *CheckoutOpts) (*Metadata, 
 			return nil, err
 		}
 	} else if err != nil {
-		clopts.ReferenceName = plumbing.NewBranchReferenceName(u.GetVersion())
+		clopts.ReferenceName = plumbing.NewBranchReferenceName(u.Version)
 		repo, err = git.PlainCloneContext(ctx, opts.Path, false, clopts)
 		if err != nil {
 			return nil, err

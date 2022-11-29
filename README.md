@@ -59,7 +59,4 @@ Forge aims to remedy this.
 - `make` is recommended - version 3.81 is tested
 - `golang` is _required_ - version 1.18.x or above is required for [generics](https://go.dev/doc/tutorial/generics)
 - `docker` is _required_ - version 20.10.x is tested
-- [`buf`](https://github.com/bufbuild/buf) is _required if_ modifying proto - version 1.4.x is tested
 - [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
-- [`protoc`](https://grpc.io/docs/protoc-installation) is _required if_ modifying proto - version 3.19.x is tested
-  - [`protoc-gen-go`](https://developers.google.com/protocol-buffers/docs/reference/go-generated) - version 1.26.x is tested

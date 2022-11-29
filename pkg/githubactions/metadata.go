@@ -42,9 +42,44 @@ func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, er
 }
 
 func (m *Metadata) IsComposite() bool {
-	return m.GetRuns().GetUsing() == RunsUsingComposite
+	return m.Runs.Using == RunsUsingComposite
 }
 
 func (m *Metadata) IsDockerfile() bool {
-	return m.GetRuns().GetUsing() == RunsUsingDocker && m.GetRuns().GetImage() == RunsUsingDockerfileImage
+	return m.Runs.Using == RunsUsingDocker && m.Runs.Image == RunsUsingDockerfileImage
+}
+
+type Metadata struct {
+	Name        string                     `json:"name,omitempty"`
+	Author      string                     `json:"author,omitempty"`
+	Description string                     `json:"description,omitempty"`
+	Inputs      map[string]*MetadataInput  `json:"inputs,omitempty"`
+	Output      map[string]*MetadataOutput `json:"output,omitempty"`
+	Runs        *MetadataRuns              `json:"runs,omitempty"`
+}
+
+type MetadataInput struct {
+	Description        string `json:"description,omitempty"`
+	Required           bool   `json:"required,omitempty"`
+	Default            string `json:"default,omitempty"`
+	DeprecationMessage string `json:"deprecation_message,omitempty"`
+}
+
+type MetadataOutput struct {
+	Description string `json:"description,omitempty"`
+}
+
+type MetadataRuns struct {
+	Plugin         string            `json:"plugin,omitempty"`
+	Using          string            `json:"using,omitempty"`
+	Pre            string            `json:"pre,omitempty"`
+	Main           string            `json:"main,omitempty"`
+	Post           string            `json:"post,omitempty"`
+	Image          string            `json:"image,omitempty"`
+	PreEntrypoint  string            `json:"pre_entrypoint,omitempty"`
+	Entrypoint     string            `json:"entrypoint,omitempty"`
+	PostEntrypoint string            `json:"post_entrypoint,omitempty"`
+	Args           []string          `json:"args,omitempty"`
+	Env            map[string]string `json:"env,omitempty"`
+	Steps          []*Step           `json:"steps,omitempty"`
 }

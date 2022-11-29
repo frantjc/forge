@@ -10,12 +10,12 @@ import (
 )
 
 type Alloy struct {
-	Id   string      `json:"id,omitempty"` //nolint:revive // matching protobuf style
+	ID   string      `json:"id,omitempty"`
 	Ores []forge.Ore `json:"ores,omitempty"`
 }
 
 func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
-	volumeName := o.GetId()
+	volumeName := o.ID
 	if volumeName == "" {
 		volumeName = uuid.NewString()
 	}
@@ -26,7 +26,7 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	}
 	defer volume.Remove(ctx) //nolint:errcheck
 
-	for _, ore := range o.GetOres() {
+	for _, ore := range o.Ores {
 		if metal, err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      volumeName,
 			Destination: cfs.WorkingDir,
@@ -36,13 +36,4 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	}
 
 	return metal, err
-}
-
-//nolint:revive // matching protobuf style
-func (o *Alloy) GetId() string {
-	return o.Id
-}
-
-func (o *Alloy) GetOres() []forge.Ore {
-	return o.Ores
 }

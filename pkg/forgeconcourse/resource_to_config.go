@@ -12,11 +12,11 @@ func ResourceToConfig(resource *concourse.Resource, resourceType *concourse.Reso
 func (m *Mapping) ResourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string) *forge.ContainerConfig {
 	return &forge.ContainerConfig{
 		Entrypoint: GetEntrypoint(method),
-		Cmd:        []string{m.GetRootPath() + "/" + resource.GetName()},
-		Privileged: resourceType.GetPrivileged(),
+		Cmd:        []string{m.RootPath + "/" + resource.Name},
+		Privileged: resourceType.Privileged,
 		Mounts: []*forge.Mount{
 			{
-				Destination: m.GetRootPath() + "/" + resource.GetName(),
+				Destination: m.RootPath + "/" + resource.Name,
 			},
 		},
 	}

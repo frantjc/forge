@@ -17,7 +17,7 @@ func TestWorkflowCommandToString(t *testing.T) {
 			Value: "value",
 		}
 		expected = "::set-output name=var,otherParam=param::value"
-		actual   = wc.CommandString()
+		actual   = wc.String()
 	)
 
 	if actual != expected {

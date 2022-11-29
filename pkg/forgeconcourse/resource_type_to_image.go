@@ -14,13 +14,13 @@ func PullImageForResourceType(ctx context.Context, containerRuntime forge.Contai
 }
 
 func ResourceTypeToImageReference(resourceType *concourse.ResourceType) string {
-	if resourceType != nil && resourceType.GetSource() != nil {
-		tag := resourceType.GetSource().GetTag()
+	if resourceType != nil && resourceType.Source != nil {
+		tag := resourceType.Source.Tag
 		if tag == "" {
 			tag = DefaultTag
 		}
 
-		return resourceType.GetSource().GetRepository() + ":" + tag
+		return resourceType.Source.Repository + ":" + tag
 	}
 
 	return ""

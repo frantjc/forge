@@ -40,9 +40,9 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 			return nil, err
 		}
 
-		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.GetVersion()
+		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
 		if uses.IsLocal() {
-			reference = path.Join("forge.dev", strings.ToLower(actionMetadata.GetName()))
+			reference = path.Join("forge.dev", strings.ToLower(actionMetadata.Name))
 		}
 
 		return containerRuntime.BuildDockerfile(ctx, dir, reference)
@@ -56,18 +56,18 @@ func MetadataToImageReference(actionMetadata *githubactions.Metadata) string {
 		return ""
 	}
 
-	if actionMetadata.GetRuns() == nil {
+	if actionMetadata.Runs == nil {
 		return ""
 	}
 
-	switch actionMetadata.GetRuns().GetUsing() {
+	switch actionMetadata.Runs.Using {
 	case githubactions.RunsUsingNode12:
 		return Node12ImageReference
 	case githubactions.RunsUsingNode16:
 		return Node16ImageReference
 	case githubactions.RunsUsingDocker:
-		if strings.HasPrefix(actionMetadata.GetRuns().GetImage(), githubactions.RunsUsingDockerImagePrefix) {
-			return strings.TrimPrefix(actionMetadata.GetRuns().GetImage(), githubactions.RunsUsingDockerImagePrefix)
+		if strings.HasPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix) {
+			return strings.TrimPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix)
 		}
 	}
 
