@@ -28,5 +28,3 @@ brews:
     license: MIT
     test: |
       system "#{bin}/forge --version"
-    dependencies:
-      - name: git

@@ -17,6 +17,7 @@ import (
 
 func NewUse() *cobra.Command {
 	var (
+		workdir   string
 		env, with map[string]string
 		cmd       = &cobra.Command{
 			Use:           "use",
@@ -25,21 +26,18 @@ func NewUse() *cobra.Command {
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
-				var (
-					ctx = cmd.Context()
-					wd  = WorkdirFrom(ctx)
-				)
+				ctx := cmd.Context()
 
-				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, wd)
+				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, workdir)
 				if err != nil {
-					return err
+					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
 					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
 				}
 
-				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolcache} {
+				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolCache} {
 					if err = os.MkdirAll(dir, 0o755); err != nil {
 						return err
 					}
@@ -53,7 +51,7 @@ func NewUse() *cobra.Command {
 				_, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, []*forge.Mount{
 						{
-							Source:      wd,
+							Source:      workdir,
 							Destination: forgeactions.DefaultWorkspace,
 						},
 						{
@@ -61,7 +59,7 @@ func NewUse() *cobra.Command {
 							Destination: forgeactions.DefaultRunnerTemp,
 						},
 						{
-							Source:      hostfs.RunnerToolcache,
+							Source:      hostfs.RunnerToolCache,
 							Destination: forgeactions.DefaultRunnerToolCache,
 						},
 					}...),
@@ -78,10 +76,17 @@ func NewUse() *cobra.Command {
 		}
 	)
 
+	wd, err := os.Getwd()
+	if err != nil {
+		wd = "."
+	}
+
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
 	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")
+	cmd.Flags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
+	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
 }

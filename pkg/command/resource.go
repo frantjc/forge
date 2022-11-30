@@ -20,7 +20,7 @@ import (
 
 func newResource(method string, check bool) *cobra.Command {
 	var (
-		conf            string
+		conf, workdir   string
 		version, params map[string]string
 		cmd             = &cobra.Command{
 			Use:           method,
@@ -34,7 +34,6 @@ func newResource(method string, check bool) *cobra.Command {
 					_      = forge.LoggerFrom(ctx)
 					name   = args[0]
 					config = &forgeconcourse.Config{}
-					wd     = WorkdirFrom(ctx)
 					file   io.Reader
 					err    error
 					o      = &ore.Resource{
@@ -49,7 +48,7 @@ func newResource(method string, check bool) *cobra.Command {
 						return err
 					}
 				} else {
-					if file, err = os.Open(filepath.Join(wd, conf)); err != nil {
+					if file, err = os.Open(filepath.Join(workdir, conf)); err != nil {
 						return err
 					}
 				}
@@ -83,7 +82,7 @@ func newResource(method string, check bool) *cobra.Command {
 
 				_, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, &forge.Mount{
-						Source:      wd,
+						Source:      workdir,
 						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
 					}), o, forge.StdDrains(),
 				)
@@ -92,12 +91,19 @@ func newResource(method string, check bool) *cobra.Command {
 		}
 	)
 
+	wd, err := os.Getwd()
+	if err != nil {
+		wd = "."
+	}
+
 	if !check {
 		cmd.Flags().StringToStringVarP(&params, "params", "p", nil, "params for resource")
 	}
 	cmd.Flags().StringToStringVarP(&version, "version", "i", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf")
+	cmd.Flags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
+	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
 }

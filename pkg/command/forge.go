@@ -9,17 +9,13 @@ import (
 
 func New() *cobra.Command {
 	var (
-		workdir   string
 		verbosity int
 		cmd       = &cobra.Command{
 			Use:     "forge",
 			Version: forge.GetSemver(),
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				cmd.SetContext(
-					WithWorkdir(
-						forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
-						workdir,
-					),
+					forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
 				)
 			},
 			SilenceErrors: true,
@@ -29,8 +25,6 @@ func New() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
-	cmd.PersistentFlags().StringVarP(&workdir, "workdir", "d", "", "working directory for forge")
-	_ = cmd.MarkFlagDirname("workdir")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewPrune())
 
 	return cmd

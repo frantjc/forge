@@ -18,5 +18,5 @@ var (
 	RunnerTmp = filepath.Join(ActionsCache, "/runner/tmp")
 	// RunnerTmp is the the directory on the host machine used as the source
 	// for the mount at RUNNER_TOOLCACHE.
-	RunnerToolcache = filepath.Join(ActionsCache, "/runner/toolcache")
+	RunnerToolCache = filepath.Join(ActionsCache, "/runner/toolcache")
 )
