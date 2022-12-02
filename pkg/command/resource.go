@@ -29,7 +29,6 @@ func newResource(method string, check bool) *cobra.Command {
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
 			SilenceUsage:  true,
-			Version:       forge.GetSemver(),
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {
 				cmd.SetContext(
 					forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
