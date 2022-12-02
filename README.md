@@ -1,4 +1,4 @@
-# forge [![CI](https://github.com/frantjc/forge/actions/workflows/push.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions)
+# forge [![CI](https://github.com/frantjc/forge/actions/workflows/push.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions) [![godoc](https://pkg.go.dev/badge/github.com/frantjc/forge.svg)](https://pkg.go.dev/github.com/frantjc/forge) [![goreportcard](https://goreportcard.com/badge/github.com/frantjc/forge)](https://goreportcard.com/report/github.com/frantjc/forge) ![license](https://shields.io/github/license/frantjc/forge)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/frantjc/forge/main/docs/demo.gif">
