@@ -49,7 +49,7 @@ func newResource(method string, check bool) *cobra.Command {
 					}
 				)
 
-				if filepath.IsAbs(conf) {
+				if cmd.Flag("conf").Changed {
 					if file, err = os.Open(conf); err != nil {
 						return err
 					}
