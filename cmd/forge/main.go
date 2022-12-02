@@ -7,7 +7,7 @@ import (
 	"syscall"
 
 	"github.com/frantjc/forge/pkg/command"
-	"github.com/frantjc/forge/pkg/errbubble"
+	errorcode "github.com/frantjc/go-error-code"
 
 	_ "gocloud.dev/blob/fileblob"
 )
@@ -23,5 +23,5 @@ func main() {
 	}
 
 	stop()
-	os.Exit(errbubble.ExitCode(err))
+	os.Exit(errorcode.ExitCode(err))
 }

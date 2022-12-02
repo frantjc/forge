@@ -67,25 +67,3 @@ func TestArrFromMap(t *testing.T) {
 		}
 	}
 }
-
-func TestToArr(t *testing.T) {
-	var (
-		expected = []string{"KEY2=", "KEY1=val"}
-		actual   = envconv.ToArr("KEY1", "val", "", "val", "KEY2", "")
-	)
-
-	for _, a := range actual {
-		contains := false
-
-		for _, e := range expected {
-			if a == e {
-				contains = true
-			}
-		}
-
-		if !contains {
-			t.Error("actual contains", a, "but expected", expected, "does not")
-			t.FailNow()
-		}
-	}
-}

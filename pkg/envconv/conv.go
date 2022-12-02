@@ -5,6 +5,16 @@ import (
 	"strings"
 )
 
+// ArrToMap takes an environment array of the form
+//
+// ["KEY1=val1", "KEY2=val2"]
+//
+// and returns a corresponding map of the form
+//
+//	{
+//		"KEY1": "val1",
+//		"KEY2": "val2"
+//	}
 func ArrToMap(a []string) map[string]string {
 	m := map[string]string{}
 	for _, s := range a {
@@ -16,10 +26,31 @@ func ArrToMap(a []string) map[string]string {
 	return m
 }
 
+// ToMap is a convenience function wrapping ArrToMap.
+// It takes an environment array of the form
+//
+// ["KEY1=val1", "KEY2=val2"]
+//
+// and returns a corresponding map of the form
+//
+//	{
+//		"KEY1": "val1",
+//		"KEY2": "val2"
+//	}
 func ToMap(ss ...string) map[string]string {
 	return ArrToMap(ss)
 }
 
+// MapToArr takes an map of the form
+//
+//	{
+//		"KEY1": "val1",
+//		"KEY2": "val2"
+//	}
+//
+// and returns a corresponding array of the form
+//
+// ["KEY1=val1", "KEY2=val2"].
 func MapToArr(m map[string]string) []string {
 	a := []string{}
 	for k, v := range m {
@@ -28,17 +59,4 @@ func MapToArr(m map[string]string) []string {
 		}
 	}
 	return a
-}
-
-func ToArr(ss ...string) []string {
-	a := []string{}
-	for i, s := range ss {
-		if i%2 == 1 {
-			sm1 := ss[i-1]
-			if sm1 != "" {
-				a = append(a, fmt.Sprintf("%s=%s", sm1, s))
-			}
-		}
-	}
-	return MapToArr(ToMap(a...))
 }

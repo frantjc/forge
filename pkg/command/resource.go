@@ -20,6 +20,7 @@ import (
 
 func newResource(method string, check bool) *cobra.Command {
 	var (
+		verbosity       int
 		conf, workdir   string
 		version, params map[string]string
 		cmd             = &cobra.Command{
@@ -28,6 +29,12 @@ func newResource(method string, check bool) *cobra.Command {
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
 			SilenceUsage:  true,
+			Version:       forge.GetSemver(),
+			PersistentPreRun: func(cmd *cobra.Command, args []string) {
+				cmd.SetContext(
+					forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
+				)
+			},
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx    = cmd.Context()
@@ -99,6 +106,7 @@ func newResource(method string, check bool) *cobra.Command {
 	if !check {
 		cmd.Flags().StringToStringVarP(&params, "params", "p", nil, "params for resource")
 	}
+	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
 	cmd.Flags().StringToStringVarP(&version, "version", "i", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf")

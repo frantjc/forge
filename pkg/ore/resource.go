@@ -11,6 +11,8 @@ import (
 	"github.com/frantjc/go-fn"
 )
 
+// Resource is an Ore representing a Concourse Resource--
+// any of get, put or check.
 type Resource struct {
 	Method       string                  `json:"method,omitempty"`
 	Version      map[string]string       `json:"version,omitempty"`

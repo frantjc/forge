@@ -8,6 +8,8 @@ import (
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
+// Lava is an Ore representing two Ores of which the
+// stdout of the first is piped to the stdin of the second.
 type Lava struct {
 	From forge.Ore `json:"from,omitempty"`
 	To   *Pure     `json:"to,omitempty"`

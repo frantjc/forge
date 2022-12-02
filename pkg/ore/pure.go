@@ -10,6 +10,8 @@ import (
 	"github.com/frantjc/forge/internal/contaminate"
 )
 
+// Pure is an Ore for running a "pure" command inside
+// of a container.
 type Pure struct {
 	Image      string   `json:"image,omitempty"`
 	Entrypoint []string `json:"entrypoint,omitempty"`

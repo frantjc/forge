@@ -8,6 +8,14 @@ import (
 	"strings"
 )
 
+// PathFromReader takes a Reader with newline-delimited directory paths e.g.
+//
+//		/usr/local/bin
+//	 /usr/bin
+//
+// and returns a corresponding PATH environment variable
+//
+// /usr/local/bin:/usr/bin.
 func PathFromReader(r io.Reader) (string, error) {
 	var (
 		lines   []string
@@ -36,6 +44,14 @@ func PathFromReader(r io.Reader) (string, error) {
 	return path, nil
 }
 
+// PathFromReader takes a path to a file with newline-delimited directory paths e.g.
+//
+//		/usr/local/bin
+//	 /usr/bin
+//
+// and returns a corresponding PATH environment variable
+//
+// /usr/local/bin:/usr/bin.
 func PathFromFile(name string) (string, error) {
 	f, err := os.Open(name)
 	if err != nil {

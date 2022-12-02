@@ -9,6 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// Alloy is an Ore made up of other Ores that share
+// a volume that is mounted to their WorkingDir.
 type Alloy struct {
 	ID   string      `json:"id,omitempty"`
 	Ores []forge.Ore `json:"ores,omitempty"`

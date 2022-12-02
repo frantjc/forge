@@ -11,8 +11,8 @@ import (
 	"syscall"
 
 	"github.com/frantjc/forge/pkg/envconv"
-	"github.com/frantjc/forge/pkg/errbubble"
 	"github.com/frantjc/forge/pkg/githubactions"
+	errorcode "github.com/frantjc/go-error-code"
 	"github.com/frantjc/go-fn"
 )
 
@@ -44,7 +44,7 @@ func main() {
 	}
 
 	stop()
-	os.Exit(errbubble.ExitCode(err))
+	os.Exit(errorcode.ExitCode(err))
 }
 
 func mainE(ctx context.Context) error {

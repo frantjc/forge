@@ -10,6 +10,9 @@ import (
 	"github.com/frantjc/forge/pkg/githubactions"
 )
 
+// Action is an Ore representing a GitHub Action.
+// That is--a step in a GitHub Actions Workflow that
+// uses the `uses` key.
 type Action struct {
 	ID            string                       `json:"id,omitempty"`
 	Uses          string                       `json:"uses,omitempty"`
