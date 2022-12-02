@@ -1,4 +1,5 @@
 GO = go
+GIT = git
 GOLANGCI-LINT = golangci-lint
 INSTALL = sudo install
 GORELEASER = goreleaser
@@ -8,6 +9,8 @@ BIN = /usr/local/bin
 
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
+
+SEMVER ?= 0.2.4
 
 -include docs/docs.mk
 
@@ -35,10 +38,14 @@ shim:
 clean:
 	@rm -rf dist/ privileged version
 
+release:
+	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
+	@$(GIT) push --follow-tags
+
 gen: generate
 dl: download
 ven: vendor
 ver: verify
 format: fmt
 
-.PHONY: install build fmt generate test download vendor verify lint shim clean gen dl ven ver format
+.PHONY: install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
