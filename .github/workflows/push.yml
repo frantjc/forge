@@ -18,7 +18,7 @@ jobs:
       - run: make dl
       - uses: golangci/golangci-lint-action@v3.3.1
       - run: make test
-      - uses: goreleaser/goreleaser-action@v3
+      - uses: goreleaser/goreleaser-action@v4
         with:
           install-only: true
       - name: make install
