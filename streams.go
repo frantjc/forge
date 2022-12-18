@@ -30,9 +30,9 @@ func StdStreams() *Streams {
 	}
 }
 
-// FileDescriptor is an interface to check io.Readers and io.Writers
+// fileDescriptor is an interface to check io.Readers and io.Writers
 // against to inspect if they are terminals.
-type FileDescriptor interface {
+type fileDescriptor interface {
 	Fd() uintptr
 }
 
@@ -67,7 +67,7 @@ func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func(
 	)
 
 	for _, fd := range []any{stdin, stdout, stderr} {
-		if fd, ok := fd.(FileDescriptor); ok {
+		if fd, ok := fd.(fileDescriptor); ok {
 			if term.IsTerminal(fd.Fd()) {
 				state, err := term.MakeRaw(fd.Fd())
 				if err != nil {
