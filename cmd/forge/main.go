@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/frantjc/forge/pkg/command"
+	"github.com/frantjc/forge/command"
 	errorcode "github.com/frantjc/go-error-code"
 
 	_ "gocloud.dev/blob/fileblob"

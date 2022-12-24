@@ -10,8 +10,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/frantjc/forge/pkg/envconv"
-	"github.com/frantjc/forge/pkg/githubactions"
+	"github.com/frantjc/forge/envconv"
+	"github.com/frantjc/forge/githubactions"
 	errorcode "github.com/frantjc/go-error-code"
 	"github.com/frantjc/go-fn"
 )
