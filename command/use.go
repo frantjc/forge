@@ -77,7 +77,7 @@ func NewUse() *cobra.Command {
 						Env:           env,
 						GlobalContext: globalContext,
 					},
-					forge.StdDrains(),
+					commandDrains(cmd),
 				)
 				return err
 			},

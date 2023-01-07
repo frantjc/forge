@@ -2,7 +2,7 @@ package forgeactions
 
 import (
 	"context"
-	"path"
+	"errors"
 	"strings"
 
 	"github.com/frantjc/forge"
@@ -33,6 +33,12 @@ func GetImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRu
 	return DefaultMapping.GetImageForMetadata(ctx, containerRuntime, actionMetadata, uses)
 }
 
+type ImageBuilder interface {
+	BuildDockerfile(context.Context, string, string) (forge.Image, error)
+}
+
+var ErrCantBuildDockerfile = errors.New("runtime can't build Dockerfile")
+
 func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *githubactions.Metadata, uses *githubactions.Uses) (forge.Image, error) {
 	if actionMetadata.IsDockerfile() {
 		dir, err := m.UsesToActionDirectory(uses)
@@ -42,10 +48,14 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 
 		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
 		if uses.IsLocal() {
-			reference = path.Join("forge.dev", strings.ToLower(actionMetadata.Name))
+			reference = "forge.dev" + dir
 		}
 
-		return containerRuntime.BuildDockerfile(ctx, dir, reference)
+		if imageBuilder, ok := containerRuntime.(ImageBuilder); ok {
+			return imageBuilder.BuildDockerfile(ctx, dir, reference)
+		}
+
+		return nil, ErrCantBuildDockerfile
 	}
 
 	return containerRuntime.PullImage(ctx, MetadataToImageReference(actionMetadata))

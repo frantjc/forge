@@ -90,7 +90,9 @@ func newResource(method string, check bool) *cobra.Command {
 					contaminate.WithMounts(ctx, &forge.Mount{
 						Source:      workdir,
 						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
-					}), o, forge.StdDrains(),
+					}),
+					o,
+					commandDrains(cmd),
 				)
 				return err
 			},

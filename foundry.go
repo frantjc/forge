@@ -18,12 +18,12 @@ type Foundry struct {
 // Process Liquifies the Ore and returns the resulting Metal.
 func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal, error) {
 	if f.ContainerRuntime == nil {
-		return nil, fmt.Errorf("nil ContainerRuntime")
+		return nil, fmt.Errorf("nil container runtime")
 	}
 
 	_ = LoggerFrom(ctx)
 
-	return ore.Liquify(ctx, f, drains)
+	return ore.Liquify(ctx, f.ContainerRuntime, drains)
 }
 
 // GoString implements fmt.GoStringer.

@@ -9,7 +9,7 @@ import (
 
 // New returns the "root" command for `forge`
 // which acts as forge's CLI entrypoint.
-func New() *cobra.Command {
+func NewForge() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "forge",
 		Version:       forge.GetSemver(),

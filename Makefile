@@ -10,7 +10,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.2.4
+SEMVER ?= 0.2.5
 
 -include docs/docs.mk
 
@@ -36,7 +36,7 @@ shim:
 	@$(UPX) --ultra-brute ./internal/bin/shim
 
 clean:
-	@rm -rf dist/ privileged version
+	@rm -rf dist/ privileged version internal/bin/shim.*
 
 release:
 	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
@@ -47,5 +47,6 @@ dl: download
 ven: vendor
 ver: verify
 format: fmt
+i: install
 
-.PHONY: install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
+.PHONY: i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release

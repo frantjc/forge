@@ -8,8 +8,6 @@ import (
 
 	"github.com/frantjc/forge/command"
 	errorcode "github.com/frantjc/go-error-code"
-
-	_ "gocloud.dev/blob/fileblob"
 )
 
 func main() {
@@ -18,7 +16,7 @@ func main() {
 		err       error
 	)
 
-	if err = command.New().ExecuteContext(ctx); err != nil {
+	if err = command.NewForge().ExecuteContext(ctx); err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 	}
 

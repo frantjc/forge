@@ -10,12 +10,12 @@ import (
 
 // PathFromReader takes a Reader with newline-delimited directory paths e.g.
 //
-//		/usr/local/bin
-//	 /usr/bin
+//	/usr/local/bin
+//	/usr/bin
 //
 // and returns a corresponding PATH environment variable
 //
-// /usr/local/bin:/usr/bin.
+//	/usr/local/bin:/usr/bin.
 func PathFromReader(r io.Reader) (string, error) {
 	var (
 		lines   []string
@@ -30,10 +30,10 @@ func PathFromReader(r io.Reader) (string, error) {
 		return "", err
 	}
 
-	for i, line := range lines {
+	for _, line := range lines {
 		if !shouldIgnore(line) {
 			cleaned := filepath.Clean(line)
-			if i == 0 {
+			if path == "" {
 				path = cleaned
 			} else if !strings.Contains(path, cleaned) {
 				path += ":" + cleaned
@@ -46,12 +46,12 @@ func PathFromReader(r io.Reader) (string, error) {
 
 // PathFromReader takes a path to a file with newline-delimited directory paths e.g.
 //
-//		/usr/local/bin
-//	 /usr/bin
+//	/usr/local/bin
+//	/usr/bin
 //
 // and returns a corresponding PATH environment variable
 //
-// /usr/local/bin:/usr/bin.
+//	/usr/local/bin:/usr/bin.
 func PathFromFile(name string) (string, error) {
 	f, err := os.Open(name)
 	if err != nil {
@@ -63,5 +63,5 @@ func PathFromFile(name string) (string, error) {
 
 func shouldIgnore(line string) bool {
 	trimmedLine := strings.TrimSpace(line)
-	return len(trimmedLine) == 0 || strings.HasPrefix(trimmedLine, "#")
+	return trimmedLine == "" || strings.HasPrefix(trimmedLine, "#")
 }
