@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"os"
 	"strconv"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/frantjc/forge/forgeactions"
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/contaminate"
+	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
@@ -22,6 +24,7 @@ func NewUse() *cobra.Command {
 		verbosity int
 		workdir   string
 		env, with map[string]string
+		attach    bool
 		cmd       = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
@@ -34,7 +37,10 @@ func NewUse() *cobra.Command {
 				)
 			},
 			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := cmd.Context()
+				var (
+					ctx = cmd.Context()
+					_   = forge.LoggerFrom(ctx)
+				)
 
 				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, workdir)
 				if err != nil {
@@ -54,6 +60,30 @@ func NewUse() *cobra.Command {
 				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 				if err != nil {
 					return err
+				}
+
+				if attach {
+					hooks.ContainerStarted.Listen(func(ctx context.Context, c forge.Container) {
+						var (
+							streams = commandStreams(cmd)
+							_, _    = streams.Out.Write([]byte("detach with " + forge.DefaultDetachKeys + "\n"))
+						)
+
+						streams, restore, err := forge.TerminalStreams(streams.In, streams.Out, streams.Err)
+						if err != nil {
+							return
+						}
+						defer func() {
+							_ = restore()
+						}()
+
+						if _, err = c.Exec(ctx, &forge.ContainerConfig{
+							Entrypoint: []string{"sh"},
+							WorkingDir: "/",
+						}, streams); err != nil {
+							return
+						}
+					})
 				}
 
 				_, err = forge.NewFoundry(docker.New(c)).Process(
@@ -90,6 +120,7 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers before executing")
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")

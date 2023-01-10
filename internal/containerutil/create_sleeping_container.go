@@ -26,7 +26,12 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 	}
 
 	hooks.ContainerCreated.Dispatch(ctx, container)
-	defer hooks.ContainerStarted.Dispatch(ctx, container)
 
-	return container, container.Start(ctx)
+	if err = container.Start(ctx); err != nil {
+		return nil, err
+	}
+
+	hooks.ContainerStarted.Dispatch(ctx, container)
+
+	return container, nil
 }

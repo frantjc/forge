@@ -68,7 +68,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 					entrypoints = append(entrypoints, pre)
 				}
 
-				if main := actionMetadata.Runs.Main; main != "" {
+				if main := actionMetadata.Runs.Entrypoint; main != "" {
 					entrypoints = append(entrypoints, main)
 				} else {
 					config, err := image.Config()

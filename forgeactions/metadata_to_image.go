@@ -48,7 +48,7 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 
 		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
 		if uses.IsLocal() {
-			reference = "forge.dev" + dir
+			reference = "forge.dev" + strings.ToLower(dir)
 		}
 
 		if imageBuilder, ok := containerRuntime.(ImageBuilder); ok {

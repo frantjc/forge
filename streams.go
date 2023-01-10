@@ -66,7 +66,7 @@ func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func(
 		}
 	)
 
-	for _, fd := range []any{stdin, stdout, stderr} {
+	for _, fd := range []any{stdin} {
 		if fd, ok := fd.(fileDescriptor); ok {
 			if term.IsTerminal(fd.Fd()) {
 				state, err := term.MakeRaw(fd.Fd())
