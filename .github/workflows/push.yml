@@ -32,9 +32,9 @@ jobs:
       - name: forge use dockerfile
         run: forge use ./testdata/actions/mock/dockerfile
       - name: forge check resource
-        run: forge check mock -i version=v0.0.0
+        run: forge check mock -V version=v0.0.0
       - name: forge get resource
-        run: forge get mock -i version=v0.0.0
+        run: forge get mock -V version=v0.0.0
       - name: forge put resource
-        run: forge put mock -i version=v0.0.0
+        run: forge put mock -V version=v0.0.0
       - run: forge prune

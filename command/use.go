@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"os"
 	"strconv"
 
@@ -21,10 +20,10 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
+		attach    bool
 		verbosity int
 		workdir   string
 		env, with map[string]string
-		attach    bool
 		cmd       = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
@@ -63,27 +62,7 @@ func NewUse() *cobra.Command {
 				}
 
 				if attach {
-					hooks.ContainerStarted.Listen(func(ctx context.Context, c forge.Container) {
-						var (
-							streams = commandStreams(cmd)
-							_, _    = streams.Out.Write([]byte("detach with " + forge.DefaultDetachKeys + "\n"))
-						)
-
-						streams, restore, err := forge.TerminalStreams(streams.In, streams.Out, streams.Err)
-						if err != nil {
-							return
-						}
-						defer func() {
-							_ = restore()
-						}()
-
-						if _, err = c.Exec(ctx, &forge.ContainerConfig{
-							Entrypoint: []string{"sh"},
-							WorkingDir: "/",
-						}, streams); err != nil {
-							return
-						}
-					})
+					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
 				_, err = forge.NewFoundry(docker.New(c)).Process(
@@ -120,7 +99,7 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers before executing")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")

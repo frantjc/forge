@@ -41,7 +41,7 @@ forge use ./testdata/actions/mock/docker
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with Concourse's [pipeline](https://concourse-ci.org/pipelines.html) schema.
 
 ```sh
-forge get mock -i version=v0.0.0
+forge get mock -V version=v0.0.0
 ```
 
 ## why?

@@ -10,6 +10,7 @@ import (
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/forgeconcourse"
 	"github.com/frantjc/forge/internal/contaminate"
+	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
 	"github.com/spf13/cobra"
@@ -20,6 +21,7 @@ import (
 
 func newResource(method string, check bool) *cobra.Command {
 	var (
+		attach          bool
 		verbosity       int
 		conf, workdir   string
 		version, params map[string]string
@@ -86,6 +88,10 @@ func newResource(method string, check bool) *cobra.Command {
 					return err
 				}
 
+				if attach {
+					hooks.ContainerStarted.Listen(hookAttach(cmd))
+				}
+
 				_, err = forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, &forge.Mount{
 						Source:      workdir,
@@ -108,7 +114,8 @@ func newResource(method string, check bool) *cobra.Command {
 		cmd.Flags().StringToStringVarP(&params, "params", "p", nil, "params for resource")
 	}
 	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
-	cmd.Flags().StringToStringVarP(&version, "version", "i", nil, "version for resource")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
+	cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf")
 	cmd.Flags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
