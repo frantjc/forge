@@ -29,6 +29,8 @@ func hookAttach(cmd *cobra.Command) func(context.Context, forge.Container) {
 			},
 			streams,
 		)
+
+		_, _ = streams.Out.Write([]byte("\n"))
 	}
 }
 
