@@ -41,6 +41,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: frantjc/forge/testdata/actions/mock/docker@${{ github.ref_name }}
-      - uses: frantjc/forge/testdata/actions/mock/dockerfile@${{ github.ref_name }}
-      - uses: frantjc/forge/testdata/actions/mock/node@${{ github.ref_name }}
+      - uses: actions/checkout@v3
+      - uses: ./testdata/actions/mock/docker
+      - uses: ./testdata/actions/mock/dockerfile
+      - uses: ./testdata/actions/mock/node
