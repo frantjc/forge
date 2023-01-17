@@ -12,7 +12,7 @@ const (
 )
 
 func (r *ContainerRuntime) CreateVolume(ctx context.Context, name string) (forge.Volume, error) {
-	v, err := r.VolumeCreate(ctx, volume.VolumeCreateBody{
+	v, err := r.VolumeCreate(ctx, volume.CreateOptions{
 		Driver: VolumeDriver,
 		Name:   name,
 	})

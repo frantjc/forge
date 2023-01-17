@@ -1,6 +1,9 @@
 package forge
 
-import "runtime/debug"
+import (
+	"runtime/debug"
+	"strings"
+)
 
 // Semver is the semantic version of forge.
 // Meant to be be overridden at build time.
@@ -30,7 +33,10 @@ func GetSemver() string {
 			if i > 7 {
 				i = 7
 			}
-			version += "+" + revision[:i]
+
+			if !strings.Contains(version, revision[:i]) {
+				version += "+" + revision[:i]
+			}
 		}
 
 		if modified {
