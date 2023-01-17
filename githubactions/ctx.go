@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -257,17 +258,33 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		serverURL = DefaultURL
 	}
 
+	// NB: While forge supports multiple OS, the GitHub Actions that
+	// it executes typically are not. As a result, I don't think
+	// that we can safely assume that the platform the user wants is
+	// the OS they're on. With that said, users can still inject
+	// the desired OS via the RUNNER_OS environment variable.
 	runnerOS := os.Getenv(EnvVarRunnerOS)
 	if runnerOS == "" {
 		runnerOS = OSLinux
 	}
 
+	// NB: On the other hand, I don't think amd64 machines can execute
+	// arm containers, meaning we can source a sensible default architecture
+	// from the runtime. It is, of course, still overridable with the
+	// desired archiecture via the RUNNER_ARCH environment variable.
 	runnerArch := os.Getenv(EnvVarRunnerArch)
 	if runnerArch == "" {
-		runnerArch = ArchX86
+		switch runtime.GOARCH {
+		case "arm64":
+			runnerArch = ArchARM64
+		case "arm":
+			runnerArch = ArchARM
+		default:
+			runnerArch = ArchX86
+		}
 	}
 
-	refProtected, _ := strconv.ParseBool(EnvVarRefProtected)
+	refProtected, _ := strconv.ParseBool(os.Getenv(EnvVarRefProtected))
 
 	runNumber, err := strconv.Atoi(os.Getenv(EnvVarRunNumber))
 	if err != nil {
@@ -408,10 +425,25 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	}
 
 	if remote, err := r.Remote(currentRemote); err == nil {
-		for _, u := range remote.Config().URLs {
-			if _, err := url.Parse(u); err == nil {
-				// TODO override default github urls
-				break
+		conf := remote.Config()
+
+		if err = conf.Validate(); err == nil {
+			urls := conf.URLs
+			if conf.IsFirstURLLocal() && len(urls) > 0 {
+				urls = urls[1:]
+			}
+
+			for _, u := range urls {
+				if p, err := url.Parse(u); err == nil {
+					if p.Hostname() != DefaultURL.Hostname() {
+						// https://github.myorg.com/frantjc/forge.git
+						// => https://github.myorg.com/
+						m := p
+						m.Path = filepath.Dir(filepath.Dir(m.Path))
+						c.GitHubContext.ServerURL = m.String()
+						break
+					}
+				}
 			}
 		}
 	}
