@@ -21,20 +21,20 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           install-only: true
-      - name: make install
+      - name: Run make install
         run: make install INSTALL=install BIN=$RUNNER_TEMP
-      - name: set path
+      - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
-      - name: forge use remote
-        run: forge use frantjc/forge/testdata/actions/mock/docker@main
-      - name: forge use local
+      - name: Run forge use remote
+        run: forge use frantjc/forge/testdata/actions/mock/docker@${{ github.ref_name }}
+      - name: Run forge use local
         run: forge use ./testdata/actions/mock/node
-      - name: forge use dockerfile
+      - name: Run forge use dockerfile
         run: forge use ./testdata/actions/mock/dockerfile
-      - name: forge check resource
+      - name: Run forge check resource
         run: forge check mock -V version=v0.0.0
-      - name: forge get resource
+      - name: Run forge get resource
         run: forge get mock -V version=v0.0.0
-      - name: forge put resource
-        run: forge put mock -V version=v0.0.0
+      - name: Run forge put resource
+        run: forge put mock -V version=v0.0.0 -p version=v0.0.0
       - run: forge prune
