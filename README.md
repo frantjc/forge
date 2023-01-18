@@ -10,22 +10,26 @@ Forge currently exposes running [GitHub Actions](https://docs.github.com/en/acti
 
 ## install
 
-### macOS
+From a [release](https://github.com/frantjc/forge/releases).
+
+Using `brew`:
 
 ```sh
 brew install frantjc/tap/forge
 ```
 
-### from source
-
-```sh
-go install github.com/frantjc/forge/cmd/forge
-```
+From source:
 
 ```sh
 git clone https://github.com/frantjc/forge
 cd forge
 make
+```
+
+Using `go`:
+
+```sh
+go install github.com/frantjc/forge/cmd/forge
 ```
 
 ## usage
@@ -70,7 +74,7 @@ You can also attach to the container executing the Resource to snoop around:
 forge get -a mock -V version=v0.0.0
 ```
 
-> The resource image must have `sh` on its `PATH` for the attach to work.
+> The Resource's image must have `sh` on its `PATH` for the attach to work.
 
 ## why?
 
@@ -84,7 +88,8 @@ Forge aims to remedy this.
 
 ## developing
 
-- `make` is recommended - version 3.81 is tested
-- `golang` is _required_ - version 1.18.x or above is required for [generics](https://go.dev/doc/tutorial/generics)
-- `docker` is _required_ - version 20.10.x is tested
+- `git` is _required_
+- `make` is _required_
+- `golang` is _required_ - version 1.18 or above is required for [generics](https://go.dev/doc/tutorial/generics)
+- `docker` is _required_
 - [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
