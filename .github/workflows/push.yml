@@ -38,10 +38,3 @@ jobs:
       - name: Run forge put resource
         run: forge put mock -V version=v0.0.0 -p version=v0.0.0
       - run: forge prune
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./testdata/actions/mock/docker
-      - uses: ./testdata/actions/mock/dockerfile
-      - uses: ./testdata/actions/mock/node

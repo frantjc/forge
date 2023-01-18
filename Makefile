@@ -10,7 +10,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.3.3
+SEMVER ?= 0.3.4
 
 -include docs/docs.mk
 

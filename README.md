@@ -16,6 +16,18 @@ Forge currently exposes running [GitHub Actions](https://docs.github.com/en/acti
 brew install frantjc/tap/forge
 ```
 
+### from source
+
+```sh
+go install github.com/frantjc/forge/cmd/forge
+```
+
+```sh
+git clone https://github.com/frantjc/forge
+cd forge
+make
+```
+
 ## usage
 
 ### GitHub Actions
@@ -36,21 +48,37 @@ You can also use local GitHub Actions by starting the reference with `"/"` or `"
 forge use ./testdata/actions/mock/docker
 ```
 
+For additional debugging, you can attach to the container running the Action:
+
+```sh
+forge use -a ./testdata/actions/mock/dockerfile
+```
+
+> If the Action runs using a custom image, that image must have `sh` on its `PATH` for the attach to work.
+
 ### Concourse Resources
 
-For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with Concourse's [pipeline](https://concourse-ci.org/pipelines.html) schema.
+For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
 
 ```sh
 forge get mock -V version=v0.0.0
 ```
 
+You can also attach to the container executing the Resource to snoop around:
+
+```sh
+forge get -a mock -V version=v0.0.0
+```
+
+> The resource image must have `sh` on its `PATH` for the attach to work.
+
 ## why?
 
-Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some CI system that executes that script, for example, on every commit to a repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
+Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some continuous integration (CI) system that executes that script in response to some event such as a commit to a Git repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
 
 In an effort to make their platform easier to use and to refactor the shared functionality out of all of the aforementioned scripts, CI systems in the past have introduced reusable "plugins"/"Actions"/"Resources" which take minimal configuration to do a complex task. GitHub Actions' [`actions/checkout`](https://github.com/actions/checkout), for example, takes one short line of code to invoke and accepts much optional configuration to modify its functionality to fulfill many related use cases.
 
-Unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult. This makes debugging the use of these plugins painful due to the long feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
+Unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult. This makes debugging the use of these plugins require long feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
 
 Forge aims to remedy this.
 
