@@ -92,7 +92,7 @@ func newResource(method string, check bool) *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
-				_, err = forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, &forge.Mount{
 						Source:      workdir,
 						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
@@ -100,7 +100,6 @@ func newResource(method string, check bool) *cobra.Command {
 					o,
 					commandDrains(cmd),
 				)
-				return err
 			},
 		}
 	)

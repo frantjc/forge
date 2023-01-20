@@ -16,7 +16,7 @@ type Alloy struct {
 	Ores []forge.Ore `json:"ores,omitempty"`
 }
 
-func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (metal *forge.Metal, err error) {
+func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (err error) {
 	volumeName := o.ID
 	if volumeName == "" {
 		volumeName = uuid.NewString()
@@ -24,18 +24,18 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 
 	volume, err := containerRuntime.CreateVolume(ctx, volumeName)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer volume.Remove(ctx) //nolint:errcheck
 
 	for _, ore := range o.Ores {
-		if metal, err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
+		if err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      volumeName,
 			Destination: cfs.WorkingDir,
 		}), containerRuntime, drains); err != nil {
-			break
+			return err
 		}
 	}
 
-	return metal, err
+	return nil
 }

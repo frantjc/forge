@@ -8,6 +8,7 @@ import (
 	"github.com/frantjc/forge/forgeconcourse"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
+	errorcode "github.com/frantjc/go-error-code"
 	"github.com/frantjc/go-fn"
 )
 
@@ -21,10 +22,10 @@ type Resource struct {
 	ResourceType *concourse.ResourceType `json:"resource_type,omitempty"`
 }
 
-func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
+func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
 	image, err := forgeconcourse.PullImageForResourceType(ctx, containerRuntime, o.ResourceType)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	containerConfig := forgeconcourse.ResourceToConfig(o.Resource, o.ResourceType, o.Method)
@@ -32,12 +33,12 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 
 	container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
-	exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(drains, &concourse.Input{
+	if exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(drains, &concourse.Input{
 		Params: fn.Ternary(
 			o.Method == forgeconcourse.MethodCheck,
 			nil, o.Params,
@@ -47,12 +48,11 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 			o.Method == forgeconcourse.MethodPut,
 			nil, o.Version,
 		),
-	}))
-	if err != nil {
-		return nil, err
+	})); err != nil {
+		return err
+	} else if exitCode > 0 {
+		return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
 	}
 
-	return &forge.Metal{
-		ExitCode: int64(exitCode),
-	}, nil
+	return nil
 }

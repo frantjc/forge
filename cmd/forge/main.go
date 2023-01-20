@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/frantjc/forge/command"
+	"github.com/frantjc/forge/ore"
 	errorcode "github.com/frantjc/go-error-code"
 )
 
@@ -16,7 +18,7 @@ func main() {
 		err       error
 	)
 
-	if err = command.NewForge().ExecuteContext(ctx); err != nil {
+	if err = command.NewForge().ExecuteContext(ctx); err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
 		os.Stderr.WriteString(err.Error() + "\n")
 	}
 

@@ -16,9 +16,9 @@ type Foundry struct {
 }
 
 // Process Liquifies the Ore and returns the resulting Metal.
-func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) (*Metal, error) {
+func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) error {
 	if f.ContainerRuntime == nil {
-		return nil, fmt.Errorf("nil container runtime")
+		return fmt.Errorf("nil container runtime")
 	}
 
 	_ = LoggerFrom(ctx)

@@ -49,13 +49,13 @@ That is to say, after running the above command, `go` should be installed to `XD
 You can also use local GitHub Actions by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively.
 
 ```sh
-forge use ./testdata/actions/mock/docker
+forge use ./testdata/actions/docker
 ```
 
 For additional debugging, you can attach to the container running the Action:
 
 ```sh
-forge use -a ./testdata/actions/mock/dockerfile
+forge use -a ./testdata/actions/dockerfile
 ```
 
 > If the Action runs using a custom image, that image must have `sh` on its `PATH` for the attach to work.

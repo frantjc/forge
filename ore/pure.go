@@ -8,6 +8,7 @@ import (
 	cfs "github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
+	errorcode "github.com/frantjc/go-error-code"
 )
 
 // Pure is an Ore for running a "pure" command inside
@@ -20,10 +21,10 @@ type Pure struct {
 	Input      []byte   `json:"input,omitempty"`
 }
 
-func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (*forge.Metal, error) {
+func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
 	image, err := containerRuntime.PullImage(ctx, o.Image)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	containerConfig := &forge.ContainerConfig{
@@ -36,7 +37,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 
 	container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
@@ -46,12 +47,11 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		input = o.Input
 	}
 
-	exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(bytes.NewReader(input)))
-	if err != nil {
-		return nil, err
+	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(bytes.NewReader(input))); err != nil {
+		return err
+	} else if exitCode > 0 {
+		return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
 	}
 
-	return &forge.Metal{
-		ExitCode: int64(exitCode),
-	}, nil
+	return nil
 }

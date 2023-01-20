@@ -22,29 +22,21 @@ var (
 %s [-s|-e|-h] [args]
 
   -s   sleep
-  -e   execute the given command after sourcing $GITHUB_PATH and $GITHUB_ENV
+  -e   execute the given command after sourcing $GITHUB_PATH and $GITHUB_ENV, if set
   -h   help
 
 `, os.Args[0])
 )
 
 func main() {
-	var (
-		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-		err       error
-	)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
-	if err := mainE(ctx); err != nil {
-		if errors.Is(err, errHelp) {
-			os.Stderr.WriteString(help)
-			err = nil
-		} else {
-			os.Stderr.WriteString(err.Error() + "\n")
-		}
+	if err := mainE(ctx); errors.Is(err, errHelp) {
+		os.Stderr.WriteString(help)
+	} else {
+		stop()
+		os.Exit(errorcode.ExitCode(err))
 	}
-
-	stop()
-	os.Exit(errorcode.ExitCode(err))
 }
 
 func mainE(ctx context.Context) error {
@@ -77,11 +69,13 @@ func mainE(ctx context.Context) error {
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
 
-		if githubEnv, err := envconv.ArrFromFile(githubEnvPath); err == nil {
-			command.Env = append(command.Env, githubEnv...)
-		} else {
-			if _, err = os.Create(githubEnvPath); err != nil {
-				return err
+		if githubEnvPath != "" {
+			if githubEnv, err := envconv.ArrFromFile(githubEnvPath); err == nil {
+				command.Env = append(command.Env, githubEnv...)
+			} else {
+				if _, err = os.Create(githubEnvPath); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -90,11 +84,13 @@ func mainE(ctx context.Context) error {
 			path += ":" + runnerToolCache
 		}
 
-		if githubPath, err := envconv.PathFromFile(githubPathPath); err == nil && githubPath != "" {
-			path += ":" + githubPath
-		} else {
-			if _, err = os.Create(githubPathPath); err != nil {
-				return err
+		if githubPathPath != "" {
+			if githubPath, err := envconv.PathFromFile(githubPathPath); err == nil && githubPath != "" {
+				path += ":" + githubPath
+			} else {
+				if _, err = os.Create(githubPathPath); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -107,7 +103,7 @@ func mainE(ctx context.Context) error {
 			command.Env = append(command.Env, path)
 		}
 
-		return command.Run()
+		return errorcode.New(command.Run(), errorcode.WithExitCode(command.ProcessState.ExitCode()))
 	}
 
 	return errHelp

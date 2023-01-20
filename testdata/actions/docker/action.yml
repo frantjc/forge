@@ -1,6 +1,6 @@
-name: Mock
+name: Test
 description: |
-  Mock action
+  Test action
 author: frantjc
 runs:
   using: docker

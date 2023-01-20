@@ -65,7 +65,7 @@ func NewUse() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
-				_, err = forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, []*forge.Mount{
 						{
 							Source:      workdir,
@@ -88,7 +88,6 @@ func NewUse() *cobra.Command {
 					},
 					commandDrains(cmd),
 				)
-				return err
 			},
 		}
 	)

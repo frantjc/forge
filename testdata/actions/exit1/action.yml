@@ -1,0 +1,8 @@
+name: Test
+description: |
+  Test action
+author: frantjc
+runs:
+  using: docker
+  image: docker://alpine:3.15
+  entrypoint: false

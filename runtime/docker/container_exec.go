@@ -60,6 +60,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		if tty {
 			_, err = io.Copy(stdout, hjr.Reader)
 		} else {
+			// "exit status 1" comes from here
 			_, err = stdcopy.StdCopy(
 				stdout,
 				stderr,
@@ -90,7 +91,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 			}
 
 			if err = hjr.CloseWrite(); err != nil {
-				errC <- hjr.CloseWrite()
+				errC <- err
 			}
 
 			go close(inC)
