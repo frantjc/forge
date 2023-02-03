@@ -39,7 +39,7 @@ go install github.com/frantjc/forge/cmd/forge
 For GitHub Actions, Forge will try to source the GitHub Actions variables from the working directory's Git configuration as well as GitHub's [default environment variables](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables).
 
 ```sh
-forge use actions/setup-go@v3 -w go-version=1.19
+forge use actions/setup-go@v3 -w go-version=1.20
 ```
 
 Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as cache directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`.
