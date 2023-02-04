@@ -52,17 +52,17 @@ records:
   - delay: 5
     content: &prompt "\e[32m$\e[0m "
   - delay: 1000
-    content: forge use actions/setup-go@v3 -w go-version=1.20
+    content: forge use actions/setup-go@v3 -w go-version=1.19
   - delay: 1000
     content: &nl "\r\n"
   - delay: 3000
-    content: "Setup go version spec 1.20\r\n"
+    content: "Setup go version spec 1.19\r\n"
   - delay: 5
-    content: "Attempting to download 1.20...\r\n"
+    content: "Attempting to download 1.19...\r\n"
   - delay: 500
-    content: "matching 1.20...\r\n"
+    content: "matching 1.19...\r\n"
   - delay: 5
-    content: "Acquiring 1.20.3 from https://github.com/actions/go-versions/releases/download/1.20.3-3375666673/go-1.20.3-linux-x64.tar.gz\r\n"
+    content: "Acquiring 1.19.3 from https://github.com/actions/go-versions/releases/download/1.19.3-3375666673/go-1.19.3-linux-x64.tar.gz\r\n"
   - delay: 5000
     content: "Extracting Go...\r\n"
   - delay: 5
@@ -70,13 +70,13 @@ records:
   - delay: 10000
     content: "Successfully extracted go to /forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/tmp/625018bc-7601-4524-aa67-73db877e8bec\r\nAdding to the cache ...\r\n"
   - delay: 10000
-    content: "Successfully cached go to /forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.20.3/x64\r\nAdded go to the path\r\n"
+    content: "Successfully cached go to /forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64\r\nAdded go to the path\r\n"
   - delay: 100
-    content: "Successfully set up Go version 1.20\r\n"
+    content: "Successfully set up Go version 1.19\r\n"
   - delay: 20
-    content: "go version go1.20.3 linux/amd64\r\n"
+    content: "go version go1.19.3 linux/amd64\r\n"
   - delay: 100
-    content: "GO111MODULE=\"\"\r\nGOARCH=\"amd64\"\r\nGOBIN=\"\"\r\nGOCACHE=\"/root/.cache/go-build\"\r\nGOENV=\"/root/.config/go/env\"\r\nGOEXE=\"\"\r\nGOEXPERIMENT=\"\"\r\nGOFLAGS=\"\"\r\nGOHOSTARCH=\"amd64\"\r\nGOHOSTOS=\"linux\"\r\nGOINSECURE=\"\"\r\nGOMODCACHE=\"/root/go/pkg/mod\"\r\nGONOPROXY=\"\"\r\nGONOSUMDB=\"\"\r\nGOOS=\"linux\"\r\nGOPATH=\"/root/go\"\r\nGOPRIVATE=\"\"\r\nGOPROXY=\"https://proxy.golang.org,direct\"\r\nGOROOT=\"/forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.20.3/x64\"\r\nGOSUMDB=\"sum.golang.org\"\r\nGOTMPDIR=\"\"\r\nGOTOOLDIR=\"/forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.20.3/x64/pkg/tool/linux_amd64\"\r\nGOVCS=\"\"\r\nGOVERSION=\"go1.20.3\"\r\nGCCGO=\"gccgo\"\r\nGOAMD64=\"v1\"\r\nAR=\"ar\"\r\nCC=\"gcc\"\r\nCXX=\"g++\"\r\nCGO_ENABLED=\"1\"\r\nGOMOD=\"/dev/null\"\r\nGOWORK=\"\"\r\nCGO_CFLAGS=\"-g -O2\"\r\nCGO_CPPFLAGS=\"\"\r\nCGO_CXXFLAGS=\"-g -O2\"\r\nCGO_FFLAGS=\"-g -O2\"\r\nCGO_LDFLAGS=\"-g -O2\"\r\nPKG_CONFIG=\"pkg-config\"\r\nGOGCCFLAGS=\"-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build56040408=/tmp/go-build -gno-record-gcc-switches\"\r\n"
+    content: "GO111MODULE=\"\"\r\nGOARCH=\"amd64\"\r\nGOBIN=\"\"\r\nGOCACHE=\"/root/.cache/go-build\"\r\nGOENV=\"/root/.config/go/env\"\r\nGOEXE=\"\"\r\nGOEXPERIMENT=\"\"\r\nGOFLAGS=\"\"\r\nGOHOSTARCH=\"amd64\"\r\nGOHOSTOS=\"linux\"\r\nGOINSECURE=\"\"\r\nGOMODCACHE=\"/root/go/pkg/mod\"\r\nGONOPROXY=\"\"\r\nGONOSUMDB=\"\"\r\nGOOS=\"linux\"\r\nGOPATH=\"/root/go\"\r\nGOPRIVATE=\"\"\r\nGOPROXY=\"https://proxy.golang.org,direct\"\r\nGOROOT=\"/forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64\"\r\nGOSUMDB=\"sum.golang.org\"\r\nGOTMPDIR=\"\"\r\nGOTOOLDIR=\"/forge/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64/pkg/tool/linux_amd64\"\r\nGOVCS=\"\"\r\nGOVERSION=\"go1.19.3\"\r\nGCCGO=\"gccgo\"\r\nGOAMD64=\"v1\"\r\nAR=\"ar\"\r\nCC=\"gcc\"\r\nCXX=\"g++\"\r\nCGO_ENABLED=\"1\"\r\nGOMOD=\"/dev/null\"\r\nGOWORK=\"\"\r\nCGO_CFLAGS=\"-g -O2\"\r\nCGO_CPPFLAGS=\"\"\r\nCGO_CXXFLAGS=\"-g -O2\"\r\nCGO_FFLAGS=\"-g -O2\"\r\nCGO_LDFLAGS=\"-g -O2\"\r\nPKG_CONFIG=\"pkg-config\"\r\nGOGCCFLAGS=\"-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build56040408=/tmp/go-build -gno-record-gcc-switches\"\r\n"
   - delay: 5
     content: *prompt
   - delay: 1000
