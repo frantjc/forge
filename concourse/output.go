@@ -1,11 +1,11 @@
 package concourse
 
+// Output is the struct which has the JSON encoding which
+// a Resource outputs on stdout.
 type Output struct {
 	Version  map[string]string `json:"version,omitempty"`
-	Metadata []*OutputMetadata `json:"metadata,omitempty"`
-}
-
-type OutputMetadata struct {
-	Name  string `json:"name,omitempty"`
-	Value string `json:"value,omitempty"`
+	Metadata []*struct {
+		Name  string `json:"name,omitempty"`
+		Value string `json:"value,omitempty"`
+	} `json:"metadata,omitempty"`
 }

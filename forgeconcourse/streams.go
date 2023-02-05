@@ -8,6 +8,7 @@ import (
 	"github.com/frantjc/forge/concourse"
 )
 
+// NewStreams creates a Streams with the JSON encoding of input on stdin.
 func NewStreams(drains *forge.Drains, input *concourse.Input) *forge.Streams {
 	in := new(bytes.Buffer)
 
