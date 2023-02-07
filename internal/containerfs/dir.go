@@ -1,10 +1,8 @@
 package containerfs
 
-import (
-	"path/filepath"
+import "github.com/google/uuid"
 
-	"github.com/google/uuid"
-)
-
-// WorkingDir is the directory Ores are ran from the context of.
-var WorkingDir = filepath.Join("/forge", uuid.NewString())
+// WorkingDir is the directory in the containers forge creates
+// where extra stuff such as forge's shim, docker.sock and
+// GitHub Action repositories gets mounted to.
+var WorkingDir = "/" + uuid.NewString()

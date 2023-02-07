@@ -12,8 +12,6 @@ GOARCH = $(shell $(GO) env GOARCH)
 
 SEMVER ?= 0.4.1
 
--include docs/docs.mk
-
 .DEFAULT: install
 
 install: build
@@ -50,3 +48,5 @@ format: fmt
 i: install
 
 .PHONY: i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
+
+-include docs/docs.mk

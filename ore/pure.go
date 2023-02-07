@@ -5,7 +5,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
-	cfs "github.com/frantjc/forge/internal/containerfs"
+	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
 	errorcode "github.com/frantjc/go-error-code"
@@ -31,7 +31,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		Entrypoint: o.Entrypoint,
 		Cmd:        o.Cmd,
 		Env:        o.Env,
-		WorkingDir: cfs.WorkingDir,
+		WorkingDir: containerfs.WorkingDir,
 		Mounts:     contaminate.MountsFrom(ctx),
 	}
 

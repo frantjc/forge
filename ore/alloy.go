@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
-	cfs "github.com/frantjc/forge/internal/containerfs"
+	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/google/uuid"
 )
@@ -31,7 +31,7 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	for _, ore := range o.Ores {
 		if err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
 			Source:      volumeName,
-			Destination: cfs.WorkingDir,
+			Destination: containerfs.WorkingDir,
 		}), containerRuntime, drains); err != nil {
 			return err
 		}
