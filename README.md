@@ -65,13 +65,13 @@ forge use -a ./testdata/actions/dockerfile
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
 
 ```sh
-forge get mock -V version=v0.0.0
+forge get mock -v version=v0.0.0
 ```
 
 You can also attach to the container executing the Resource to snoop around:
 
 ```sh
-forge get -a mock -V version=v0.0.0
+forge get -a mock -v version=v0.0.0
 ```
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
