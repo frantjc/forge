@@ -1,4 +1,4 @@
-# forge [![CI](https://github.com/frantjc/forge/actions/workflows/push.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions) [![godoc](https://pkg.go.dev/badge/github.com/frantjc/forge.svg)](https://pkg.go.dev/github.com/frantjc/forge) [![goreportcard](https://goreportcard.com/badge/github.com/frantjc/forge)](https://goreportcard.com/report/github.com/frantjc/forge) ![license](https://shields.io/github/license/frantjc/forge)
+# forge [![CI](https://github.com/frantjc/forge/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions) [![godoc](https://pkg.go.dev/badge/github.com/frantjc/forge.svg)](https://pkg.go.dev/github.com/frantjc/forge) [![goreportcard](https://goreportcard.com/badge/github.com/frantjc/forge)](https://goreportcard.com/report/github.com/frantjc/forge) ![license](https://shields.io/github/license/frantjc/forge)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/frantjc/forge/main/docs/demo.gif">
@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [CircleCI Orbs](https://circleci.com/developer/orbs) e.g. [`circleci/node`](https://circleci.com/developer/orbs/orb/circleci/node).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and coming soon [CircleCI Orbs](https://circleci.com/developer/orbs) e.g. [`circleci/node`](https://circleci.com/developer/orbs/orb/circleci/node).
 
 ## install
 
@@ -65,13 +65,13 @@ forge use -a ./testdata/actions/dockerfile
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`forge.yml`](forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
 
 ```sh
-forge get mock -V version=v0.0.0
+forge get mock -v version=v0.0.0
 ```
 
 You can also attach to the container executing the Resource to snoop around:
 
 ```sh
-forge get -a mock -V version=v0.0.0
+forge get -a mock -v version=v0.0.0
 ```
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
