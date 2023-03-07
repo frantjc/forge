@@ -45,3 +45,28 @@ func NewShimTarArchive() io.Reader {
 
 	return tarArchive
 }
+
+func NewTarArchiveWithEmptyFiles(names ...string) io.Reader {
+	var (
+		tarArchive      = new(bytes.Buffer)
+		gzipWriter, err = gzip.NewWriterLevel(tarArchive, TarArchiveCompression)
+		tarWriter       = tar.NewWriter(gzipWriter)
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer gzipWriter.Close()
+	defer tarWriter.Close()
+
+	for _, name := range names {
+		if err := tarWriter.WriteHeader(&tar.Header{
+			Name:    name,
+			Mode:    mode,
+			ModTime: modTime,
+		}); err != nil {
+			panic(err)
+		}
+	}
+
+	return tarArchive
+}

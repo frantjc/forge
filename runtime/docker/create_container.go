@@ -144,7 +144,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 
 	hostConfig.Mounts = append(hostConfig.Mounts, fn.Map(
 		config.Mounts,
-		func(m *forge.Mount, _ int) mount.Mount {
+		func(m forge.Mount, _ int) mount.Mount {
 			mountType := mount.TypeVolume
 			switch {
 			case m.Source == "":

@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)) and [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [CircleCI Orbs](https://circleci.com/developer/orbs) e.g. [`circleci/node`](https://circleci.com/developer/orbs/orb/circleci/node).
 
 ## install
 
@@ -80,7 +80,7 @@ forge get -a mock -V version=v0.0.0
 
 Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some continuous integration (CI) system that executes that script in response to some event such as a commit to a Git repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
 
-In an effort to make their platform easier to use and to refactor the shared functionality out of all of the aforementioned scripts, CI systems in the past have introduced reusable "plugins"/"Actions"/"Resources" which take minimal configuration to do a complex task. GitHub Actions' [`actions/checkout`](https://github.com/actions/checkout), for example, takes one short line of code to invoke and accepts much optional configuration to modify its functionality to fulfill many related use cases.
+In an effort to make their platform easier to use and to refactor the shared functionality out of all of the aforementioned scripts, CI systems in the past have introduced reusable "plugins"/"Actions"/"Resources"/"Orbs" which take minimal configuration to do a complex task. GitHub Actions' [`actions/checkout`](https://github.com/actions/checkout), for example, takes one short line of code to invoke and accepts much optional configuration to modify its functionality to fulfill many related use cases.
 
 Unfortunately, using such powerful plugins outside of the the system they were built for can be wildly difficult. This makes debugging the use of these plugins require long feedback loops. It also makes migrating from one CI system to another treacherous, having to replace uses of one system's plugins with another's.
 

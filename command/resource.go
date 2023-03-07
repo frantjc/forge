@@ -22,7 +22,6 @@ import (
 func newResource(method string, check bool) *cobra.Command {
 	var (
 		attach          bool
-		verbosity       int
 		conf, workdir   string
 		version, params map[string]string
 		cmd             = &cobra.Command{
@@ -31,11 +30,6 @@ func newResource(method string, check bool) *cobra.Command {
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
 			SilenceUsage:  true,
-			PersistentPreRun: func(cmd *cobra.Command, args []string) {
-				cmd.SetContext(
-					forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
-				)
-			},
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx    = cmd.Context()
@@ -67,7 +61,8 @@ func newResource(method string, check bool) *cobra.Command {
 
 				for _, r := range config.Resources {
 					if r.Name == name {
-						o.Resource = r
+						resource := r
+						o.Resource = &resource
 					}
 				}
 				if o.Resource == nil {
@@ -76,7 +71,8 @@ func newResource(method string, check bool) *cobra.Command {
 
 				for _, t := range config.ResourceTypes {
 					if t.Name == o.Resource.Type {
-						o.ResourceType = t
+						resourceType := t
+						o.ResourceType = &resourceType
 					}
 				}
 				if o.ResourceType == nil {
@@ -93,7 +89,7 @@ func newResource(method string, check bool) *cobra.Command {
 				}
 
 				return forge.NewFoundry(docker.New(c)).Process(
-					contaminate.WithMounts(ctx, &forge.Mount{
+					contaminate.WithMounts(ctx, forge.Mount{
 						Source:      workdir,
 						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
 					}),
@@ -112,12 +108,11 @@ func newResource(method string, check bool) *cobra.Command {
 	if !check {
 		cmd.Flags().StringToStringVarP(&params, "params", "p", nil, "params for resource")
 	}
-	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
-	_ = cmd.MarkFlagFilename("conf")
-	cmd.Flags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
+	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")
+	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for resource")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd

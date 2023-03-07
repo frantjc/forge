@@ -9,5 +9,5 @@ type ContainerConfig struct {
 	Env        []string `json:"env,omitempty"`
 	User       string   `json:"user,omitempty"`
 	Privileged bool     `json:"privileged,omitempty"`
-	Mounts     []*Mount `json:"mounts,omitempty"`
+	Mounts     []Mount  `json:"mounts,omitempty"`
 }

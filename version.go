@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Semver is the semantic version of forge.
+// Semver is the semantic version of Forge.
 // Meant to be be overridden at build time.
 var Semver = "0.0.0"
 

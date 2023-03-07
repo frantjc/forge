@@ -54,15 +54,17 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 
 	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(o.GlobalContext, o.ID, drains)
 	for _, containerConfig := range containerConfigs {
-		containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
-		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
+		cc := containerConfig
+		cc.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
+
+		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, &cc)
 		if err != nil {
 			return err
 		}
 		defer container.Stop(ctx)   //nolint:errcheck
 		defer container.Remove(ctx) //nolint:errcheck
 
-		if exitCode, err := container.Exec(ctx, containerConfig, workflowCommandStreams); err != nil {
+		if exitCode, err := container.Exec(ctx, &cc, workflowCommandStreams); err != nil {
 			return err
 		} else if exitCode > 0 {
 			return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
