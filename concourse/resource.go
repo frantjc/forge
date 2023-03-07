@@ -11,8 +11,8 @@ func WithResources(ctx context.Context, resources ...*Resource) context.Context 
 
 // ResourcesFrom returns whatever resources have been embedded in
 // given context.
-func ResourcesFrom(ctx context.Context) (resources []*Resource, ok bool) {
-	resources, ok = ctx.Value(resourcesKey{}).([]*Resource)
+func ResourcesFrom(ctx context.Context) (resources []Resource, ok bool) {
+	resources, ok = ctx.Value(resourcesKey{}).([]Resource)
 	return
 }
 

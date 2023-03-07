@@ -11,8 +11,8 @@ func WithResourceTypes(ctx context.Context, resourceTypes ...*ResourceType) cont
 
 // ResourceTypesFrom returns whatever resource types have been embedded in
 // given context.
-func ResourceTypesFrom(ctx context.Context) (resourceTypes []*ResourceType, ok bool) {
-	resourceTypes, ok = ctx.Value(resourceTypesKey{}).([]*ResourceType)
+func ResourceTypesFrom(ctx context.Context) (resourceTypes []ResourceType, ok bool) {
+	resourceTypes, ok = ctx.Value(resourceTypesKey{}).([]ResourceType)
 	return
 }
 
