@@ -21,7 +21,6 @@ import (
 func NewUse() *cobra.Command {
 	var (
 		attach    bool
-		verbosity int
 		workdir   string
 		env, with map[string]string
 		cmd       = &cobra.Command{
@@ -30,11 +29,6 @@ func NewUse() *cobra.Command {
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
 			SilenceUsage:  true,
-			PersistentPreRun: func(cmd *cobra.Command, args []string) {
-				cmd.SetContext(
-					forge.WithLogger(cmd.Context(), forge.NewLogger().V(verbosity)),
-				)
-			},
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx = cmd.Context()
@@ -66,7 +60,7 @@ func NewUse() *cobra.Command {
 				}
 
 				return forge.NewFoundry(docker.New(c)).Process(
-					contaminate.WithMounts(ctx, []*forge.Mount{
+					contaminate.WithMounts(ctx, []forge.Mount{
 						{
 							Source:      workdir,
 							Destination: forgeactions.DefaultWorkspace,
@@ -97,13 +91,12 @@ func NewUse() *cobra.Command {
 		wd = "."
 	}
 
-	cmd.Flags().CountVarP(&verbosity, "verbose", "v", "verbosity for forge")
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
 	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")
-	cmd.Flags().StringVarP(&workdir, "workdir", "d", wd, "working directory for forge")
+	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
