@@ -23,7 +23,7 @@ require (
 
 require (
 	github.com/cloudflare/circl v1.3.1 // indirect
-	github.com/containerd/containerd v1.6.15 // indirect
+	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/moby/buildkit v0.11.0 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
