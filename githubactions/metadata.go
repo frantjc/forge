@@ -81,5 +81,5 @@ type MetadataRuns struct {
 	PostEntrypoint string            `json:"post_entrypoint,omitempty"`
 	Args           []string          `json:"args,omitempty"`
 	Env            map[string]string `json:"env,omitempty"`
-	Steps          []*Step           `json:"steps,omitempty"`
+	Steps          []Step            `json:"steps,omitempty"`
 }

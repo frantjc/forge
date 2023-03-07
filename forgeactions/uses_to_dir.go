@@ -16,7 +16,7 @@ func (m *Mapping) UsesToRootDirectory(uses *githubactions.Uses) (string, error) 
 		return filepath.Abs(uses.Path)
 	}
 
-	return filepath.Join(hostfs.ActionCache, uses.GetRepository(), uses.Version), nil
+	return filepath.Join(hostfs.ActionsCache, uses.GetRepository(), uses.Version), nil
 }
 
 func UsesToActionDirectory(uses *githubactions.Uses) (string, error) {
@@ -28,5 +28,5 @@ func (m *Mapping) UsesToActionDirectory(uses *githubactions.Uses) (string, error
 		return m.UsesToRootDirectory(uses)
 	}
 
-	return filepath.Join(hostfs.ActionCache, uses.GetRepository(), uses.Version, uses.GetActionPath()), nil
+	return filepath.Join(hostfs.ActionsCache, uses.GetRepository(), uses.Version, uses.GetActionPath()), nil
 }

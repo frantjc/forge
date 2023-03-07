@@ -10,14 +10,14 @@ import (
 	"github.com/frantjc/forge/internal/bin"
 )
 
-func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]*forge.ContainerConfig, error) {
+func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]forge.ContainerConfig, error) {
 	return DefaultMapping.ActionToConfigs(globalContext, uses, with, environment, actionMetadata, image)
 }
 
-func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]*forge.ContainerConfig, error) {
+func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]forge.ContainerConfig, error) {
 	var (
 		_                = forge.NewLogger()
-		containerConfigs = []*forge.ContainerConfig{}
+		containerConfigs = []forge.ContainerConfig{}
 	)
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
@@ -32,7 +32,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 				entrypoint = []string{bin.ShimPath, "-e"}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
 				cmd        = actionMetadata.Runs.Args
-				mounts     = []*forge.Mount{
+				mounts     = []forge.Mount{
 					{
 						Source:      actionDir,
 						Destination: m.ActionPath,
@@ -87,7 +87,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			var (
 				inputs   = make(map[string]string, len(unexpandedInputs))
-				expander = githubactions.NewExpander(globalContext.GetString)
+				expander = githubactions.ExpandFunc(globalContext.GetString)
 			)
 			for k, v := range unexpandedInputs {
 				inputs[k] = expander.ExpandString(v)
@@ -99,7 +99,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			for _, s := range entrypoints {
 				if s != "" {
-					containerConfigs = append(containerConfigs, &forge.ContainerConfig{
+					containerConfigs = append(containerConfigs, forge.ContainerConfig{
 						Entrypoint: entrypoint,
 						Cmd:        append([]string{s}, cmd...),
 						Env:        env,

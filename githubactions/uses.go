@@ -12,8 +12,8 @@ import (
 )
 
 type Uses struct {
-	Path    string `json:"path,omitempty"`
-	Version string `json:"version,omitempty"`
+	Path    string
+	Version string
 }
 
 func (u *Uses) IsLocal() bool {
@@ -24,7 +24,7 @@ func (u *Uses) IsRemote() bool {
 	return !u.IsLocal()
 }
 
-func (u *Uses) UsesString() string {
+func (u *Uses) String() string {
 	uses := u.Path
 	if v := u.Version; v != "" {
 		uses = uses + "@" + v
@@ -52,7 +52,7 @@ func (u *Uses) GetActionPath() string {
 }
 
 func (u *Uses) GoString() string {
-	return "&Uses{" + u.UsesString() + "}"
+	return "&Uses{" + u.String() + "}"
 }
 
 // TODO regexp.
@@ -78,7 +78,7 @@ func Parse(uses string) (*Uses, error) {
 }
 
 func (u *Uses) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + u.UsesString() + "\""), nil
+	return []byte("\"" + u.String() + "\""), nil
 }
 
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {

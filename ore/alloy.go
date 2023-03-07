@@ -29,7 +29,7 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	defer volume.Remove(ctx) //nolint:errcheck
 
 	for _, ore := range o.Ores {
-		if err = ore.Liquify(contaminate.WithMounts(ctx, &forge.Mount{
+		if err = ore.Liquify(contaminate.WithMounts(ctx, forge.Mount{
 			Source:      volumeName,
 			Destination: containerfs.WorkingDir,
 		}), containerRuntime, drains); err != nil {

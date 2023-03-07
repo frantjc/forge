@@ -14,7 +14,7 @@ func (m *Mapping) ResourceToConfig(resource *concourse.Resource, resourceType *c
 		Entrypoint: GetEntrypoint(method),
 		Cmd:        []string{m.RootPath + "/" + resource.Name},
 		Privileged: resourceType.Privileged,
-		Mounts: []*forge.Mount{
+		Mounts: []forge.Mount{
 			{
 				Destination: m.RootPath + "/" + resource.Name,
 			},

@@ -4,20 +4,12 @@ import "strings"
 
 type ExpandFunc func(string) string
 
-type Expander struct {
-	ExpandFunc
+func (e ExpandFunc) ExpandString(s string) string {
+	return ExpandString(s, e)
 }
 
-func NewExpander(f ExpandFunc) *Expander {
-	return &Expander{f}
-}
-
-func (e *Expander) ExpandString(s string) string {
-	return ExpandString(s, e.ExpandFunc)
-}
-
-func (e *Expander) Expand(b []byte) []byte {
-	return Expand(b, e.ExpandFunc)
+func (e ExpandFunc) Expand(b []byte) []byte {
+	return Expand(b, e)
 }
 
 func ExpandString(s string, mapping ExpandFunc) string {
