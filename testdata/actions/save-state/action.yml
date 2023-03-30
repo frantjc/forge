@@ -3,8 +3,8 @@ description: |
   Save State action
 author: frantjc
 runs:
-  using: docker
-  image: docker://alpine:3.15
-  entrypoint: |
-    bash -c "echo hello=there >> "$GITHUB_STATE" && echo "::save-state name=general::kenobi""
-  post-entrypoint: env
+  using: composite
+  steps:
+    - run: echo hello=there >> $GITHUB_STATE
+    - run: echo "::save-state name=general::kenobi"
+    - run: env
