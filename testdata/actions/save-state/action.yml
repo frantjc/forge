@@ -1,0 +1,8 @@
+name: Save State
+description: |
+  Save State action
+author: frantjc
+runs:
+  using: node16
+  main: main.js
+  post: post.js
