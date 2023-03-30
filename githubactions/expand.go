@@ -49,6 +49,7 @@ func Expand(b []byte, mapping ExpandFunc) (p []byte) {
 func getGitHubName(b []byte) (s string, w int) {
 	if len(b) > 3 && b[0] == '{' && b[1] == '{' {
 		i := 2
+		//nolint:revive
 		for ; i+1 < len(b) && b[i] != '}'; i++ {
 		}
 		if b[i] == '}' && i+1 < len(b) && b[i+1] != '}' {
