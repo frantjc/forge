@@ -1,8 +1,7 @@
 name: Save State
 on: [workflow_dispatch]
 jobs:
-  release:
+  save-state:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "foo=bar" >> $GITHUB_STATE
-      - run: env
+      - uses: frantjc/forge/testdata/actions/save-state@main
