@@ -25,12 +25,12 @@ require (
 	github.com/cloudflare/circl v1.3.1 // indirect
 	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/moby/buildkit v0.11.0 // indirect
+	github.com/moby/buildkit v0.11.4 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/symlink v0.2.0 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
-	github.com/opencontainers/runc v1.1.4 // indirect
+	github.com/opencontainers/runc v1.1.5 // indirect
 	github.com/pjbgf/sha1cd v0.2.3 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
