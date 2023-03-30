@@ -1,8 +1,7 @@
-name: Save State
+name: Test
 description: |
-  Save State action
+  Test action
 author: frantjc
 runs:
   using: node16
   main: main.js
-  post: post.js
