@@ -5,6 +5,9 @@ author: frantjc
 runs:
   using: composite
   steps:
-    - run: echo hello=there >> $GITHUB_STATE
-    - run: echo "::save-state name=general::kenobi"
-    - run: env
+    - shell: bash
+      run: echo hello=there >> $GITHUB_STATE
+    - shell: bash
+      run: echo "::save-state name=general::kenobi"
+    - shell: bash
+      run: env
