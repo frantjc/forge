@@ -4,5 +4,5 @@ description: |
 author: frantjc
 runs:
   using: node16
+  pre: pre.js
   main: main.js
-  post: post.js

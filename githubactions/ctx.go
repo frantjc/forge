@@ -15,6 +15,7 @@ import (
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/go-fn"
 	"github.com/go-git/go-git/v5"
+	"golang.org/x/exp/maps"
 )
 
 type globalContextKey struct{}
@@ -235,9 +236,7 @@ func (c *GlobalContext) AddEnv(env map[string]string) {
 		return
 	}
 
-	for k, v := range env {
-		c.EnvContext[k] = v
-	}
+	maps.Copy(c.EnvContext, env)
 }
 
 func NewGlobalContextFromEnv() *GlobalContext {
@@ -489,11 +488,7 @@ func (c *GlobalContext) envMap() map[string]string {
 		EnvVarRepositoryOwner: c.GitHubContext.RepositoryOwner,
 	}
 
-	if c.EnvContext != nil {
-		for k, v := range c.EnvContext {
-			env[k] = v
-		}
-	}
+	maps.Copy(env, c.EnvContext)
 
 	if c.InputsContext != nil {
 		for k, v := range c.InputsContext {

@@ -54,7 +54,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	// Because this is the Docker runtime...
 	// Mount the Docker daemon into the container for use by the process inside the container.
 	if addr != "" {
-		sock := filepath.Join(containerfs.WorkingDir, "/var/run/docker.sock")
+		sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
 		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 			Source: strings.TrimPrefix(addr, "unix://"),
 			Target: sock,

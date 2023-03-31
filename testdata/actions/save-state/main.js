@@ -1,5 +1,3 @@
-const fs = require('fs');
-
-console.log('::save-state name=hello::there');
-const b = fs.readFileSync(process.env.GITHUB_STATE);
-fs.writeFileSync(process.env.GITHUB_STATE, `${b}general=kenobi\n`);
+for (const [k, v] of Object.entries(process.env)) {
+    console.log(`${k}=${v}`);
+}

@@ -26,7 +26,6 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 	if err != nil {
 		return err
 	}
-	defer volume.Remove(ctx) //nolint:errcheck
 
 	for _, ore := range o.Ores {
 		if err = ore.Liquify(contaminate.WithMounts(ctx, forge.Mount{
@@ -37,5 +36,5 @@ func (o *Alloy) Liquify(ctx context.Context, containerRuntime forge.ContainerRun
 		}
 	}
 
-	return nil
+	return volume.Remove(ctx)
 }

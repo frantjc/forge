@@ -1,6 +1,7 @@
 package forgeactions
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -46,9 +47,6 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 					{
 						Destination: m.RunnerTemp,
 					},
-					{
-						Destination: m.GitHubPath,
-					},
 				}
 				entrypoints []string
 			)
@@ -78,6 +76,8 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 					entrypoints = append(entrypoints, strings.Join(config.Entrypoint, " "))
 				}
+			default:
+				return nil, fmt.Errorf("unsupported runs using: %s", actionMetadata.Runs.Using)
 			}
 
 			unexpandedInputs, err := actionMetadata.InputsFromWith(with)
@@ -95,7 +95,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
-			env = append(env, githubactions.EnvVarPath+"="+m.GitHubPathPath, githubactions.EnvVarEnv+"="+m.GitHubEnvPath)
+			env = append(env, githubactions.EnvVarPath+"="+m.GitHubPathPath, githubactions.EnvVarEnv+"="+m.GitHubEnvPath, githubactions.EnvVarOutput+"="+m.GitHubOutputPath, githubactions.EnvVarState+"="+m.GitHubStatePath)
 
 			for _, s := range entrypoints {
 				if s != "" {
