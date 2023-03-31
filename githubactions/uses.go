@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/tarutil"
 )
 
 type Uses struct {
@@ -32,9 +33,17 @@ func (u *Uses) String() string {
 	return uses
 }
 
+func (u *Uses) GetOwner() string {
+	if u.IsRemote() {
+		return strings.Split(u.Path, "/")[0]
+	}
+
+	return ""
+}
+
 func (u *Uses) GetRepository() string {
 	if u.IsRemote() {
-		return filepath.Join(strings.Split(u.Path, "/")[0:2]...)
+		return strings.Split(u.Path, "/")[1]
 	}
 
 	return ""
@@ -82,17 +91,20 @@ func (u *Uses) MarshalJSON() ([]byte, error) {
 }
 
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
-	var (
-		_ = forge.LoggerFrom(ctx)
-		u = GetGitHubURL()
-	)
+	_ = forge.LoggerFrom(ctx)
 
 	if uses.IsRemote() {
-		return CheckoutUses(ctx, uses, &CheckoutOpts{
-			GitHubURL: u,
-			Insecure:  u.Scheme != "https",
-			Path:      filepath.Clean(dir),
-		})
+		metadata, rc, err := DownloadAction(ctx, uses)
+		if err != nil {
+			return nil, err
+		}
+		defer rc.Close()
+
+		if err = tarutil.Extract(rc, dir); err != nil {
+			return nil, err
+		}
+
+		return metadata, nil
 	}
 
 	r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath()))
