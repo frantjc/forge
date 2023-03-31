@@ -22,17 +22,22 @@ var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 // TODO use github.com/frantjc/forge/internal/tarutil.StripPrefix
 // instead of returning the prefix to be stripped.
 func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, error) {
-	_ = forge.LoggerFrom(ctx)
+	var (
+		_        = forge.LoggerFrom(ctx)
+		client   *github.Client
+		metadata *Metadata
+		sha      = u.Version
+	)
 
 	if u.IsLocal() {
 		return nil, nil, fmt.Errorf("clone local action: %s", u.Path)
 	}
 
-	var (
-		client   = github.NewTokenClient(ctx, os.Getenv(EnvVarToken))
-		metadata *Metadata
-		sha      = u.Version
-	)
+	if token := os.Getenv(EnvVarToken); token != "" {
+		client = github.NewTokenClient(ctx, os.Getenv(EnvVarToken))
+	} else {
+		client = github.NewClient(http.DefaultClient)
+	}
 
 	if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "tags/"+u.Version); err == nil {
 		sha = ref.GetObject().GetSHA()
