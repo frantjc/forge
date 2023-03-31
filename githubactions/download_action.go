@@ -46,11 +46,6 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		panic("unable to get action sha")
 	}
 
-	// make sure the sha exists
-	if _, _, err := client.Git.GetCommit(ctx, u.GetOwner(), u.GetRepository(), sha); err != nil {
-		return nil, nil, err
-	}
-
 	for _, filename := range ActionYAMLFilenames {
 		rc, _, err := client.Repositories.DownloadContents(ctx, u.GetOwner(), u.GetRepository(), u.GetActionPath()+"/"+filename, &github.RepositoryContentGetOptions{
 			Ref: u.Version,
