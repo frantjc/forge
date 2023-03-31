@@ -40,9 +40,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return err
 	}
 
-	if o.GlobalContext == nil {
-		o.GlobalContext = githubactions.NewGlobalContextFromEnv()
-	}
+	o.GlobalContext = forgeactions.ConfigureGlobalContext(o.GlobalContext)
 	defer func() {
 		ctx = githubactions.WithGlobalContext(ctx, o.GlobalContext)
 	}()
@@ -56,18 +54,29 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 	for _, containerConfig := range containerConfigs {
 		cc := containerConfig
 		cc.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
+		cc.Env = append(cc.Env, o.GlobalContext.Env()...)
 
 		container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, &cc)
 		if err != nil {
 			return err
 		}
-		defer container.Stop(ctx)   //nolint:errcheck
-		defer container.Remove(ctx) //nolint:errcheck
 
 		if exitCode, err := container.Exec(ctx, &cc, workflowCommandStreams); err != nil {
 			return err
 		} else if exitCode > 0 {
 			return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
+		}
+
+		if err = container.Stop(ctx); err != nil {
+			return err
+		}
+
+		if err = forgeactions.SetGlobalContextFromEnvFiles(ctx, o.GlobalContext, o.ID, container); err != nil {
+			return err
+		}
+
+		if err = container.Remove(ctx); err != nil {
+			return err
 		}
 	}
 
