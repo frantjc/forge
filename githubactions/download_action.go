@@ -19,8 +19,6 @@ var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 // DownloadAction takes a Uses reference and returns the corresponding GitHub Action Metadata,
 // a tarball of the GitHub Action repository and a common path prefix shared by all of the
 // tar headers for files from the repository.
-// TODO use github.com/frantjc/forge/internal/tarutil.StripPrefix
-// instead of returning the prefix to be stripped.
 func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, error) {
 	var (
 		_        = forge.LoggerFrom(ctx)
@@ -34,7 +32,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	if token := os.Getenv(EnvVarToken); token != "" {
-		client = github.NewTokenClient(ctx, os.Getenv(EnvVarToken))
+		client = github.NewTokenClient(ctx, token)
 	} else {
 		client = github.NewClient(http.DefaultClient)
 	}
