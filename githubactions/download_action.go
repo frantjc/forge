@@ -17,8 +17,7 @@ import (
 var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 
 // DownloadAction takes a Uses reference and returns the corresponding GitHub Action Metadata,
-// a tarball of the GitHub Action repository and a common path prefix shared by all of the
-// tar headers for files from the repository.
+// a tarball of the GitHub Action repository.
 func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, error) {
 	var (
 		_        = forge.LoggerFrom(ctx)
