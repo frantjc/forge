@@ -27,7 +27,7 @@ func Extract(r io.Reader, dir string, opts ...Opt) error {
 		opt(o)
 	}
 
-	if o.gzip {
+	if o.readerGzipped {
 		zr, err := gzip.NewReader(r)
 		if err != nil {
 			return err

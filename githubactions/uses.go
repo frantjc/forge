@@ -93,6 +93,10 @@ func (u *Uses) MarshalJSON() ([]byte, error) {
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
 	_ = forge.LoggerFrom(ctx)
 
+	if r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath())); err == nil {
+		return NewMetadataFromReader(r)
+	}
+
 	if uses.IsRemote() {
 		metadata, rc, err := DownloadAction(ctx, uses)
 		if err != nil {
@@ -107,12 +111,7 @@ func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, er
 		return metadata, nil
 	}
 
-	r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath()))
-	if err != nil {
-		return nil, err
-	}
-
-	return NewMetadataFromReader(r)
+	return nil, fmt.Errorf("open local action: %s", dir)
 }
 
 func OpenUsesMetadata(uses *Uses) (io.Reader, error) {
@@ -130,5 +129,5 @@ func OpenDirectoryMetadata(dir string) (_ io.Reader, err error) {
 		}
 	}
 
-	return nil, err
+	return nil, fmt.Errorf("open action in directory: %s", dir)
 }

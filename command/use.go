@@ -42,6 +42,7 @@ func NewUse() *cobra.Command {
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
+				globalContext.StepsContext[id] = &githubactions.StepContext{}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
 					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
@@ -64,7 +65,9 @@ func NewUse() *cobra.Command {
 
 				if outputs {
 					defer func() {
-						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[id].Outputs)
+						if outputs := globalContext.StepsContext[id].Outputs; len(outputs) > 0 {
+							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[id].Outputs)
+						}
 					}()
 				}
 

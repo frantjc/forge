@@ -24,8 +24,8 @@ func MapFromReader(r io.Reader) (map[string]string, error) {
 
 // MapFromFile takes a path to a file with the content of a .env file e.g.
 //
-//		FOO=bar
-//	 KEY=val
+//	FOO=bar
+//	KEY=val
 //
 // and returns a corresponding map
 //
@@ -44,12 +44,12 @@ func MapFromFile(name string) (map[string]string, error) {
 
 // ArrFromReader takes a Reader with the content of a .env file e.g.
 //
-//		FOO=bar
-//	 KEY=val
+//	FOO=bar
+//	KEY=val
 //
 // and returns a corresponding environment array
 //
-// ["FOO=bar", "KEY=val"].
+//	["FOO=bar", "KEY=val"].
 func ArrFromReader(r io.Reader) ([]string, error) {
 	m, err := MapFromReader(r)
 	if err != nil {
@@ -61,12 +61,12 @@ func ArrFromReader(r io.Reader) ([]string, error) {
 
 // ArrFromFile takes a path to a file with the content of a .env file e.g.
 //
-//		FOO=bar
-//	 KEY=val
+//	FOO=bar
+//	KEY=val
 //
 // and returns a corresponding environment array
 //
-// ["FOO=bar", "KEY=val"].
+//	["FOO=bar", "KEY=val"].
 func ArrFromFile(name string) ([]string, error) {
 	m, err := MapFromFile(name)
 	if err != nil {

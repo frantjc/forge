@@ -18,7 +18,10 @@ func SetGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 }
 
 func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubactions.GlobalContext, step string, container forge.Container) error {
-	_ = forge.LoggerFrom(ctx)
+	var (
+		_    = forge.LoggerFrom(ctx)
+		errs []error
+	)
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	rc, err := container.CopyFrom(ctx, m.GitHubPath)
@@ -39,12 +42,12 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 		//nolint:gocritic
 		switch header.Typeflag {
 		case tar.TypeReg:
-
 			switch {
 			case strings.HasSuffix(m.GitHubOutputPath, header.Name):
 				outputs, err := envconv.MapFromReader(io.LimitReader(r, header.Size))
 				if err != nil {
-					return err
+					errs = append(errs, err)
+					continue
 				}
 
 				if _, ok := globalContext.StepsContext[step]; !ok {
@@ -57,7 +60,8 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 			case strings.HasSuffix(m.GitHubStatePath, header.Name):
 				outputs, err := envconv.MapFromReader(io.LimitReader(r, header.Size))
 				if err != nil {
-					return err
+					errs = append(errs, err)
+					continue
 				}
 
 				for k, v := range outputs {
@@ -67,5 +71,5 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 		}
 	}
 
-	return rc.Close()
+	return errors.Join(append(errs, rc.Close())...)
 }

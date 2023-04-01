@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/tarutil"
@@ -44,8 +45,10 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		}
 	}
 
-	if len(sha) < 7 {
-		panic("unable to get action sha")
+	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
+		return nil, nil, err
+	} else if !matched {
+		return nil, nil, fmt.Errorf("unabled to get action sha")
 	}
 
 	for _, filename := range ActionYAMLFilenames {
@@ -92,5 +95,5 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		return nil, nil, err
 	}
 
-	return metadata, tarutil.StripPrefix(res.Body, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/", tarutil.WithGzip), nil
+	return metadata, tarutil.StripPrefix(res.Body, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/", tarutil.IsGzipped), nil
 }

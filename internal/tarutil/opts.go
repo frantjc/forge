@@ -1,11 +1,11 @@
 package tarutil
 
 type Opts struct {
-	gzip bool
+	readerGzipped bool
 }
 
 type Opt func(*Opts)
 
-func WithGzip(o *Opts) {
-	o.gzip = true
+func IsGzipped(o *Opts) {
+	o.readerGzipped = true
 }

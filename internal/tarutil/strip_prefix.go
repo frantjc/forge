@@ -26,7 +26,7 @@ func StripPrefix(r io.Reader, prefix string, opts ...Opt) io.ReadCloser {
 	go func() {
 		defer pw.Close()
 
-		if o.gzip {
+		if o.readerGzipped {
 			zr, err := gzip.NewReader(r)
 			if err != nil {
 				_ = pw.CloseWithError(err)
