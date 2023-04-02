@@ -31,8 +31,10 @@ const (
 	EnvVarRunnerTemp      = "RUNNER_TEMP"
 	EnvVarRunnerToolCache = "RUNNER_TOOL_CACHE"
 
-	EnvVarEnv  = "GITHUB_ENV"
-	EnvVarPath = "GITHUB_PATH"
+	EnvVarEnv    = "GITHUB_ENV"
+	EnvVarPath   = "GITHUB_PATH"
+	EnvVarState  = "GITHUB_STATE"
+	EnvVarOutput = "GITHUB_OUTPUT"
 
 	EnvVarToken = "GITHUB_TOKEN" //nolint:gosec
 

@@ -26,7 +26,7 @@ jobs:
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       - name: Run forge use remote
-        run: forge use frantjc/forge/testdata/actions/docker@main
+        run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
       - name: Run forge use local
         run: forge use ./testdata/actions/node
       - name: Run forge use dockerfile

@@ -7,10 +7,11 @@ import (
 
 type WorkflowCommandWriter struct {
 	*githubactions.GlobalContext
-	ID                 string
-	StopCommandsTokens map[string]bool
-	State              map[string]string
-	Debug              bool
+	ID                         string
+	StopCommandsTokens         map[string]bool
+	Debug                      bool
+	SaveStateDeprecationWarned bool
+	SetOutputDeprecationWarned bool
 }
 
 func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []byte {
@@ -31,20 +32,30 @@ func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []by
 			w.GlobalContext.StepsContext[w.ID] = &githubactions.StepContext{
 				Outputs: map[string]string{},
 			}
+		} else if w.GlobalContext.StepsContext[w.ID].Outputs == nil {
+			w.GlobalContext.StepsContext[w.ID].Outputs = make(map[string]string)
 		}
 
 		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.Value
+
+		if !w.SetOutputDeprecationWarned {
+			return []byte("[" + githubactions.CommandWarning + "] The `" + wc.Command + "` command is deprecated and will be disabled soon. Please upgrade to using Environment Files. For more information see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/")
+		}
 	case githubactions.CommandStopCommands:
 		w.StopCommandsTokens[wc.Value] = true
 	case githubactions.CommandSaveState:
-		w.State[wc.GetName()] = wc.Value
+		w.GlobalContext.EnvContext["STATE_"+wc.GetName()] = wc.Value
+
+		if !w.SaveStateDeprecationWarned {
+			return []byte("[" + githubactions.CommandWarning + "] The `" + wc.Command + "` command is deprecated and will be disabled soon. Please upgrade to using Environment Files. For more information see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/")
+		}
 	case githubactions.CommandEcho:
 		w.Debug = !w.Debug
 	case githubactions.CommandEndGroup:
-		return []byte("[endgroup]")
+		return []byte("[" + githubactions.CommandEndGroup + "]")
 	case githubactions.CommandDebug:
 		if w.Debug {
-			return []byte("[debug] " + wc.Value)
+			return []byte("[" + githubactions.CommandDebug + "] " + wc.Value)
 		}
 	default:
 		return []byte("[" + wc.Command + "] " + wc.Value)
@@ -54,15 +65,10 @@ func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []by
 }
 
 func NewWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
-	if globalContext == nil {
-		globalContext = ConfigureGlobalContext(githubactions.NewGlobalContextFromEnv())
-	}
-
 	w := &WorkflowCommandWriter{
-		GlobalContext:      globalContext,
+		GlobalContext:      ConfigureGlobalContext(globalContext),
 		ID:                 id,
 		StopCommandsTokens: map[string]bool{},
-		State:              map[string]string{},
 		Debug:              globalContext.SecretsContext[githubactions.SecretActionsStepDebug] == githubactions.SecretDebugValue,
 	}
 

@@ -1,7 +1,8 @@
-name: Test
+name: Save State
 description: |
-  Test action
+  Save State action
 author: frantjc
 runs:
   using: node16
+  pre: pre.js
   main: main.js

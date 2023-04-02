@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 
@@ -59,9 +60,11 @@ func mainE(ctx context.Context) error {
 		}
 
 		var (
-			command        = exec.CommandContext(ctx, args[2], args[3:]...) //nolint:gosec
-			githubEnvPath  = os.Getenv(githubactions.EnvVarEnv)
-			githubPathPath = os.Getenv(githubactions.EnvVarPath)
+			command          = exec.CommandContext(ctx, args[2], args[3:]...) //nolint:gosec
+			githubEnvPath    = os.Getenv(githubactions.EnvVarEnv)
+			githubPathPath   = os.Getenv(githubactions.EnvVarPath)
+			githubStatePath  = os.Getenv(githubactions.EnvVarState)
+			githubOutputPath = os.Getenv(githubactions.EnvVarOutput)
 		)
 
 		command.Env = os.Environ()
@@ -69,12 +72,27 @@ func mainE(ctx context.Context) error {
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
 
-		if githubEnvPath != "" {
-			if githubEnv, err := envconv.ArrFromFile(githubEnvPath); err == nil {
-				command.Env = append(command.Env, githubEnv...)
-			} else {
-				if _, err = os.Create(githubEnvPath); err != nil {
+		for _, githubPath := range []string{
+			githubStatePath,
+			githubOutputPath,
+			githubEnvPath,
+			githubPathPath,
+		} {
+			if githubPath != "" {
+				if err := os.MkdirAll(filepath.Dir(githubPath), 0o755); err != nil {
 					return err
+				}
+
+				if _, err := os.Create(githubPath); err != nil {
+					return err
+				}
+			}
+		}
+
+		if githubEnvPath != "" {
+			if file, err := os.Open(githubEnvPath); err == nil {
+				if githubEnv, err := githubactions.ParseEnvFile(file); err == nil {
+					command.Env = append(command.Env, envconv.MapToArr(githubEnv)...)
 				}
 			}
 		}
@@ -85,11 +103,9 @@ func mainE(ctx context.Context) error {
 		}
 
 		if githubPathPath != "" {
-			if githubPath, err := envconv.PathFromFile(githubPathPath); err == nil && githubPath != "" {
-				path += ":" + githubPath
-			} else {
-				if _, err = os.Create(githubPathPath); err != nil {
-					return err
+			if file, err := os.Open(githubPathPath); err == nil {
+				if githubPath, err := githubactions.ParsePathFile(file); err == nil {
+					path += ":" + githubPath
 				}
 			}
 		}

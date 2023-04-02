@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/json"
 	"os"
 	"strconv"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -20,10 +22,10 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		attach    bool
-		workdir   string
-		env, with map[string]string
-		cmd       = &cobra.Command{
+		attach, outputs bool
+		workdir         string
+		env, with       map[string]string
+		cmd             = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
 			Args:          cobra.ExactArgs(1),
@@ -33,12 +35,14 @@ func NewUse() *cobra.Command {
 				var (
 					ctx = cmd.Context()
 					_   = forge.LoggerFrom(ctx)
+					id  = uuid.NewString()
 				)
 
 				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, workdir)
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
+				globalContext.StepsContext[id] = &githubactions.StepContext{}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
 					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
@@ -59,6 +63,14 @@ func NewUse() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
+				if outputs {
+					defer func() {
+						if outputs := globalContext.StepsContext[id].Outputs; len(outputs) > 0 {
+							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(outputs)
+						}
+					}()
+				}
+
 				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, []forge.Mount{
 						{
@@ -75,6 +87,7 @@ func NewUse() *cobra.Command {
 						},
 					}...),
 					&ore.Action{
+						ID:            id,
 						Uses:          args[0],
 						With:          with,
 						Env:           env,
@@ -92,6 +105,7 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
+	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
 	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")

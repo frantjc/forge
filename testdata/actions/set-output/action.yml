@@ -1,7 +1,8 @@
-name: Test
+name: Set Output
 description: |
-  Test action
+  Set Output action
 author: frantjc
 runs:
   using: node16
+  pre: pre.js
   main: main.js
