@@ -13,7 +13,6 @@ require (
 	github.com/google/go-containerregistry v0.12.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.3.0
-	github.com/joho/godotenv v1.4.0
 	github.com/moby/term v0.0.0-20221205130635-1aeaba878587
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc2

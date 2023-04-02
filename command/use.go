@@ -66,7 +66,7 @@ func NewUse() *cobra.Command {
 				if outputs {
 					defer func() {
 						if outputs := globalContext.StepsContext[id].Outputs; len(outputs) > 0 {
-							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[id].Outputs)
+							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(outputs)
 						}
 					}()
 				}

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
 	"golang.org/x/exp/maps"
 )
@@ -44,13 +43,13 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 		case tar.TypeReg:
 			switch {
 			case strings.HasSuffix(m.GitHubOutputPath, header.Name):
-				outputs, err := envconv.MapFromReader(io.LimitReader(r, header.Size))
+				outputs, err := githubactions.ParseEnvFile(r)
 				if err != nil {
 					errs = append(errs, err)
 					continue
 				}
 
-				if _, ok := globalContext.StepsContext[step]; !ok {
+				if stepContext, ok := globalContext.StepsContext[step]; !ok || stepContext.Outputs == nil {
 					globalContext.StepsContext[step] = &githubactions.StepContext{
 						Outputs: outputs,
 					}
@@ -58,7 +57,7 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 					maps.Copy(globalContext.StepsContext[step].Outputs, outputs)
 				}
 			case strings.HasSuffix(m.GitHubStatePath, header.Name):
-				outputs, err := envconv.MapFromReader(io.LimitReader(r, header.Size))
+				outputs, err := githubactions.ParseEnvFile(r)
 				if err != nil {
 					errs = append(errs, err)
 					continue
