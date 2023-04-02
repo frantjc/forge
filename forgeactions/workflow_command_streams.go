@@ -32,6 +32,8 @@ func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []by
 			w.GlobalContext.StepsContext[w.ID] = &githubactions.StepContext{
 				Outputs: map[string]string{},
 			}
+		} else if w.GlobalContext.StepsContext[w.ID].Outputs == nil {
+			w.GlobalContext.StepsContext[w.ID].Outputs = make(map[string]string)
 		}
 
 		w.GlobalContext.StepsContext[w.ID].Outputs[wc.GetName()] = wc.Value

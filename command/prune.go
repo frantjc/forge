@@ -16,7 +16,7 @@ func NewPrune() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return os.RemoveAll(hostfs.ActionsCache)
+			return os.RemoveAll(hostfs.CacheHome)
 		},
 	}
 

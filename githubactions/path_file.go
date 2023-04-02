@@ -1,9 +1,8 @@
-package envconv
+package githubactions
 
 import (
 	"bufio"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 )
@@ -15,8 +14,8 @@ import (
 //
 // and returns a corresponding PATH environment variable
 //
-//	/usr/local/bin:/usr/bin.
-func PathFromReader(r io.Reader) (string, error) {
+//	/usr/local/bin:/usr/bin
+func ParsePathFile(r io.Reader) (string, error) {
 	var (
 		lines   []string
 		path    = ""
@@ -42,23 +41,6 @@ func PathFromReader(r io.Reader) (string, error) {
 	}
 
 	return path, nil
-}
-
-// PathFromReader takes a path to a file with newline-delimited directory paths e.g.
-//
-//	/usr/local/bin
-//	/usr/bin
-//
-// and returns a corresponding PATH environment variable
-//
-//	/usr/local/bin:/usr/bin.
-func PathFromFile(name string) (string, error) {
-	f, err := os.Open(name)
-	if err != nil {
-		return "", err
-	}
-
-	return PathFromReader(f)
 }
 
 func shouldIgnore(line string) bool {

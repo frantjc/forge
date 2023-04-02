@@ -90,8 +90,10 @@ func mainE(ctx context.Context) error {
 		}
 
 		if githubEnvPath != "" {
-			if githubEnv, err := envconv.ArrFromFile(githubEnvPath); err == nil {
-				command.Env = append(command.Env, githubEnv...)
+			if file, err := os.Open(githubEnvPath); err == nil {
+				if githubEnv, err := githubactions.ParseEnvFile(file); err == nil {
+					command.Env = append(command.Env, envconv.MapToArr(githubEnv)...)
+				}
 			}
 		}
 
@@ -101,8 +103,10 @@ func mainE(ctx context.Context) error {
 		}
 
 		if githubPathPath != "" {
-			if githubPath, err := envconv.PathFromFile(githubPathPath); err == nil && githubPath != "" {
-				path += ":" + githubPath
+			if file, err := os.Open(githubPathPath); err == nil {
+				if githubPath, err := githubactions.ParsePathFile(file); err == nil {
+					path += ":" + githubPath
+				}
 			}
 		}
 
