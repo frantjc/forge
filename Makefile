@@ -10,7 +10,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.5.0
+SEMVER ?= 0.6.0
 
 .DEFAULT: install
 
