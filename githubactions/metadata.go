@@ -50,12 +50,12 @@ func (m *Metadata) IsDockerfile() bool {
 }
 
 type Metadata struct {
-	Name        string                     `json:"name,omitempty"`
-	Author      string                     `json:"author,omitempty"`
-	Description string                     `json:"description,omitempty"`
-	Inputs      map[string]*MetadataInput  `json:"inputs,omitempty"`
-	Output      map[string]*MetadataOutput `json:"output,omitempty"`
-	Runs        *MetadataRuns              `json:"runs,omitempty"`
+	Name        string                    `json:"name,omitempty"`
+	Author      string                    `json:"author,omitempty"`
+	Description string                    `json:"description,omitempty"`
+	Inputs      map[string]MetadataInput  `json:"inputs,omitempty"`
+	Output      map[string]MetadataOutput `json:"output,omitempty"`
+	Runs        *MetadataRuns             `json:"runs,omitempty"`
 }
 
 type MetadataInput struct {

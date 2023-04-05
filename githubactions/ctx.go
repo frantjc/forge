@@ -337,7 +337,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		},
 		EnvContext:   make(map[string]string),
 		JobContext:   &JobContext{},
-		StepsContext: make(map[string]*StepContext),
+		StepsContext: make(map[string]StepContext),
 		RunnerContext: &RunnerContext{
 			Name:      runnerName,
 			OS:        runnerOS,
@@ -347,7 +347,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		},
 		InputsContext:  make(map[string]string),
 		SecretsContext: make(map[string]string),
-		NeedsContext:   make(map[string]*NeedContext),
+		NeedsContext:   make(map[string]NeedContext),
 	}
 }
 
@@ -506,73 +506,73 @@ func (c *GlobalContext) Env() []string {
 }
 
 type GlobalContext struct {
-	GitHubContext  *GitHubContext          `json:"git_hub_context,omitempty"`
-	EnvContext     map[string]string       `json:"env_context,omitempty"`
-	JobContext     *JobContext             `json:"job_context,omitempty"`
-	StepsContext   map[string]*StepContext `json:"steps_context,omitempty"`
-	RunnerContext  *RunnerContext          `json:"runner_context,omitempty"`
-	InputsContext  map[string]string       `json:"inputs_context,omitempty"`
-	SecretsContext map[string]string       `json:"secrets_context,omitempty"`
-	NeedsContext   map[string]*NeedContext `json:"needs_context,omitempty"`
+	GitHubContext  *GitHubContext
+	EnvContext     map[string]string
+	JobContext     *JobContext
+	StepsContext   map[string]StepContext
+	RunnerContext  *RunnerContext
+	InputsContext  map[string]string
+	SecretsContext map[string]string
+	NeedsContext   map[string]NeedContext
 }
 
 type GitHubContext struct {
-	Action          string `json:"action,omitempty"`
-	ActionPath      string `json:"action_path,omitempty"`
-	Actor           string `json:"actor,omitempty"`
-	BaseRef         string `json:"base_ref,omitempty"`
-	Event           string `json:"event,omitempty"`
-	EventName       string `json:"event_name,omitempty"`
-	EventPath       string `json:"event_path,omitempty"`
-	HeadRef         string `json:"head_ref,omitempty"`
-	Job             string `json:"job,omitempty"`
-	Ref             string `json:"ref,omitempty"`
-	RefName         string `json:"ref_name,omitempty"`
-	RefProtected    bool   `json:"ref_protected,omitempty"`
-	RefType         string `json:"ref_type,omitempty"`
-	Repository      string `json:"repository,omitempty"`
-	RepositoryOwner string `json:"repository_owner,omitempty"`
-	RunID           string `json:"run_id,omitempty"`
-	RunNumber       int64  `json:"run_number,omitempty"`
-	RunAttempt      int64  `json:"run_attempt,omitempty"`
-	ServerURL       string `json:"server_url,omitempty"`
-	Sha             string `json:"sha,omitempty"`
-	Token           string `json:"token,omitempty"`
-	Workflow        string `json:"workflow,omitempty"`
-	Workspace       string `json:"workspace,omitempty"`
+	Action          string
+	ActionPath      string
+	Actor           string
+	BaseRef         string
+	Event           string
+	EventName       string
+	EventPath       string
+	HeadRef         string
+	Job             string
+	Ref             string
+	RefName         string
+	RefProtected    bool
+	RefType         string
+	Repository      string
+	RepositoryOwner string
+	RunID           string
+	RunNumber       int64
+	RunAttempt      int64
+	ServerURL       string
+	Sha             string
+	Token           string
+	Workflow        string
+	Workspace       string
 }
 
 type JobContext struct {
-	Container *JobContextContainer          `json:"container,omitempty"`
-	Services  map[string]*JobContextService `json:"services,omitempty"`
-	Status    string                        `json:"status,omitempty"`
+	Container *JobContextContainer
+	Services  map[string]JobContextService
+	Status    string
 }
 
 type StepContext struct {
-	Outputs    map[string]string `json:"outputs,omitempty"`
-	Conclusion string            `json:"conclusion,omitempty"`
-	Outcome    string            `json:"outcome,omitempty"`
+	Outputs    map[string]string
+	Conclusion string
+	Outcome    string
 }
 
 type RunnerContext struct {
-	Name      string `json:"name,omitempty"`
-	OS        string `json:"os,omitempty"`
-	Arch      string `json:"arch,omitempty"`
-	Temp      string `json:"temp,omitempty"`
-	ToolCache string `json:"tool_cache,omitempty"`
+	Name      string
+	OS        string
+	Arch      string
+	Temp      string
+	ToolCache string
 }
 
 type NeedContext struct {
-	Outputs map[string]string `json:"outputs,omitempty"`
+	Outputs map[string]string
 }
 
 type JobContextContainer struct {
-	ID      string `json:"id,omitempty"`
-	Network string `json:"network,omitempty"`
+	ID      string
+	Network string
 }
 
 type JobContextService struct {
-	ID      string            `json:"id,omitempty"`
-	Network string            `json:"network,omitempty"`
-	Ports   map[string]string `json:"ports,omitempty"`
+	ID      string
+	Network string
+	Ports   map[string]string
 }

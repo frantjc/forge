@@ -42,7 +42,7 @@ func NewUse() *cobra.Command {
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
-				globalContext.StepsContext[id] = &githubactions.StepContext{}
+				globalContext.StepsContext[id] = githubactions.StepContext{Outputs: make(map[string]string)}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
 					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
