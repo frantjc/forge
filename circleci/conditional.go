@@ -4,7 +4,7 @@ import "strconv"
 
 type Conditional struct {
 	Condition any    `json:"condition,omitempty" yaml:",omitempty"`
- 	Steps     []Step `json:"steps,omitempty" yaml:",omitempty"`
+	Steps     []Step `json:"steps,omitempty" yaml:",omitempty"`
 }
 
 func EvaluateConditional(e ExpandFunc, c *Conditional) bool {
