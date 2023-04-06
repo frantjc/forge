@@ -50,7 +50,7 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 				}
 
 				if stepContext, ok := globalContext.StepsContext[step]; !ok || stepContext.Outputs == nil {
-					globalContext.StepsContext[step] = &githubactions.StepContext{
+					globalContext.StepsContext[step] = githubactions.StepContext{
 						Outputs: outputs,
 					}
 				} else {

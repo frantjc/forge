@@ -7,9 +7,9 @@ import (
 )
 
 type WorkflowCommand struct {
-	Command    string            `json:"command,omitempty"`
-	Parameters map[string]string `json:"parameters,omitempty"`
-	Value      string            `json:"value,omitempty"`
+	Command    string
+	Parameters map[string]string
+	Value      string
 }
 
 func (c *WorkflowCommand) String() string {

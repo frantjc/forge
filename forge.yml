@@ -8,3 +8,5 @@ resources:
     type: mock
     source:
       log: true
+orbs:
+  node: circleci/node@5.1.0

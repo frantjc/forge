@@ -7,9 +7,7 @@ import (
 	"github.com/frantjc/forge"
 )
 
-const (
-	VolumeDriver = "local"
-)
+const VolumeDriver = "local"
 
 func (r *ContainerRuntime) CreateVolume(ctx context.Context, name string) (forge.Volume, error) {
 	v, err := r.VolumeCreate(ctx, volume.CreateOptions{

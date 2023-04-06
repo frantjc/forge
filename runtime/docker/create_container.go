@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -67,7 +68,12 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	// If we're on linux, mount the Docker CLI into the container since then executables on
 	// the host can also be used by the container because they have a common OS.
 	if runtime.GOOS == "linux" {
-		if docker, err := exec.LookPath("docker"); err == nil {
+		docker, err := exec.LookPath("docker")
+		if errors.Is(err, exec.ErrDot) {
+			docker, err = filepath.Abs(docker)
+		}
+
+		if err == nil {
 			var (
 				bin       = filepath.Join(containerfs.WorkingDir, "/bin")
 				addedPath = false
