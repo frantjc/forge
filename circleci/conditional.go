@@ -3,8 +3,8 @@ package circleci
 import "strconv"
 
 type Conditional struct {
-	Condition any
-	Steps     []Step
+	Condition any    `json:"condition,omitempty" yaml:",omitempty"`
+ 	Steps     []Step `json:"steps,omitempty" yaml:",omitempty"`
 }
 
 func EvaluateConditional(e ExpandFunc, c *Conditional) bool {
