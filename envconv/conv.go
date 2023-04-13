@@ -7,7 +7,7 @@ import (
 
 // ArrToMap takes an environment array of the form
 //
-// ["KEY1=val1", "KEY2=val2"]
+//	["KEY1=val1", "KEY2=val2"]
 //
 // and returns a corresponding map of the form
 //
@@ -29,7 +29,7 @@ func ArrToMap(a []string) map[string]string {
 // ToMap is a convenience function wrapping ArrToMap.
 // It takes an environment array of the form
 //
-// ["KEY1=val1", "KEY2=val2"]
+//	["KEY1=val1", "KEY2=val2"]
 //
 // and returns a corresponding map of the form
 //
@@ -50,7 +50,7 @@ func ToMap(ss ...string) map[string]string {
 //
 // and returns a corresponding array of the form
 //
-// ["KEY1=val1", "KEY2=val2"].
+//	["KEY1=val1", "KEY2=val2"].
 func MapToArr(m map[string]string) []string {
 	a := []string{}
 	for k, v := range m {

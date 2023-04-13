@@ -2,17 +2,20 @@ package circleci
 
 import "strconv"
 
+// Conditional is a `when` or `unless` in a CircleCI Orb step.
 type Conditional struct {
 	Condition any    `json:"condition,omitempty" yaml:",omitempty"`
 	Steps     []Step `json:"steps,omitempty" yaml:",omitempty"`
 }
 
-func EvaluateConditional(e ExpandFunc, c *Conditional) bool {
+// EvaluateConditional evaluates a Conditional, expanding any
+// variables using the given ExpandFunc before evaluating.
+func EvaluateConditional(expand ExpandFunc, c *Conditional) bool {
 	switch v := c.Condition.(type) {
 	case bool:
 		return v
 	case string:
-		b, _ := strconv.ParseBool(e.ExpandString(v))
+		b, _ := strconv.ParseBool(expand(v))
 
 		return b
 	case map[string]any:

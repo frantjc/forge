@@ -2,21 +2,19 @@ package circleci
 
 import "strings"
 
+// ExpandFunc takes a variable name and returns the variable value.
 type ExpandFunc func(string) string
 
-func (e ExpandFunc) ExpandString(s string) string {
-	return ExpandString(s, e)
+// ExpandString is a convenience method for Expanding strings. See Expand.
+func ExpandString(s string, expand ExpandFunc) string {
+	return string(Expand([]byte(s), expand))
 }
 
-func (e ExpandFunc) Expand(b []byte) []byte {
-	return Expand(b, e)
-}
-
-func ExpandString(s string, mapping ExpandFunc) string {
-	return string(Expand([]byte(s), mapping))
-}
-
-func Expand(b []byte, mapping ExpandFunc) (p []byte) {
+// Expand takes bytes and an ExpandFunc. Whenever it encounters a variable
+// in the bytes, signified by e.g. "<< example >>", it calls ExpandFunc
+// with the variable name and replaces the variable with the result.
+// It returns the fully expanded bytes.
+func Expand(b []byte, expand ExpandFunc) (p []byte) {
 	i := 0
 	for j := 0; j < len(b); j++ {
 		if b[j] == '<' {
@@ -32,7 +30,7 @@ func Expand(b []byte, mapping ExpandFunc) (p []byte) {
 				// valid syntax, but << >> contained no name
 				p = append(p, b[j])
 			default:
-				p = append(p, mapping(name)...)
+				p = append(p, expand(name)...)
 			}
 			j += w
 			i = j + 1
