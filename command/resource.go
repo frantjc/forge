@@ -8,6 +8,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/forgeconcourse"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hooks"
@@ -32,13 +33,13 @@ func newResource(method string, check bool) *cobra.Command {
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
-					ctx    = cmd.Context()
-					_      = forge.LoggerFrom(ctx)
-					name   = args[0]
-					config = &forgeconcourse.Config{}
-					file   io.Reader
-					err    error
-					o      = &ore.Resource{
+					ctx      = cmd.Context()
+					_        = forge.LoggerFrom(ctx)
+					name     = args[0]
+					pipeline = &concourse.Pipeline{}
+					file     io.Reader
+					err      error
+					o        = &ore.Resource{
 						Method:  method,
 						Version: version,
 						Params:  params,
@@ -55,11 +56,11 @@ func newResource(method string, check bool) *cobra.Command {
 					}
 				}
 
-				if err = yaml.NewDecoder(file).Decode(config); err != nil {
+				if err = yaml.NewDecoder(file).Decode(pipeline); err != nil {
 					return err
 				}
 
-				for _, r := range config.Resources {
+				for _, r := range pipeline.Resources {
 					if r.Name == name {
 						resource := r
 						o.Resource = &resource
@@ -69,7 +70,7 @@ func newResource(method string, check bool) *cobra.Command {
 					return fmt.Errorf("resource not found: %s", name)
 				}
 
-				for _, t := range config.ResourceTypes {
+				for _, t := range pipeline.ResourceTypes {
 					if t.Name == o.Resource.Type {
 						resourceType := t
 						o.ResourceType = &resourceType

@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Orb is a parsed orb reference e.g. "circleci/node@5.1.0".
 type Orb struct {
 	Name    string
 	Version string
