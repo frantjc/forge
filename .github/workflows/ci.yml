@@ -16,6 +16,9 @@ jobs:
           node-version: 16
           cache: yarn
           cache-dependency-path: action/yarn.lock
+      - run: |
+          cd action/ && yarn
+        name: Run yarn
       - uses: actions/setup-go@v4
         with:
           go-version: '1.20'
