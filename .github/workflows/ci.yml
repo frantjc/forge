@@ -26,6 +26,14 @@ jobs:
         run: make i INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
+      - uses: ./
+        with:
+          install: false
+          get: mock
+      - uses: ./
+        with:
+          install: false
+          put: mock
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
       - name: Run forge use local

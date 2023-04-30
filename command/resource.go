@@ -111,7 +111,7 @@ func newResource(method string, check bool) *cobra.Command {
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().StringToStringVarP(&version, "version", "v", nil, "version for resource")
-	cmd.Flags().StringVarP(&conf, "conf", "c", "forge.yml", "config file for resource")
+	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for resource")
 	_ = cmd.MarkFlagDirname("workdir")

@@ -1,0 +1,19 @@
+name: forge
+description: Use forge
+author: frantjc
+inputs:
+  version:
+    description: Version of forge to install
+  install:
+    description: |
+      Install forge
+    default: true
+  get:
+    description: |
+      Concourse resource to get. Cannot be set at the same time as `put`
+  put:
+    description: |
+      Concourse resource to put. Cannot be set at the same time as `get`
+runs:
+  using: node16
+  main: action/dist/index.js

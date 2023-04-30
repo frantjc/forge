@@ -4,6 +4,7 @@ GOLANGCI-LINT = golangci-lint
 INSTALL = sudo install
 GORELEASER = goreleaser
 UPX = upx
+YARN = yarn
 
 BIN = /usr/local/bin
 
@@ -20,8 +21,17 @@ install: build
 build:
 	@$(GORELEASER) release --snapshot --rm-dist
 
-fmt generate test:
+action:
+	@cd action/ && \
+		$(YARN) build
+
+generate:
 	@$(GO) $@ ./...
+
+fmt test:
+	@$(GO) $@ ./...
+	@cd action/ && \
+		$(YARN) $@
 
 download vendor verify:
 	@$(GO) mod $@
@@ -37,6 +47,8 @@ clean:
 	@rm -rf dist/ privileged version internal/bin/shim.*
 
 release:
+	@cd action/ && \
+		$(YARN) version --new-version $(SEMVER)
 	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
 	@$(GIT) push --follow-tags
 
@@ -47,6 +59,6 @@ ver: verify
 format: fmt
 i: install
 
-.PHONY: i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
+.PHONY: action i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
 
 -include docs/docs.mk
