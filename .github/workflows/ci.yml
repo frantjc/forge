@@ -40,6 +40,8 @@ jobs:
         with:
           install: false
           put: mock
+          params: |
+            version=0.0.0
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
       - name: Run forge use local

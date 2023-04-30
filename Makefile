@@ -19,10 +19,10 @@ install: build
 	@$(INSTALL) ./dist/forge_$(GOOS)_$(GOARCH)*/forge $(BIN)
 
 build:
-	@$(GORELEASER) release --snapshot --rm-dist
+	@$(GORELEASER) release --snapshot --clean
 
-action:
-	@cd action/ && \
+.github/action:
+	@cd .github/action && \
 		$(YARN) build
 
 generate:
@@ -30,7 +30,7 @@ generate:
 
 fmt test:
 	@$(GO) $@ ./...
-	@cd action/ && \
+	@cd .github/action && \
 		$(YARN) $@
 
 download vendor verify:
@@ -52,6 +52,7 @@ release:
 	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
 	@$(GIT) push --follow-tags
 
+action: .github/action
 gen: generate
 dl: download
 ven: vendor
@@ -59,6 +60,6 @@ ver: verify
 format: fmt
 i: install
 
-.PHONY: action i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
+.PHONY: .github/action action i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
 
 -include docs/docs.mk
