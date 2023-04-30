@@ -16,14 +16,12 @@ jobs:
           node-version: 16
           cache: yarn
           cache-dependency-path: .github/action/yarn.lock
-      - run: |
-          cd action/ && yarn
-        name: Run yarn
       - uses: actions/setup-go@v4
         with:
           go-version: '1.20'
           cache: true
       - uses: golangci/golangci-lint-action@v3.4.0
+      - run: make download
       - run: make test
       - uses: goreleaser/goreleaser-action@v4
         with:

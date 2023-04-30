@@ -33,7 +33,12 @@ fmt test:
 	@cd .github/action && \
 		$(YARN) $@
 
-download vendor verify:
+download:
+	@$(GO) mod $@
+	@cd .github/action && \
+		$(YARN)
+
+vendor verify:
 	@$(GO) mod $@
 
 lint:
@@ -47,7 +52,7 @@ clean:
 	@rm -rf dist/ privileged version internal/bin/shim.*
 
 release:
-	@cd action/ && \
+	@cd .github/action && \
 		$(YARN) version --new-version $(SEMVER)
 	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
 	@$(GIT) push --follow-tags
