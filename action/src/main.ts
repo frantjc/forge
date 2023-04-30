@@ -28,7 +28,7 @@ async function run(): Promise<void> {
 
     let runnerArch;
     switch (process.env.RUNNER_ARCH) {
-      case "X86":
+      case "X64":
         runnerArch = "amd64";
         break;
     }
@@ -84,7 +84,7 @@ async function run(): Promise<void> {
       await cp.exec(forge, ["put", put], { cwd });
     }
   } catch (err) {
-    if (err instanceof Error) core.setFailed(err.message);
+    if (typeof err === "string" || err instanceof Error) core.setFailed(err);
   }
 }
 
