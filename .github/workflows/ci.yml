@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 16
           cache: yarn
-          cache-dependency-path: action/yarn.lock
+          cache-dependency-path: .github/action/yarn.lock
       - run: |
           cd action/ && yarn
         name: Run yarn
