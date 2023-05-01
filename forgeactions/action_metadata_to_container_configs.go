@@ -90,7 +90,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 				expander = githubactions.ExpandFunc(globalContext.GetString)
 			)
 			for k, v := range unexpandedInputs {
-				inputs[k] = expander(v)
+				inputs[k] = expander.ExpandString(v)
 			}
 
 			globalContext.InputsContext = inputs

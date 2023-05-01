@@ -22,3 +22,6 @@ internal/bin/shim*
 
 # goreleaser
 dist/
+
+# nodejs
+node_modules/

@@ -11,21 +11,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+          cache-dependency-path: .github/action/yarn.lock
       - uses: actions/setup-go@v4
         with:
           go-version: '1.20'
           cache: true
       - uses: golangci/golangci-lint-action@v3.4.0
-        with:
-          skip-go-installation: true
+      - run: make download
       - run: make test
       - uses: goreleaser/goreleaser-action@v4
         with:
           install-only: true
       - name: Run make install
-        run: make i INSTALL=install BIN=$RUNNER_TEMP
+        run: make INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
+      - uses: ./
+        with:
+          install: false
+          get: mock
+      - uses: ./
+        with:
+          install: false
+          put: mock
+          params: |
+            version=0.0.0
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
       - name: Run forge use local

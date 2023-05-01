@@ -4,13 +4,14 @@ GOLANGCI-LINT = golangci-lint
 INSTALL = sudo install
 GORELEASER = goreleaser
 UPX = upx
+YARN = yarn
 
 BIN = /usr/local/bin
 
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.6.0
+SEMVER ?= 0.7.0
 
 .DEFAULT: install
 
@@ -18,12 +19,23 @@ install: build
 	@$(INSTALL) ./dist/forge_$(GOOS)_$(GOARCH)*/forge $(BIN)
 
 build:
-	@$(GORELEASER) release --snapshot --rm-dist
+	@$(GORELEASER) release --snapshot --clean
 
-fmt generate test:
+.github/action:
+	@cd .github/action && $(YARN) all
+
+generate:
 	@$(GO) $@ ./...
 
-download vendor verify:
+fmt test:
+	@$(GO) $@ ./...
+	@cd .github/action && $(YARN) $@
+
+download:
+	@$(GO) mod $@
+	@cd .github/action && $(YARN)
+
+vendor verify:
 	@$(GO) mod $@
 
 lint:
@@ -36,10 +48,18 @@ shim:
 clean:
 	@rm -rf dist/ privileged version internal/bin/shim.*
 
-release:
-	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
-	@$(GIT) push --follow-tags
+MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
+MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 
+release:
+	@cd .github/action && \
+		$(YARN) version --new-version $(SEMVER)
+	@$(GIT) tag v$(SEMVER)
+	@$(GIT) tag -f v$(MAJOR)
+	@$(GIT) tag -f v$(MAJOR).$(MINOR)
+	@$(GIT) push --tags
+
+action: .github/action
 gen: generate
 dl: download
 ven: vendor
@@ -47,6 +67,6 @@ ver: verify
 format: fmt
 i: install
 
-.PHONY: i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
+.PHONY: .github/action action i install build fmt generate test download vendor verify lint shim clean gen dl ven ver format release
 
 -include docs/docs.mk
