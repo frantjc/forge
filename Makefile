@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.6.0
+SEMVER ?= 0.7.0
 
 .DEFAULT: install
 
@@ -22,21 +22,18 @@ build:
 	@$(GORELEASER) release --snapshot --clean
 
 .github/action:
-	@cd .github/action && \
-		$(YARN) build
+	@cd .github/action && $(YARN) all
 
 generate:
 	@$(GO) $@ ./...
 
 fmt test:
 	@$(GO) $@ ./...
-	@cd .github/action && \
-		$(YARN) $@
+	@cd .github/action && $(YARN) $@
 
 download:
 	@$(GO) mod $@
-	@cd .github/action && \
-		$(YARN)
+	@cd .github/action && $(YARN)
 
 vendor verify:
 	@$(GO) mod $@
@@ -51,11 +48,16 @@ shim:
 clean:
 	@rm -rf dist/ privileged version internal/bin/shim.*
 
+MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
+MINOR = $(word 2,$(subst ., ,$(SEMVER)))
+
 release:
 	@cd .github/action && \
 		$(YARN) version --new-version $(SEMVER)
-	@$(GIT) tag -a v$(SEMVER) -m v$(SEMVER)
-	@$(GIT) push --follow-tags
+	@$(GIT) tag v$(SEMVER)
+	@$(GIT) tag -f v$(MAJOR)
+	@$(GIT) tag -f v$(MAJOR).$(MINOR)
+	@$(GIT) push --tags
 
 action: .github/action
 gen: generate

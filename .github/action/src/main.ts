@@ -26,6 +26,9 @@ async function run(): Promise<void> {
       throw new Error("cannot use with `get` and `put`");
     }
 
+    const action = get ? "get" : "put";
+    const resource = get || put;
+
     const params = core.getMultilineInput("params");
     const config = core.getInput("config");
 
@@ -65,6 +68,8 @@ async function run(): Promise<void> {
         break;
     }
 
+    const versionOs = `${version}_${os}`;
+
     // Before we even attempt the download, check if goreleaser was configured
     // to build the GOOS that we are trying to download
     //
@@ -83,8 +88,8 @@ async function run(): Promise<void> {
     if (core.getBooleanInput("install")) {
       core.startGroup("install");
 
-      // Look for forge in the cache
-      forge = tc.find(tool, version);
+      // Look for forge in the cache.
+      forge = tc.find(tool, versionOs);
 
       // If we don't find forge in the cache, download, extract and cache it
       // from its GitHub release.
@@ -100,7 +105,7 @@ async function run(): Promise<void> {
           ),
           tool,
           tool,
-          version
+          versionOs
         );
       }
 
@@ -112,19 +117,18 @@ async function run(): Promise<void> {
     // Sanity check that forge was installed correctly.
     await cp.exec(forge, ["-v"]);
 
-    // Inputs for get a put are not required so that this action can be used to only
-    // install forge. Note that we checked above if both were set, so at most one of
-    // these conditions could evaluate to true.
-    if (get) {
+    // Inputs for `get` a `put` are not required so that this action can be used to
+    // only install forge. Note that we checked above if both were set, so at most
+    // one of these conditions could evaluate to true.
+    if (resource) {
       await cp.exec(
         forge,
-        ["get", get, `-c=${config}`, ...params.map((param) => `-p=${param}`)],
-        { cwd }
-      );
-    } else if (put) {
-      await cp.exec(
-        forge,
-        ["put", put, `-c=${config}`, ...params.map((param) => `-p=${param}`)],
+        [
+          action,
+          resource,
+          `-c=${config}`,
+          ...params.map((param) => `-p=${param}`),
+        ],
         { cwd }
       );
     }

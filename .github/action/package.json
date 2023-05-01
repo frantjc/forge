@@ -3,15 +3,16 @@
   "version": "0.6.0",
   "private": true,
   "description": "forge action",
-  "main": "./lib/src/main.js",
   "scripts": {
-    "build": "npm-run-all build:tsc build:ncc",
-    "build:tsc": "tsc",
-    "build:ncc": "ncc build --source-map --license licenses.txt",
+    "all": "npm-run-all fmt test build",
     "fmt": "npm-run-all fmt:*",
     "fmt:eslint": "eslint --fix",
     "fmt:pretty": "prettier --write .",
-    "test": "jest --passWithNoTests"
+    "test": "npm-run-all build test:jest",
+    "test:jest": "jest",
+    "build": "npm-run-all build:tsc build:ncc",
+    "build:tsc": "tsc",
+    "build:ncc": "ncc build ./lib/src/main.js --source-map --license licenses.txt"
   },
   "repository": {
     "type": "git",

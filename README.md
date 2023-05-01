@@ -76,6 +76,36 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
 
+### Forge GitHub Action
+
+If you're specifically interested in using Forge inside of GitHub Actions, you can, for example...
+
+Install only:
+
+```yml
+  - uses: frantjc/forge@0.7
+```
+
+Skip install and `get` a Concourse Resource using a pre-installed `forge`:
+
+```yml
+  - uses: frantjc/forge@0.7
+    with:
+      install: false
+      get: my-resource
+```
+
+Install and `put` a Concourse Resource with the given `params` and `config`:
+
+```yml
+  - uses: frantjc/forge@0.7
+    with:
+      put: my-resource
+      params:
+        my-param=my-value
+      config: forge.yaml
+```
+
 ## why?
 
 Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some continuous integration (CI) system that executes that script in response to some event such as a commit to a Git repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
@@ -90,6 +120,7 @@ Forge aims to remedy this.
 
 - `git` is _required_
 - `make` is _required_
-- `golang` is _required_ - version 1.18 or above is required for [generics](https://go.dev/doc/tutorial/generics)
-- `docker` is _required_
+- `go` 1.18 is _required_ for developing Forge for [generics](https://go.dev/doc/tutorial/generics)
+- `docker` is _required_ to test Forge as it is its only runtime
 - [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
+- `node` 16 is _required_ for developing the [`action`](.github/action)
