@@ -57,7 +57,7 @@ release:
 	@$(GIT) tag v$(SEMVER)
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
-	@$(GIT) push --tags
+	@$(GIT) push --tags -f
 
 action: .github/action
 gen: generate
