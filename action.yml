@@ -1,25 +1,30 @@
-name: forge
-description: Use forge
+name: Forge
+description: |
+  Use Forge to easily run reusable steps from other proprietary CI systems.
 author: frantjc
+branding:
+  color: yellow
+  icon: box
 inputs:
   version:
-    description: Version of forge to install
+    description: |
+      Version of Forge to install.
   install:
     description: |
-      Install forge
+      Whether or not to install Forge.
     default: true
   get:
     description: |
-      Concourse resource to get. Cannot be set at the same time as `put`
+      Concourse resource to get. Cannot be set at the same time as `put`.
   put:
     description: |
-      Concourse resource to put. Cannot be set at the same time as `get`
+      Concourse resource to put. Cannot be set at the same time as `get`.
   params:
     description: |
-      Newline-delimited parameters to use
+      Newline-delimited parameters to use.
   config:
     description: |
-      Config file to use
+      Config file to use.
     default: .forge.yml
 runs:
   using: node16
