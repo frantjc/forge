@@ -53,9 +53,8 @@ MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 
 release:
 	@cd .github/action && \
-		$(YARN) version --new-version $(SEMVER)
-# yarn does this unless --no-git-tag-version
-# @$(GIT) tag v$(SEMVER)
+		$(YARN) version --no-git-tag-version --new-version $(SEMVER)
+	@$(GIT) tag v$(SEMVER)
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
 	@$(GIT) push --tags
