@@ -52,7 +52,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.13.0 // indirect
-	github.com/docker/cli v23.0.0-rc.2+incompatible
+	github.com/docker/cli v24.0.0-rc.1+incompatible
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
