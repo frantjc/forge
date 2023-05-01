@@ -1,4 +1,4 @@
-name: Forge
+name: Setup Forge
 description: |
   Use Forge to easily run reusable steps from other proprietary CI systems.
 author: frantjc
