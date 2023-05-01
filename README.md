@@ -76,7 +76,7 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
 
-### Forge GitHub Action
+### Setup Forge
 
 If you're specifically interested in using Forge inside of GitHub Actions, you can, for example...
 
