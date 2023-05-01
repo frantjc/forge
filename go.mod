@@ -8,7 +8,7 @@ require (
 	github.com/frantjc/go-error-code v0.1.1
 	github.com/frantjc/go-fn v0.3.0
 	github.com/go-git/go-git/v5 v5.5.2
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.3
 	github.com/google/go-containerregistry v0.14.0
 	github.com/google/go-github/v50 v50.2.0
