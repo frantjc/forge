@@ -493,7 +493,7 @@ func (c *GlobalContext) envMap() map[string]string {
 	if c.InputsContext != nil {
 		for k, v := range c.InputsContext {
 			if v != "" {
-				env[fmt.Sprintf("INPUT_%s", strings.ToUpper(strings.ReplaceAll(strings.ToUpper(k), " ", "_")))] = v
+				env[fmt.Sprintf("INPUT_%s", strings.ReplaceAll(strings.ToUpper(k), " ", "_"))] = v
 			}
 		}
 	}
