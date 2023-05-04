@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.7.2
+SEMVER ?= 0.7.3
 
 .DEFAULT: install
 
@@ -53,8 +53,7 @@ MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 
 release:
 	@cd .github/action && \
-		$(YARN) version --no-git-tag-version --new-version $(SEMVER)
-	@$(GIT) tag v$(SEMVER)
+		$(YARN) version --new-version $(SEMVER)
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
 	@$(GIT) push --tags -f
