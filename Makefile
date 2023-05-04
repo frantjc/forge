@@ -54,9 +54,10 @@ MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 release:
 	@cd .github/action && \
 		$(YARN) version --new-version $(SEMVER)
+	@$(GIT) push
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
-	@$(GIT) push --all -f
+	@$(GIT) push --tag -f
 
 action: .github/action
 gen: generate
