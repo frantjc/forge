@@ -57,7 +57,7 @@ release:
 	@$(GIT) push
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
-	@$(GIT) push --tag -f
+	@$(GIT) push --tags -f
 
 action: .github/action
 gen: generate
