@@ -56,7 +56,7 @@ release:
 		$(YARN) version --new-version $(SEMVER)
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
-	@$(GIT) push --follow-tags -f
+	@$(GIT) push --all -f
 
 action: .github/action
 gen: generate
