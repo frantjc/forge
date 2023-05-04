@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/adrg/xdg v0.4.0
 	github.com/docker/docker v23.0.5+incompatible
-	github.com/frantjc/go-error-code v0.1.1
+	github.com/frantjc/go-error-code v0.2.0
 	github.com/frantjc/go-fn v0.3.0
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/go-logr/logr v1.2.4
