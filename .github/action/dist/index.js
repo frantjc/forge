@@ -116,12 +116,13 @@ function run() {
             if (core.getBooleanInput("install")) {
                 core.startGroup("install");
                 // Look for forge in the cache.
-                bin = path_1.default.join(tc.find(tool, versionOs), tool);
+                let dir = tc.find(tool, versionOs);
                 // If we don't find forge in the cache, download, extract and cache it
                 // from its GitHub release.
-                if (!bin) {
-                    bin = path_1.default.join(yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs), tool);
+                if (!dir) {
+                    dir = yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs);
                 }
+                bin = path_1.default.join(dir, bin);
                 core.addPath(bin);
                 core.endGroup();
             }

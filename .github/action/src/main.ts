@@ -89,28 +89,27 @@ async function run(): Promise<void> {
       core.startGroup("install");
 
       // Look for forge in the cache.
-      bin = path.join(tc.find(tool, versionOs), tool);
+      let dir = tc.find(tool, versionOs);
 
       // If we don't find forge in the cache, download, extract and cache it
       // from its GitHub release.
-      if (!bin) {
-        bin = path.join(
-          await tc.cacheFile(
-            path.join(
-              await tc.extractTar(
-                await tc.downloadTool(
-                  `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
-                )
-              ),
-              tool
+      if (!dir) {
+        dir = await tc.cacheFile(
+          path.join(
+            await tc.extractTar(
+              await tc.downloadTool(
+                `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
+              )
             ),
-            tool,
-            tool,
-            versionOs
+            tool
           ),
-          tool
-        )
+          tool,
+          tool,
+          versionOs
+        );
       }
+
+      bin = path.join(dir, bin);
 
       core.addPath(bin);
 
