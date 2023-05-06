@@ -109,6 +109,8 @@ async function run(): Promise<void> {
         );
       }
 
+      core.addPath(forge);
+
       core.endGroup();
     }
 
