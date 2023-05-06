@@ -89,7 +89,7 @@ async function run(): Promise<void> {
       core.startGroup("install");
 
       // Look for forge in the cache.
-      bin = tc.find(tool, versionOs);
+      bin = path.join(tc.find(tool, versionOs), tool);
 
       // If we don't find forge in the cache, download, extract and cache it
       // from its GitHub release.

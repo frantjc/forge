@@ -116,7 +116,7 @@ function run() {
             if (core.getBooleanInput("install")) {
                 core.startGroup("install");
                 // Look for forge in the cache.
-                bin = tc.find(tool, versionOs);
+                bin = path_1.default.join(tc.find(tool, versionOs), tool);
                 // If we don't find forge in the cache, download, extract and cache it
                 // from its GitHub release.
                 if (!bin) {
