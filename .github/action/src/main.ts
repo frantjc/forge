@@ -84,7 +84,7 @@ async function run(): Promise<void> {
     }
 
     // Default to looking it up on PATH if install is explicitly set to false.
-    let forge = "";
+    let forge = "forge";
     if (core.getBooleanInput("install")) {
       core.startGroup("install");
 
@@ -111,8 +111,6 @@ async function run(): Promise<void> {
 
       core.endGroup();
     }
-
-    forge = path.join(forge, "forge");
 
     // Sanity check that forge was installed correctly.
     await cp.exec(forge, ["-v"]);

@@ -2,9 +2,8 @@
   "name": "setup-forge",
   "version": "0.7.2",
   "private": true,
-  "description": "forge action",
   "scripts": {
-    "all": "npm-run-all fmt test build",
+    "all": "npm-run-all fmt test",
     "fmt": "npm-run-all fmt:*",
     "fmt:eslint": "eslint --fix",
     "fmt:pretty": "prettier --write .",

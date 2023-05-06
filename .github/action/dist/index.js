@@ -112,7 +112,7 @@ function run() {
                 throw new Error(`unsupported OS ${process.env.RUNNER_OS}`);
             }
             // Default to looking it up on PATH if install is explicitly set to false.
-            let forge = "";
+            let forge = "forge";
             if (core.getBooleanInput("install")) {
                 core.startGroup("install");
                 // Look for forge in the cache.
@@ -124,7 +124,6 @@ function run() {
                 }
                 core.endGroup();
             }
-            forge = path_1.default.join(forge, "forge");
             // Sanity check that forge was installed correctly.
             yield cp.exec(forge, ["-v"]);
             // Inputs for `get` a `put` are not required so that this action can be used to
@@ -15121,7 +15120,7 @@ exports.visitAsync = visitAsync;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"forge-action","version":"0.6.0","private":true,"description":"forge action","scripts":{"all":"npm-run-all fmt test build","fmt":"npm-run-all fmt:*","fmt:eslint":"eslint --fix","fmt:pretty":"prettier --write .","test":"npm-run-all build test:jest","test:jest":"jest","build":"npm-run-all build:tsc build:ncc","build:tsc":"tsc","build:ncc":"ncc build ./lib/src/main.js --source-map --license licenses.txt"},"repository":{"type":"git","url":"git+https://github.com/frantjc/forge.git"},"author":"frantjc","license":"MIT","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/tool-cache":"^2.0.1","yaml":"^2.2.2"},"devDependencies":{"@types/node":"^18.15.13","@typescript-eslint/parser":"^5.59.0","@vercel/ncc":"^0.36.1","eslint":"^8.38.0","eslint-plugin-github":"^4.7.0","eslint-plugin-jest":"^27.2.1","jest":"^29.5.0","js-yaml":"^4.1.0","npm-run-all":"^4.1.5","prettier":"^2.8.7","ts-jest":"^29.1.0","typescript":"^5.0.4"},"engines":{"node":">=16.0.0"}}');
+module.exports = JSON.parse('{"name":"setup-forge","version":"0.7.2","private":true,"scripts":{"all":"npm-run-all fmt test build","fmt":"npm-run-all fmt:*","fmt:eslint":"eslint --fix","fmt:pretty":"prettier --write .","test":"npm-run-all build test:jest","test:jest":"jest","build":"npm-run-all build:tsc build:ncc","build:tsc":"tsc","build:ncc":"ncc build ./lib/src/main.js --source-map --license licenses.txt"},"repository":{"type":"git","url":"git+https://github.com/frantjc/forge.git"},"author":"frantjc","license":"MIT","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/tool-cache":"^2.0.1","yaml":"^2.2.2"},"devDependencies":{"@types/node":"^18.15.13","@typescript-eslint/parser":"^5.59.2","@vercel/ncc":"^0.36.1","eslint":"^8.38.0","eslint-plugin-github":"^4.7.0","eslint-plugin-jest":"^27.2.1","jest":"^29.5.0","js-yaml":"^4.1.0","npm-run-all":"^4.1.5","prettier":"^2.8.7","ts-jest":"^29.1.0","typescript":"^5.0.4"},"engines":{"node":">=16.0.0"}}');
 
 /***/ })
 
