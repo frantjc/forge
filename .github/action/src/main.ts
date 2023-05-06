@@ -84,45 +84,48 @@ async function run(): Promise<void> {
     }
 
     // Default to looking it up on PATH if install is explicitly set to false.
-    let forge = "forge";
+    let bin = tool;
     if (core.getBooleanInput("install")) {
       core.startGroup("install");
 
       // Look for forge in the cache.
-      forge = tc.find(tool, versionOs);
+      bin = tc.find(tool, versionOs);
 
       // If we don't find forge in the cache, download, extract and cache it
       // from its GitHub release.
-      if (!forge) {
-        forge = await tc.cacheFile(
-          path.join(
-            await tc.extractTar(
-              await tc.downloadTool(
-                `https://github.com/frantjc/forge/releases/download/v${version}/forge_${version}_${os}_${arch}.tar.gz`
-              )
+      if (!bin) {
+        bin = path.join(
+          await tc.cacheFile(
+            path.join(
+              await tc.extractTar(
+                await tc.downloadTool(
+                  `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
+                )
+              ),
+              tool
             ),
-            tool
+            tool,
+            tool,
+            versionOs
           ),
-          tool,
-          tool,
-          versionOs
-        );
+          tool
+        )
       }
 
-      core.addPath(forge);
+      core.addPath(bin);
 
       core.endGroup();
     }
 
     // Sanity check that forge was installed correctly.
-    await cp.exec(forge, ["-v"]);
+    await cp.exec(bin, ["-v"]);
 
     // Inputs for `get` a `put` are not required so that this action can be used to
     // only install forge. Note that we checked above if both were set, so at most
     // one of these conditions could evaluate to true.
     if (resource) {
       await cp.exec(
-        forge,
+        bin,
         [
           action,
           resource,

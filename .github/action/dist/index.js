@@ -112,25 +112,26 @@ function run() {
                 throw new Error(`unsupported OS ${process.env.RUNNER_OS}`);
             }
             // Default to looking it up on PATH if install is explicitly set to false.
-            let forge = "forge";
+            let bin = tool;
             if (core.getBooleanInput("install")) {
                 core.startGroup("install");
                 // Look for forge in the cache.
-                forge = tc.find(tool, versionOs);
+                bin = tc.find(tool, versionOs);
                 // If we don't find forge in the cache, download, extract and cache it
                 // from its GitHub release.
-                if (!forge) {
-                    forge = yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/forge/releases/download/v${version}/forge_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs);
+                if (!bin) {
+                    bin = path_1.default.join(yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs), tool);
                 }
+                core.addPath(bin);
                 core.endGroup();
             }
             // Sanity check that forge was installed correctly.
-            yield cp.exec(forge, ["-v"]);
+            yield cp.exec(bin, ["-v"]);
             // Inputs for `get` a `put` are not required so that this action can be used to
             // only install forge. Note that we checked above if both were set, so at most
             // one of these conditions could evaluate to true.
             if (resource) {
-                yield cp.exec(forge, [
+                yield cp.exec(bin, [
                     action,
                     resource,
                     `-c=${config}`,
@@ -15120,7 +15121,7 @@ exports.visitAsync = visitAsync;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"setup-forge","version":"0.7.2","private":true,"scripts":{"all":"npm-run-all fmt test build","fmt":"npm-run-all fmt:*","fmt:eslint":"eslint --fix","fmt:pretty":"prettier --write .","test":"npm-run-all build test:jest","test:jest":"jest","build":"npm-run-all build:tsc build:ncc","build:tsc":"tsc","build:ncc":"ncc build ./lib/src/main.js --source-map --license licenses.txt"},"repository":{"type":"git","url":"git+https://github.com/frantjc/forge.git"},"author":"frantjc","license":"MIT","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/tool-cache":"^2.0.1","yaml":"^2.2.2"},"devDependencies":{"@types/node":"^18.15.13","@typescript-eslint/parser":"^5.59.2","@vercel/ncc":"^0.36.1","eslint":"^8.38.0","eslint-plugin-github":"^4.7.0","eslint-plugin-jest":"^27.2.1","jest":"^29.5.0","js-yaml":"^4.1.0","npm-run-all":"^4.1.5","prettier":"^2.8.7","ts-jest":"^29.1.0","typescript":"^5.0.4"},"engines":{"node":">=16.0.0"}}');
+module.exports = JSON.parse('{"name":"setup-forge","version":"0.7.2","private":true,"scripts":{"all":"npm-run-all fmt test","fmt":"npm-run-all fmt:*","fmt:eslint":"eslint --fix","fmt:pretty":"prettier --write .","test":"npm-run-all build test:jest","test:jest":"jest","build":"npm-run-all build:tsc build:ncc","build:tsc":"tsc","build:ncc":"ncc build ./lib/src/main.js --source-map --license licenses.txt"},"repository":{"type":"git","url":"git+https://github.com/frantjc/forge.git"},"author":"frantjc","license":"MIT","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/tool-cache":"^2.0.1","yaml":"^2.2.2"},"devDependencies":{"@types/node":"^18.15.13","@typescript-eslint/parser":"^5.59.2","@vercel/ncc":"^0.36.1","eslint":"^8.38.0","eslint-plugin-github":"^4.7.0","eslint-plugin-jest":"^27.2.1","jest":"^29.5.0","js-yaml":"^4.1.0","npm-run-all":"^4.1.5","prettier":"^2.8.7","ts-jest":"^29.1.0","typescript":"^5.0.4"},"engines":{"node":">=16.0.0"}}');
 
 /***/ })
 
