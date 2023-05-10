@@ -25,7 +25,6 @@ inputs:
   config:
     description: |
       Config file to use.
-    default: .forge.yml
 runs:
   using: node16
   main: .github/action/dist/index.js

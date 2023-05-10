@@ -132,12 +132,11 @@ function run() {
             // only install forge. Note that we checked above if both were set, so at most
             // one of these conditions could evaluate to true.
             if (resource) {
-                yield cp.exec(bin, [
-                    action,
-                    resource,
-                    `-c=${config}`,
-                    ...params.map((param) => `-p=${param}`),
-                ], { cwd });
+                let args = [action, resource, ...params.map((param) => `-p=${param}`)];
+                if (config) {
+                    args = [...args, `-c=${config}`];
+                }
+                yield cp.exec(bin, args, { cwd });
             }
         }
         catch (err) {

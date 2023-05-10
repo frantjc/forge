@@ -123,16 +123,13 @@ async function run(): Promise<void> {
     // only install forge. Note that we checked above if both were set, so at most
     // one of these conditions could evaluate to true.
     if (resource) {
-      await cp.exec(
-        bin,
-        [
-          action,
-          resource,
-          `-c=${config}`,
-          ...params.map((param) => `-p=${param}`),
-        ],
-        { cwd }
-      );
+      let args = [action, resource, ...params.map((param) => `-p=${param}`)];
+
+      if (config) {
+        args = [...args, `-c=${config}`];
+      }
+
+      await cp.exec(bin, args, { cwd });
     }
   } catch (err) {
     if (typeof err === "string" || err instanceof Error) core.setFailed(err);

@@ -60,6 +60,8 @@ forge use -a ./testdata/actions/dockerfile
 
 > If the Action runs using a custom image, that image must have `sh` on its `PATH` for the attach to work.
 
+> Local Actions cannot refer to files outside of the action metadata file's directory.
+
 ### Concourse Resources
 
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`.forge.yml`](.forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
@@ -105,6 +107,8 @@ Install and `put` a Concourse Resource with the given `params` and `config`:
         my-param=my-value
       config: forge.yaml
 ```
+
+> Forge will not work inside of Forge e.g. `forge use /path/to/frantjc/forge` will fail due to the nesting of containers.
 
 ## why?
 
