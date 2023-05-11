@@ -2,18 +2,18 @@ package circleci
 
 // Step ...
 //
-//		steps:
-//	   - when:
+//	steps:
+//	  - when:
 //	 	  condition:
-//			    equal:
-//			      - 1.0.0
-//			      - << parameters.version >>
-//		      run:
-//			    command: env
-//	   - run:
-//	       command: env
-//	   - node/install:
-//		      key: value
+//			equal:
+//			  - 1.0.0
+//			  - << parameters.version >>
+//		  run:
+//		    command: env
+//	  - run:
+//	      command: env
+//	  - node/install:
+//		  key: value
 type Step struct {
 	When   *Conditional `json:"when,omitempty" yaml:",omitempty"`
 	Unless *Conditional `json:"unless,omitempty" yaml:",omitempty"`
