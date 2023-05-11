@@ -10,12 +10,12 @@ type Conditional struct {
 
 // EvaluateConditional evaluates a Conditional, expanding any
 // variables using the given ExpandFunc before evaluating.
-func EvaluateConditional(expand ExpandFunc, c *Conditional) bool {
+func EvaluateConditional(expander ExpandFunc, c *Conditional) bool {
 	switch v := c.Condition.(type) {
 	case bool:
 		return v
 	case string:
-		b, _ := strconv.ParseBool(expand(v))
+		b, _ := strconv.ParseBool(expander.ExpandString((v)))
 
 		return b
 	case map[string]any:
