@@ -11,7 +11,7 @@
     "test:jest": "jest",
     "build": "npm-run-all build:tsc build:ncc",
     "build:tsc": "tsc",
-    "build:ncc": "ncc build ./lib/src/main.js --source-map --license licenses.txt"
+    "build:ncc": "ncc build ./lib/main.js --source-map --license licenses.txt"
   },
   "repository": {
     "type": "git",

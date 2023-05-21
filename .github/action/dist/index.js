@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 9536:
+/***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -48,13 +48,13 @@ const cp = __importStar(__nccwpck_require__(1514));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const yaml_1 = __importDefault(__nccwpck_require__(4083));
-const package_json_1 = __importDefault(__nccwpck_require__(2876));
+const packageJSON = JSON.parse(fs_1.default.readFileSync(path_1.default.join(__dirname, "../package.json")).toString());
 const goreleaserYML = yaml_1.default.parse(fs_1.default.readFileSync(path_1.default.join(__dirname, "../../../.goreleaser.yaml")).toString());
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const tool = "forge";
-            const version = core.getInput("version") || package_json_1.default.version;
+            const version = core.getInput("version") || packageJSON.version;
             const get = core.getInput("get");
             const put = core.getInput("put");
             const cwd = process.env.GITHUB_WORKSPACE;
@@ -15115,14 +15115,6 @@ exports.visit = visit;
 exports.visitAsync = visitAsync;
 
 
-/***/ }),
-
-/***/ 2876:
-/***/ ((module) => {
-
-"use strict";
-module.exports = JSON.parse('{"name":"setup-forge","version":"0.7.3","private":true,"scripts":{"all":"npm-run-all fmt build","fmt":"npm-run-all fmt:*","fmt:eslint":"eslint --fix","fmt:pretty":"prettier --write .","test":"npm-run-all build test:jest","test:jest":"jest","build":"npm-run-all build:tsc build:ncc","build:tsc":"tsc","build:ncc":"ncc build ./lib/src/main.js --source-map --license licenses.txt"},"repository":{"type":"git","url":"git+https://github.com/frantjc/forge.git"},"author":"frantjc","license":"MIT","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/tool-cache":"^2.0.1","yaml":"^2.2.2"},"devDependencies":{"@types/node":"^18.15.13","@typescript-eslint/parser":"^5.59.2","@vercel/ncc":"^0.36.1","eslint":"^8.38.0","eslint-plugin-github":"^4.7.0","eslint-plugin-jest":"^27.2.1","jest":"^29.5.0","js-yaml":"^4.1.0","npm-run-all":"^4.1.5","prettier":"^2.8.7","ts-jest":"^29.1.0","typescript":"^5.0.4"},"engines":{"node":">=16.0.0"}}');
-
 /***/ })
 
 /******/ 	});
@@ -15167,7 +15159,7 @@ module.exports = JSON.parse('{"name":"setup-forge","version":"0.7.3","private":t
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(9536);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
 /******/ 	module.exports = __webpack_exports__;
 /******/
 /******/ })()

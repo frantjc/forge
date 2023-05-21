@@ -6,7 +6,9 @@ import fs from "fs";
 import path from "path";
 import yaml from "yaml";
 
-import packageJSON from "../package.json";
+const packageJSON = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../package.json")).toString()
+);
 
 const goreleaserYML = yaml.parse(
   fs.readFileSync(path.join(__dirname, "../../../.goreleaser.yaml")).toString()
