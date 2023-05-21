@@ -26,8 +26,8 @@
     "yaml": "^2.2.2"
   },
   "devDependencies": {
-    "@types/node": "^20.1.0",
-    "@typescript-eslint/parser": "^5.59.2",
+    "@types/node": "^20.1.4",
+    "@typescript-eslint/parser": "^5.59.6",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.40.0",
     "eslint-plugin-github": "^4.7.0",
