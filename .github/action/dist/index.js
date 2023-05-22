@@ -59,7 +59,7 @@ function run() {
             const put = core.getInput("put");
             const cwd = process.env.GITHUB_WORKSPACE;
             if (get && put) {
-                throw new Error("cannot use with `get` and `put`");
+                throw new Error("cannot use both `get` and `put`");
             }
             const action = get ? "get" : "put";
             const resource = get || put;
@@ -123,7 +123,7 @@ function run() {
                     dir = yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs);
                 }
                 bin = path_1.default.join(dir, bin);
-                core.addPath(bin);
+                core.addPath(dir);
                 core.endGroup();
             }
             // Sanity check that forge was installed correctly.

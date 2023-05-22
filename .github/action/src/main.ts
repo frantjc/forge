@@ -25,7 +25,7 @@ async function run(): Promise<void> {
     const cwd = process.env.GITHUB_WORKSPACE;
 
     if (get && put) {
-      throw new Error("cannot use with `get` and `put`");
+      throw new Error("cannot use both `get` and `put`");
     }
 
     const action = get ? "get" : "put";
@@ -113,7 +113,7 @@ async function run(): Promise<void> {
 
       bin = path.join(dir, bin);
 
-      core.addPath(bin);
+      core.addPath(dir);
 
       core.endGroup();
     }
