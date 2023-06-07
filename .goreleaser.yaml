@@ -9,9 +9,6 @@ builds:
       - darwin
     goarch:
       - amd64
-    hooks:
-      post:
-        - upx {{ .Path }}
 changelog:
   use: github
   filters:
