@@ -17,8 +17,7 @@ privileged
 version
 
 # upx
-internal/bin/shim*
-!internal/bin/shim
+internal/bin/shim*.*
 
 # goreleaser
 dist/

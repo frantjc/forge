@@ -128,7 +128,7 @@ function run() {
             }
             // Sanity check that forge was installed correctly.
             yield cp.exec(bin, ["-v"]);
-            // Inputs for `get` a `put` are not required so that this action can be used to
+            // Inputs for `get` and `put` are not required so that this action can be used to
             // only install forge. Note that we checked above if both were set, so at most
             // one of these conditions could evaluate to true.
             if (resource) {
