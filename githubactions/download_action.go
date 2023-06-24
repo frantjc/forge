@@ -37,6 +37,8 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		client = github.NewClient(http.DefaultClient)
 	}
 
+	client.BaseURL = GetGitHubAPIURL()
+
 	if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "tags/"+u.Version); err == nil {
 		sha = ref.GetObject().GetSHA()
 	} else {
@@ -48,7 +50,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
 		return nil, nil, err
 	} else if !matched {
-		return nil, nil, fmt.Errorf("unabled to get action sha")
+		return nil, nil, fmt.Errorf("unable to get action sha")
 	}
 
 	for _, filename := range ActionYAMLFilenames {
