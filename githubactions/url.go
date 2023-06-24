@@ -38,7 +38,7 @@ func APIURLFromBaseURL(base *url.URL) (*url.URL, error) {
 		api = api.JoinPath("/api/v3")
 	}
 
-	return api, nil
+	return api.JoinPath("/"), nil
 }
 
 func GraphQLURLFromBaseURL(base *url.URL) (*url.URL, error) {
@@ -47,7 +47,7 @@ func GraphQLURLFromBaseURL(base *url.URL) (*url.URL, error) {
 		return nil, err
 	}
 
-	graphql = graphql.JoinPath("/graphql")
+	graphql = graphql.JoinPath("/graphql/")
 
 	return graphql, nil
 }
@@ -55,7 +55,7 @@ func GraphQLURLFromBaseURL(base *url.URL) (*url.URL, error) {
 func GetGitHubURL() *url.URL {
 	envVar := os.Getenv(EnvVarServerURL)
 	if u, err := url.Parse(envVar); err == nil && envVar != "" {
-		return u
+		return u.JoinPath("/")
 	}
 
 	return DefaultURL
@@ -68,7 +68,7 @@ func GetGitHubServerURL() *url.URL {
 func GetGitHubAPIURL() *url.URL {
 	envVar := os.Getenv(EnvVarAPIURL)
 	if u, err := url.Parse(envVar); err == nil && envVar != "" {
-		return u
+		return u.JoinPath("/")
 	}
 
 	return DefaultAPIURL
