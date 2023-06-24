@@ -16,9 +16,8 @@ func ResourceTypesFrom(ctx context.Context) (resourceTypes []ResourceType, ok bo
 	return
 }
 
-// ResourceType is the struct which has the YAML encoding of a resource type
-// as it would appear in the `resource_types` array of a Concourse pipeline
-// configuration file.
+// ResourceType has the YAML encoding of a resource type as it would appear
+// in the `resource_types` array of a Concourse pipeline configuration file.
 type ResourceType struct {
 	Name       string `json:"name,omitempty"`
 	Privileged bool   `json:"privileged,omitempty"`

@@ -16,9 +16,6 @@ __debug_bin
 privileged
 version
 
-# upx
-internal/bin/shim*.*
-
 # goreleaser
 dist/
 

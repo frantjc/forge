@@ -37,21 +37,23 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		client = github.NewClient(http.DefaultClient)
 	}
 
-	client.BaseURL = GetGitHubAPIURL()
+	client.BaseURL = GetGitHubAPIURL().JoinPath("/")
 
-	if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "tags/"+u.Version); err == nil {
-		sha = ref.GetObject().GetSHA()
-	} else {
-		if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "heads/"+u.Version); err == nil {
-			sha = ref.GetObject().GetSHA()
+	// Get the sha in parallel for speed.
+	// Used later to know what directory of the action's tarball
+	// the repository's contents actually reside in.
+	shaC := make(chan string, 1)
+	go func() {
+		defer close(shaC)
+
+		if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "tags/"+u.Version); err == nil {
+			shaC <- ref.GetObject().GetSHA()
+		} else {
+			if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "heads/"+u.Version); err == nil {
+				shaC <- ref.GetObject().GetSHA()
+			}
 		}
-	}
-
-	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
-		return nil, nil, err
-	} else if !matched {
-		return nil, nil, fmt.Errorf("unable to get action sha")
-	}
+	}()
 
 	for _, filename := range ActionYAMLFilenames {
 		rc, _, err := client.Repositories.DownloadContents(ctx, u.GetOwner(), u.GetRepository(), u.GetActionPath()+"/"+filename, &github.RepositoryContentGetOptions{
@@ -97,5 +99,11 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		return nil, nil, err
 	}
 
-	return metadata, tarutil.StripPrefix(res.Body, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/", tarutil.IsGzipped), nil
+	if matched, err := regexp.MatchString("[0-9a-f]{40}", <-shaC); err != nil {
+		return nil, nil, err
+	} else if !matched {
+		return nil, nil, fmt.Errorf("unable to get action sha")
+	}
+
+	return metadata, tarutil.Subdir(res.Body, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/", tarutil.IsGzipped), nil
 }

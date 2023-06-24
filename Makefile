@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.8.1
+SEMVER ?= 0.9.0
 
 .DEFAULT: install
 
@@ -41,17 +41,13 @@ vendor verify:
 lint:
 	@$(GOLANGCI-LINT) run --fix
 
-shim: shim_$(GOARCH)
-
-shim_$(GOARCH): internal/bin/shim_$(GOARCH)
-
 internal/bin/shim_$(GOARCH):
 	@GOOS=linux $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
 	@$(UPX) --ultra-brute $@
 	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > internal/bin/fs_$(GOARCH).go
 
 clean:
-	@rm -rf dist/ privileged version internal/bin/shim*.*
+	@rm -rf dist/ vendor/ privileged version internal/bin/shim*.*
 
 MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
 MINOR = $(word 2,$(subst ., ,$(SEMVER)))
@@ -71,7 +67,10 @@ ven: vendor
 ver: verify
 format: fmt
 i: install
+shim: shim_$(GOARCH)
+shim_$(GOARCH): internal/bin/shim_$(GOARCH)
 
-.PHONY: .github/action action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
+
+.PHONY: .github/action action i install build fmt generate test download vendor verify lint shim shims shim_$(GOARCH) internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
 -include docs/docs.mk

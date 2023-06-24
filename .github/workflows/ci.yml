@@ -55,4 +55,4 @@ jobs:
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
-      - run: forge prune
+      - run: forge cache --clean

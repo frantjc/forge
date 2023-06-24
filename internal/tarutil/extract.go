@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-// Extract reads the tar file from r and writes it into dir.
+// Extract reads the tarball from r and writes it into dir.
 // This was copied and modified from golang.org/x/build/internal/untar.
 func Extract(r io.Reader, dir string, opts ...Opt) error {
 	var (
@@ -27,7 +27,7 @@ func Extract(r io.Reader, dir string, opts ...Opt) error {
 		opt(o)
 	}
 
-	if o.readerGzipped {
+	if o.gzipped {
 		zr, err := gzip.NewReader(r)
 		if err != nil {
 			return err
