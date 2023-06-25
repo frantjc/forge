@@ -24,7 +24,6 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		_        = forge.LoggerFrom(ctx)
 		client   *github.Client
 		metadata *Metadata
-		sha      = u.Version
 	)
 
 	if u.IsLocal() {
@@ -51,6 +50,8 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		} else {
 			if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "heads/"+u.Version); err == nil {
 				shaC <- ref.GetObject().GetSHA()
+			} else {
+				shaC <- u.Version
 			}
 		}
 	}()
@@ -99,7 +100,9 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		return nil, nil, err
 	}
 
-	if matched, err := regexp.MatchString("[0-9a-f]{40}", <-shaC); err != nil {
+	sha := <-shaC
+
+	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
 		return nil, nil, err
 	} else if !matched {
 		return nil, nil, fmt.Errorf("unable to get action sha")

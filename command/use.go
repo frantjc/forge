@@ -22,10 +22,10 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		attach, outputs bool
-		workdir         string
-		env, with       map[string]string
-		cmd             = &cobra.Command{
+		attach, outputs, envVars bool
+		workdir                  string
+		env, with                map[string]string
+		cmd                      = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
 			Args:          cobra.ExactArgs(1),
@@ -65,9 +65,13 @@ func NewUse() *cobra.Command {
 
 				if outputs {
 					defer func() {
-						if outputs := globalContext.StepsContext[id].Outputs; len(outputs) > 0 {
-							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(outputs)
-						}
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[id].Outputs)
+					}()
+				}
+
+				if envVars {
+					defer func() {
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.EnvContext)
 					}()
 				}
 
@@ -93,7 +97,7 @@ func NewUse() *cobra.Command {
 						Env:           env,
 						GlobalContext: globalContext,
 					},
-					commandDrains(cmd),
+					commandDrains(cmd, outputs, envVars),
 				)
 			},
 		}
@@ -106,7 +110,8 @@ func NewUse() *cobra.Command {
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
-	cmd.Flags().StringToStringVarP(&with, "env", "e", nil, "env values")
+	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
+	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
 	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")

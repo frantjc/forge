@@ -1,0 +1,8 @@
+name: Set Env
+description: |
+  Set Env action
+author: frantjc
+runs:
+  using: node16
+  pre: pre.js
+  main: main.js

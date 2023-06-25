@@ -26,7 +26,6 @@ func ParseEnvFile(r io.Reader) (map[string]string, error) {
 		if strings.HasPrefix(line0, "# ") || strings.TrimSpace(line0) == "" {
 			continue
 		} else if matches := keyDelimiterR.FindStringSubmatch(line0); len(matches) == 2 {
-			fmt.Println(line0, matches)
 			if scanner.Scan() {
 				line1 := scanner.Text()
 				if scanner.Scan() {

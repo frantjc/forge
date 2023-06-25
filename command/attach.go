@@ -8,10 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func hookAttach(cmd *cobra.Command) func(context.Context, forge.Container) {
+func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, forge.Container) {
 	return func(ctx context.Context, c forge.Container) {
 		var (
-			streams = commandStreams(cmd)
+			streams = commandStreams(cmd, stdoutUsed...)
 			_, _    = streams.Out.Write([]byte("detach with " + forge.DefaultDetachKeys + "\n"))
 		)
 
@@ -34,6 +34,6 @@ func hookAttach(cmd *cobra.Command) func(context.Context, forge.Container) {
 	}
 }
 
-func commandStreams(cmd *cobra.Command) *forge.Streams {
-	return commandDrains(cmd).ToStreams(cmd.InOrStdin())
+func commandStreams(cmd *cobra.Command, stdoutUsed ...bool) *forge.Streams {
+	return commandDrains(cmd, stdoutUsed...).ToStreams(cmd.InOrStdin())
 }
