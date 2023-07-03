@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/moby/term v0.5.0
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.1.0-rc3
+	github.com/opencontainers/image-spec v1.1.0-rc4
 	go.uber.org/zap v1.24.0
 	golang.org/x/text v0.10.0
 	gopkg.in/yaml.v3 v3.0.1
