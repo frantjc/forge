@@ -85,13 +85,13 @@ If you're specifically interested in using Forge inside of GitHub Actions, you c
 Install only:
 
 ```yml
-  - uses: frantjc/forge@0.9
+  - uses: frantjc/forge@v0
 ```
 
 Skip install and `get` a Concourse Resource using a pre-installed `forge`:
 
 ```yml
-  - uses: frantjc/forge@0.9
+  - uses: frantjc/forge@v0
     with:
       install: false
       get: my-resource
@@ -100,7 +100,7 @@ Skip install and `get` a Concourse Resource using a pre-installed `forge`:
 Install and `put` a Concourse Resource with the given `params` and `config`:
 
 ```yml
-  - uses: frantjc/forge@0.9
+  - uses: frantjc/forge@v0
     with:
       put: my-resource
       params: |
