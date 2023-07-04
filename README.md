@@ -32,9 +32,7 @@ Using `go`:
 go install github.com/frantjc/forge/cmd/forge
 ```
 
-### GitHub Actions
-
-If you're specifically interested in using Forge inside of GitHub Actions, you can, for example...
+In GitHub Actions...
 
 Install only:
 
