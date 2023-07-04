@@ -32,6 +32,38 @@ Using `go`:
 go install github.com/frantjc/forge/cmd/forge
 ```
 
+### GitHub Actions
+
+If you're specifically interested in using Forge inside of GitHub Actions, you can, for example...
+
+Install only:
+
+```yml
+  - uses: frantjc/forge@v0
+```
+
+Skip install and `get` a Concourse Resource using a pre-installed `forge`:
+
+```yml
+  - uses: frantjc/forge@v0
+    with:
+      install: false
+      get: my-resource
+```
+
+Install and `put` a Concourse Resource with the given `params` and `config`:
+
+```yml
+  - uses: frantjc/forge@v0
+    with:
+      put: my-resource
+      params: |
+        my-param=my-value
+      config: forge.yaml
+```
+
+> Forge will not work inside of Forge e.g. `forge use /path/to/frantjc/forge` will fail due to the nesting of containers mixing up volume mount paths.
+
 ## usage
 
 ### GitHub Actions
@@ -77,38 +109,6 @@ forge get -a mock -v version=v0.0.0
 ```
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
-
-### Setup Forge
-
-If you're specifically interested in using Forge inside of GitHub Actions, you can, for example...
-
-Install only:
-
-```yml
-  - uses: frantjc/forge@v0
-```
-
-Skip install and `get` a Concourse Resource using a pre-installed `forge`:
-
-```yml
-  - uses: frantjc/forge@v0
-    with:
-      install: false
-      get: my-resource
-```
-
-Install and `put` a Concourse Resource with the given `params` and `config`:
-
-```yml
-  - uses: frantjc/forge@v0
-    with:
-      put: my-resource
-      params: |
-        my-param=my-value
-      config: forge.yaml
-```
-
-> Forge will not work inside of Forge e.g. `forge use /path/to/frantjc/forge` will fail due to the nesting of containers.
 
 ## why?
 
