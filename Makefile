@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.9.1
+SEMVER ?= 0.9.2
 
 .DEFAULT: install
 
@@ -69,7 +69,6 @@ format: fmt
 i: install
 shim: shim_$(GOARCH)
 shim_$(GOARCH): internal/bin/shim_$(GOARCH)
-
 
 .PHONY: .github/action action i install build fmt generate test download vendor verify lint shim shims shim_$(GOARCH) internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
