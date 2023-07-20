@@ -2,7 +2,6 @@ package tarutil
 
 import (
 	"archive/tar"
-	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
@@ -15,29 +14,14 @@ import (
 )
 
 // Extract reads the tarball from r and writes it into dir.
-// This was copied and modified from golang.org/x/build/internal/untar.
-func Extract(r io.Reader, dir string, opts ...Opt) error {
+// Copied and modified from golang.org/x/build/internal/untar.
+func Extract(r io.Reader, dir string) error {
 	var (
-		o       = new(Opts)
 		t0      = time.Now()
 		madeDir = map[string]bool{}
-		ir      = r
 	)
-	for _, opt := range opts {
-		opt(o)
-	}
 
-	if o.gzipped {
-		zr, err := gzip.NewReader(r)
-		if err != nil {
-			return err
-		}
-		defer zr.Close()
-
-		ir = zr
-	}
-
-	tr := tar.NewReader(ir)
+	tr := tar.NewReader(r)
 	for {
 		f, err := tr.Next()
 		if err == io.EOF {

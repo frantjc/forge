@@ -80,5 +80,5 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 		}
 	}
 
-	return errors.Join(append(errs, rc.Close())...)
+	return errors.Join(errs...)
 }

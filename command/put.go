@@ -8,5 +8,5 @@ import (
 // NewPut returns the command which acts as
 // the entrypoint for `forge put`.
 func NewPut() *cobra.Command {
-	return newResource(concourse.MethodPut, false)
+	return newResource(concourse.MethodPut)
 }

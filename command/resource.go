@@ -20,7 +20,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func newResource(method string, check bool) *cobra.Command {
+func newResource(method string) *cobra.Command {
 	var (
 		attach          bool
 		conf, workdir   string
@@ -106,7 +106,7 @@ func newResource(method string, check bool) *cobra.Command {
 		wd = "."
 	}
 
-	if !check {
+	if method == "check" {
 		cmd.Flags().StringToStringVarP(&params, "param", "p", nil, "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")

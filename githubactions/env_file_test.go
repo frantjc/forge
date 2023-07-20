@@ -22,12 +22,18 @@ YOU="are a"
 BOLD<<ghadelimiter_` + uuid.NewString() + `
 one
 ghadelimiter_` + uuid.NewString() + `
-		`
+
+NARUTO="'uzumaki'"
+YOU_BETTER<<ghadelimiter_` + uuid.NewString() + `
+"believe it"
+ghadelimiter_` + uuid.NewString() + "\n"
 		expected = map[string]string{
-			"HELLO":   "there",
-			"GENERAL": "kenobi",
-			"YOU":     "are a",
-			"BOLD":    "one",
+			"HELLO":      "there",
+			"GENERAL":    "kenobi",
+			"YOU":        "are a",
+			"BOLD":       "one",
+			"NARUTO":     "'uzumaki'",
+			"YOU_BETTER": `"believe it"`,
 		}
 		actual, err = githubactions.ParseEnvFile(bytes.NewBufferString(env))
 	)

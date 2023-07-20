@@ -20,15 +20,21 @@ import (
 
 type globalContextKey struct{}
 
+// WithGlobalContext stores the given *GlobalContext in the given context.Context.
+// Retrievable via GlobalContextFrom.
 func WithGlobalContext(ctx context.Context, globalContext *GlobalContext) context.Context {
 	return context.WithValue(ctx, globalContextKey{}, globalContext)
 }
 
+// WithGlobalContext gets the *GlobalContext from the given context.Context.
+// Settable via WithGlobalContext.
 func GlobalContextFrom(ctx context.Context) (globalContext *GlobalContext, ok bool) {
 	globalContext, ok = ctx.Value(globalContextKey{}).(*GlobalContext)
 	return
 }
 
+// GetString allows *GlobalContext to be accessed "like a map", e.g.
+// *GlobalContext.GetString("env.EXAMPLE") returns *GlobalContext.EnvContext["EXAMPLE"].
 func (c *GlobalContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -81,6 +87,8 @@ func (c *GlobalContext) GetString(key string) string {
 	return ""
 }
 
+// GetString allows *GitHubContext to be accessed "like a map", e.g.
+// *GitHubContext.GetString("ref") returns *GitHubContext.Ref.
 func (c *GitHubContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -137,6 +145,8 @@ func (c *GitHubContext) GetString(key string) string {
 	return ""
 }
 
+// GetString allows *JobContext to be accessed "like a map", e.g.
+// *JobContext.GetString("container.id") returns *JobContext.Container.ID.
 func (c *JobContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -177,6 +187,8 @@ func (c *JobContext) GetString(key string) string {
 	return ""
 }
 
+// GetString allows *StepContext to be accessed "like a map", e.g.
+// *StepContext.GetString("outputs.digest") returns *StepContext.Outputs["digest"].
 func (c *StepContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -197,6 +209,8 @@ func (c *StepContext) GetString(key string) string {
 	return ""
 }
 
+// GetString allows *RunnerContext to be accessed "like a map", e.g.
+// *RunnerContext.GetString("os") returns *StepContext.OS.
 func (c *RunnerContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -217,6 +231,8 @@ func (c *RunnerContext) GetString(key string) string {
 	return ""
 }
 
+// GetString allows *NeedContext to be accessed "like a map", e.g.
+// *NeedContext.GetString("outputs.digest") returns *NeedContext.Outputs["digest"].
 func (c *NeedContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -230,6 +246,8 @@ func (c *NeedContext) GetString(key string) string {
 	return ""
 }
 
+// AddEnv adds the given environment variable map to its
+// environment context.
 func (c *GlobalContext) AddEnv(env map[string]string) {
 	if len(c.EnvContext) == 0 {
 		c.EnvContext = env
@@ -239,6 +257,8 @@ func (c *GlobalContext) AddEnv(env map[string]string) {
 	maps.Copy(c.EnvContext, env)
 }
 
+// NewGlobalContextFromEnv returns a *GlobalContext whose values
+// are sourced from the environment as well as sensible defaults.
 func NewGlobalContextFromEnv() *GlobalContext {
 	u, _ := user.Current()
 
@@ -258,7 +278,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 	}
 
 	// NB: While forge supports multiple OS, the GitHub Actions that
-	// it executes typically are not. As a result, I don't think
+	// it executes typically do not. As a result, I don't think
 	// that we can safely assume that the platform the user wants is
 	// the OS they're on. With that said, users can still inject
 	// the desired OS via the RUNNER_OS environment variable.
@@ -352,10 +372,17 @@ func NewGlobalContextFromEnv() *GlobalContext {
 }
 
 const (
+	// DefaultBranch is the default git branch to be used
+	// if no other can be surmised.
 	DefaultBranch = "main"
+	// DefaultBranch is the default git origin to be used
+	// if no other can be surmised.
 	DefaultRemote = "origin"
 )
 
+// NewGlobalContextFromEnv returns a *GlobalContext whose values
+// are sourced from the git repository at the given path, the environment
+// and some sensible defaults.
 func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext, error) {
 	var (
 		_             = forge.LoggerFrom(ctx)
@@ -501,10 +528,17 @@ func (c *GlobalContext) envMap() map[string]string {
 	return env
 }
 
+// Env returns the environment array for this *GlobalContext.
 func (c *GlobalContext) Env() []string {
 	return envconv.MapToArr(c.envMap())
 }
 
+// GlobalContext stores all contexts accessible within
+// a GitHub Action, i.e. the stuff you access...
+//
+//	${{ like.this }}
+//
+// ...in Workflow files.
 type GlobalContext struct {
 	GitHubContext  *GitHubContext
 	EnvContext     map[string]string
@@ -516,6 +550,12 @@ type GlobalContext struct {
 	NeedsContext   map[string]NeedContext
 }
 
+// GitHubContext stores all the values accessible
+// through the...
+//
+//	${{ github }}
+//
+// ...context in Workflow files.
 type GitHubContext struct {
 	Action          string
 	ActionPath      string
@@ -542,18 +582,36 @@ type GitHubContext struct {
 	Workspace       string
 }
 
+// JobContext stores all the values accessible
+// through the...
+//
+//	${{ job }}
+//
+// ...context in Workflow files.
 type JobContext struct {
 	Container *JobContextContainer
 	Services  map[string]JobContextService
 	Status    string
 }
 
+// StepContext stores all the values accessible
+// through the...
+//
+//	${{ step }}
+//
+// ...context in Workflow files.
 type StepContext struct {
 	Outputs    map[string]string
 	Conclusion string
 	Outcome    string
 }
 
+// RunnerContext stores all the values accessible
+// through the...
+//
+//	${{ runner }}
+//
+// ...context in Workflow files.
 type RunnerContext struct {
 	Name      string
 	OS        string
@@ -562,15 +620,34 @@ type RunnerContext struct {
 	ToolCache string
 }
 
+// Needontext stores all the values accessible
+// through the...
+//
+//	TODO: needs?
+//	${{ need }}
+//
+// ...context in Workflow files.
 type NeedContext struct {
 	Outputs map[string]string
 }
 
+// JobContextContainer stores all the values accessible
+// through the...
+//
+//	${{ job.container }}
+//
+// ...context in Workflow files.
 type JobContextContainer struct {
 	ID      string
 	Network string
 }
 
+// JobContextService stores all the values accessible
+// through the...
+//
+//	${{ job.service }}
+//
+// ...context in Workflow files.
 type JobContextService struct {
 	ID      string
 	Network string

@@ -29,16 +29,27 @@ var (
 	Node16ImageReference = DefaultNode16ImageReference
 )
 
+// GetImageForMetadata is a re-export of DefaultMapping.GetImageForMetadata
+// for convenience purposes.
 func GetImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *githubactions.Metadata, uses *githubactions.Uses) (forge.Image, error) {
 	return DefaultMapping.GetImageForMetadata(ctx, containerRuntime, actionMetadata, uses)
 }
 
+// ImageBuilder is for a ContainerRuntime to implement building a Dockerfile.
+// Because building an OCI image is not ubiquitous, forge.ContainerRuntimes are
+// not required to implement this, but they may. The default runtime (Docker)
+// happens to so as to support GitHub Actions that run using "docker".
 type ImageBuilder interface {
 	BuildDockerfile(context.Context, string, string) (forge.Image, error)
 }
 
-var ErrCantBuildDockerfile = errors.New("runtime can't build Dockerfile")
+// ErrCantBuildDockerfile will be returned when a forge.ContainerRuntime
+// does not implement ImageBuilder.
+var ErrCantBuildDockerfile = errors.New("runtime cannot build Dockerfile")
 
+// GetImageForMetadata takes an action.yml and returns the OCI image that forge
+// should run it inside of. If the action.yml runs using "dockerfile" and the
+// forge.ContainerRuntime does not implement ImageBuilder, returns ErrCantBuildDockerfile.
 func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *githubactions.Metadata, uses *githubactions.Uses) (forge.Image, error) {
 	if actionMetadata.IsDockerfile() {
 		dir, err := m.UsesToActionDirectory(uses)
@@ -48,6 +59,7 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 
 		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
 		if uses.IsLocal() {
+			// dir will always be an absolute path here
 			reference = "forge.dev" + strings.ToLower(dir)
 		}
 
@@ -61,6 +73,8 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 	return containerRuntime.PullImage(ctx, MetadataToImageReference(actionMetadata))
 }
 
+// MetadataToImageReference takes an action.yaml and finds the reference
+// to the OCI image that forge should run it inside of.
 func MetadataToImageReference(actionMetadata *githubactions.Metadata) string {
 	if actionMetadata == nil {
 		return ""

@@ -95,7 +95,12 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
-			env = append(env, githubactions.EnvVarPath+"="+m.GitHubPathPath, githubactions.EnvVarEnv+"="+m.GitHubEnvPath, githubactions.EnvVarOutput+"="+m.GitHubOutputPath, githubactions.EnvVarState+"="+m.GitHubStatePath)
+			env = append(env,
+				githubactions.EnvVarPath+"="+m.GitHubPathPath,
+				githubactions.EnvVarEnv+"="+m.GitHubEnvPath,
+				githubactions.EnvVarOutput+"="+m.GitHubOutputPath,
+				githubactions.EnvVarState+"="+m.GitHubStatePath,
+			)
 
 			for _, s := range entrypoints {
 				if s != "" {

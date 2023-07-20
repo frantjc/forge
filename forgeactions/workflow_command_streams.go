@@ -5,6 +5,8 @@ import (
 	"github.com/frantjc/forge/githubactions"
 )
 
+// WorkflowCommandWriter holds the state of GitHub Actions
+// workflow commands throughout the execution of a step.
 type WorkflowCommandWriter struct {
 	*githubactions.GlobalContext
 	ID                         string
@@ -14,6 +16,9 @@ type WorkflowCommandWriter struct {
 	SetOutputDeprecationWarned bool
 }
 
+// Callback takes a *githubactions.WorkflowCommand and processes it by storing
+// a value in the appropriate location in its *githubactions.GlobalContext if
+// necessary. It returns the bytes that should be written for the workflow command.
 func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []byte {
 	if _, ok := w.StopCommandsTokens[wc.Command]; ok {
 		w.StopCommandsTokens[wc.Command] = false
@@ -62,6 +67,10 @@ func (w *WorkflowCommandWriter) Callback(wc *githubactions.WorkflowCommand) []by
 	return make([]byte, 0)
 }
 
+// NewWorkflowCommandStreams takes io.Writers and returns wrapped writers to pass to a process executing
+// a GitHub Action as stdout and stderr. These streams process workflow commands that are written to them
+// and write any corresponding bytes to the underlying writers. They write any non-workflow command bytes
+// directly to the underlying writers.
 func NewWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
 	w := &WorkflowCommandWriter{
 		GlobalContext:      ConfigureGlobalContext(globalContext),

@@ -8,5 +8,5 @@ import (
 // NewGet returns the command which acts as
 // the entrypoint for `forge get`.
 func NewGet() *cobra.Command {
-	return newResource(concourse.MethodGet, false)
+	return newResource(concourse.MethodGet)
 }

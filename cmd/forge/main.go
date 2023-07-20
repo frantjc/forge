@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,7 +20,7 @@ func main() {
 	)
 
 	if err = command.NewForge().ExecuteContext(ctx); err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
-		os.Stderr.WriteString(err.Error() + "\n")
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
 	stop()

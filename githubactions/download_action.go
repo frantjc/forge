@@ -1,6 +1,7 @@
 package githubactions
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -17,8 +18,8 @@ import (
 // a GitHub Action metadata file.
 var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 
-// DownloadAction takes a Uses reference and returns the corresponding GitHub Action Metadata,
-// a tarball of the GitHub Action repository.
+// DownloadAction takes a Uses reference and returns the corresponding GitHub Action Metadata
+// and a tarball of the GitHub Action repository.
 func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, error) {
 	var (
 		_        = forge.LoggerFrom(ctx)
@@ -31,6 +32,8 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	if token := os.Getenv(EnvVarToken); token != "" {
+		// Uses http.DefaultClient with no way to override,
+		// so we also just use http.DefaultClient.
 		client = github.NewTokenClient(ctx, token)
 	} else {
 		client = github.NewClient(http.DefaultClient)
@@ -100,6 +103,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		return nil, nil, err
 	}
 
+	// Wait on the sha to have been gotten.
 	sha := <-shaC
 
 	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
@@ -108,5 +112,11 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		return nil, nil, fmt.Errorf("unable to get action sha")
 	}
 
-	return metadata, tarutil.Subdir(res.Body, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/", tarutil.IsGzipped), nil
+	r, err := gzip.NewReader(res.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// sha is guaranteed to be a 40 character string by the above regexp.
+	return metadata, tarutil.Subdir(r, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
 }

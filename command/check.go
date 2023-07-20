@@ -8,5 +8,5 @@ import (
 // NewCheck returns the command which acts as
 // the entrypoint for `forge check`.
 func NewCheck() *cobra.Command {
-	return newResource(concourse.MethodCheck, true)
+	return newResource(concourse.MethodCheck)
 }

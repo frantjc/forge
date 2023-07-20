@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/containerfs"
@@ -12,7 +13,7 @@ func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, fo
 	return func(ctx context.Context, c forge.Container) {
 		var (
 			streams = commandStreams(cmd, stdoutUsed...)
-			_, _    = streams.Out.Write([]byte("detach with " + forge.DefaultDetachKeys + "\n"))
+			_, _    = fmt.Fprintln(streams.Out, "detach with "+forge.DefaultDetachKeys)
 		)
 
 		streams, restore, err := forge.TerminalStreams(streams.In, streams.Out, streams.Err)
@@ -30,7 +31,7 @@ func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, fo
 			streams,
 		)
 
-		_, _ = streams.Out.Write([]byte("\n"))
+		_, _ = fmt.Fprintln(streams.Out)
 	}
 }
 

@@ -16,6 +16,13 @@ var (
 	keyDelimiterR = regexp.MustCompile(keyDelimiter)
 )
 
+// ParseEnvFile reads a GitHub Actions environment file e.g.
+//
+//		KEY1=value1
+//		# SKIPPED=comment
+//	 KEY2<<ghadelimiter_CC992248-87BA-41AF-BF33-A52DCE9681A6
+//		value2 # For some security reason(s), @actions/core writes to the environment this way.
+//		ghadelimiter_CC992248-87BA-41AF-BF33-A52DCE9681A6
 func ParseEnvFile(r io.Reader) (map[string]string, error) {
 	var (
 		values  = make(map[string]string)
