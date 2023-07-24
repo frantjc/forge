@@ -17,10 +17,10 @@ func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, fo
 		)
 
 		streams, restore, err := forge.TerminalStreams(streams.In, streams.Out, streams.Err)
+		defer restore() //nolint:errcheck
 		if err != nil {
 			return
 		}
-		defer restore() //nolint:errcheck
 
 		_, _ = c.Exec(
 			ctx,

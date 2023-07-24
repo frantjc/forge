@@ -36,6 +36,7 @@ func StdStreams() *Streams {
 func StdTerminalStreams() (*Streams, func() error) {
 	streams, restore, err := TerminalStreams(os.Stdin, os.Stdout, os.Stderr)
 	if err != nil {
+		defer restore() //nolint:errcheck
 		panic(err)
 	}
 
@@ -60,6 +61,8 @@ func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func(
 				if err := term.RestoreTerminal(fd, state); err != nil {
 					return err
 				}
+
+				delete(states, fd)
 			}
 
 			return nil
