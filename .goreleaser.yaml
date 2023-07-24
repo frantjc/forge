@@ -19,7 +19,7 @@ changelog:
       - Merge remote-tracking branch
       - Merge branch
 brews:
-  - tap:
+  - repository:
       owner: frantjc
       name: homebrew-tap
     folder: Formula
