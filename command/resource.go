@@ -106,7 +106,7 @@ func newResource(method string) *cobra.Command {
 		wd = "."
 	}
 
-	if method == "check" {
+	if method != "check" {
 		cmd.Flags().StringToStringVarP(&params, "param", "p", nil, "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
