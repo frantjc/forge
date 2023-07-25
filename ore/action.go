@@ -41,6 +41,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 	}
 
 	o.GlobalContext = forgeactions.ConfigureGlobalContext(o.GlobalContext)
+	o.GlobalContext.StepsContext[o.ID] = githubactions.StepContext{Outputs: make(map[string]string)}
 	defer func() {
 		ctx = githubactions.WithGlobalContext(ctx, o.GlobalContext)
 	}()

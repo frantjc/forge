@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and coming soon<sup>TM</sup> [CircleCI Orbs](https://circleci.com/developer/orbs) (e.g. [`circleci/node`](https://circleci.com/developer/orbs/orb/circleci/node)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)) and [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)).
 
 ## install
 
@@ -122,7 +122,7 @@ Forge aims to remedy this.
 
 - `git` is _required_
 - `make` is _required_
-- `go` 1.18 is _required_ for developing Forge for [generics](https://go.dev/doc/tutorial/generics)
-- `docker` is _required_ to test Forge as it is its only runtime
-- [`upx`](https://github.com/upx/upx) is _required for_ compressing [`shim`](internal/cmd/shim)
+- `go` 1.20 is _required_ for multi-error handling
+- `docker` is _required_ to test as it is its only runtime
+- [`upx`](https://github.com/upx/upx) is _required_ for compressing [`shim`](internal/cmd/shim)
 - `node` 16 is _required_ for developing the [`action`](.github/action)

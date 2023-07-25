@@ -10,11 +10,11 @@ import (
 	"github.com/frantjc/forge/forgeactions"
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/contaminate"
+	"github.com/frantjc/forge/internal/digestutil"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -22,10 +22,10 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		attach, outputs, envVars bool
-		workdir                  string
-		env, with                map[string]string
-		cmd                      = &cobra.Command{
+		attach, outputs, envVars, bust bool
+		workdir                        string
+		env, with                      map[string]string
+		cmd                            = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
 			Args:          cobra.ExactArgs(1),
@@ -35,14 +35,12 @@ func NewUse() *cobra.Command {
 				var (
 					ctx = cmd.Context()
 					_   = forge.LoggerFrom(ctx)
-					id  = uuid.NewString()
 				)
 
 				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, workdir)
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
-				globalContext.StepsContext[id] = githubactions.StepContext{Outputs: make(map[string]string)}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
 					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
@@ -63,9 +61,22 @@ func NewUse() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
+				a := &ore.Action{
+					Uses:          args[0],
+					With:          with,
+					Env:           env,
+					GlobalContext: globalContext,
+				}
+
+				d, err := digestutil.JSON(a)
+				if err != nil {
+					return err
+				}
+				a.ID = d.Encoded()
+
 				if outputs {
 					defer func() {
-						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[id].Outputs)
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[a.ID].Outputs)
 					}()
 				}
 
@@ -73,6 +84,11 @@ func NewUse() *cobra.Command {
 					defer func() {
 						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.EnvContext)
 					}()
+				}
+
+				var o forge.Ore = a
+				if !bust {
+					o = &ore.Cache{Ore: o}
 				}
 
 				return forge.NewFoundry(docker.New(c)).Process(
@@ -90,13 +106,7 @@ func NewUse() *cobra.Command {
 							Destination: forgeactions.DefaultRunnerToolCache,
 						},
 					}...),
-					&ore.Action{
-						ID:            id,
-						Uses:          args[0],
-						With:          with,
-						Env:           env,
-						GlobalContext: globalContext,
-					},
+					o,
 					commandDrains(cmd, outputs, envVars),
 				)
 			},
@@ -109,6 +119,7 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
+	cmd.Flags().BoolVar(&bust, "bust", false, "bust cache")
 	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
 	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
 	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")

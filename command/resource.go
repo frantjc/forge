@@ -22,7 +22,7 @@ import (
 
 func newResource(method string) *cobra.Command {
 	var (
-		attach          bool
+		attach, bust    bool
 		conf, workdir   string
 		version, params map[string]string
 		cmd             = &cobra.Command{
@@ -39,7 +39,7 @@ func newResource(method string) *cobra.Command {
 					pipeline = &concourse.Pipeline{}
 					file     io.Reader
 					err      error
-					o        = &ore.Resource{
+					cr       = &ore.Resource{
 						Method:  method,
 						Version: version,
 						Params:  params,
@@ -63,21 +63,21 @@ func newResource(method string) *cobra.Command {
 				for _, r := range pipeline.Resources {
 					if r.Name == name {
 						resource := r
-						o.Resource = &resource
+						cr.Resource = &resource
 					}
 				}
-				if o.Resource == nil {
+				if cr.Resource == nil {
 					return fmt.Errorf("resource not found: %s", name)
 				}
 
 				for _, t := range pipeline.ResourceTypes {
-					if t.Name == o.Resource.Type {
+					if t.Name == cr.Resource.Type {
 						resourceType := t
-						o.ResourceType = &resourceType
+						cr.ResourceType = &resourceType
 					}
 				}
-				if o.ResourceType == nil {
-					return fmt.Errorf("resource type not found: %s", o.Resource.Type)
+				if cr.ResourceType == nil {
+					return fmt.Errorf("resource type not found: %s", cr.Resource.Type)
 				}
 
 				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -89,10 +89,15 @@ func newResource(method string) *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
+				var o forge.Ore = cr
+				if !bust {
+					o = &ore.Cache{Ore: o}
+				}
+
 				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, forge.Mount{
 						Source:      workdir,
-						Destination: filepath.Join(forgeconcourse.DefaultRootPath, o.Resource.Name),
+						Destination: filepath.Join(forgeconcourse.DefaultRootPath, cr.Resource.Name),
 					}),
 					o,
 					commandDrains(cmd),
@@ -110,6 +115,7 @@ func newResource(method string) *cobra.Command {
 		cmd.Flags().StringToStringVarP(&params, "param", "p", nil, "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
+	cmd.Flags().BoolVar(&bust, "bust", false, "bust cache")
 	cmd.Flags().StringToStringVarP(&version, "version", "v", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")

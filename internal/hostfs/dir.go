@@ -23,7 +23,4 @@ var (
 	RunnerToolCache = filepath.Join(GitHubActionsHome, "/runner/toolcache")
 )
 
-var (
-	CircleCICache = filepath.Join(CacheHome, "/circleci")
-	CircleCIHome  = filepath.Join(CircleCICache, "/home")
-)
+var OreCache = filepath.Join(CacheHome, "/ore")

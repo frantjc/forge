@@ -1,6 +1,8 @@
 package forge
 
-import "context"
+import (
+	"context"
+)
 
 // Ore represents one or more sequential containerized commands.
 // Ores are meant to represent the entire input to said commands,

@@ -21,7 +21,7 @@ install: build
 build:
 	@$(GORELEASER) release --snapshot --clean
 
-.github/action:
+.github/action .github/action/:
 	@cd .github/action && $(YARN) all
 
 generate:
@@ -29,7 +29,6 @@ generate:
 
 fmt test:
 	@$(GO) $@ ./...
-	@cd .github/action && $(YARN) $@
 
 download:
 	@$(GO) mod $@
@@ -70,6 +69,6 @@ i: install
 shim: shim_$(GOARCH)
 shim_$(GOARCH): internal/bin/shim_$(GOARCH)
 
-.PHONY: .github/action action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
+.PHONY: .github/action .github/action/ action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
 -include docs/docs.mk

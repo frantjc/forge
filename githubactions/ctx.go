@@ -320,15 +320,12 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		runnerName = u.Name
 	}
 
-	runnerTemp := os.Getenv(EnvVarRunnerTemp)
+	runnerTemp, _ := filepath.Abs(os.Getenv(EnvVarRunnerTemp))
 	if runnerTemp == "" {
 		runnerTemp = os.TempDir()
 	}
 
-	runnerToolCache := os.Getenv(EnvVarRunnerToolCache)
-	if runnerToolCache == "" {
-		runnerToolCache = os.TempDir()
-	}
+	runnerToolCache, _ := filepath.Abs(os.Getenv(EnvVarRunnerToolCache))
 
 	return &GlobalContext{
 		GitHubContext: &GitHubContext{
