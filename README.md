@@ -86,7 +86,7 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `sh` on its `PATH` for the attach to work.
 
-### Action
+### Setup Forge
 
 Skip install and `get` a Concourse Resource using a pre-installed `forge`:
 
