@@ -14,6 +14,7 @@ var (
 	runnerTmpArgs       = []string{"runner_temp", "runnertemp", "runner_tmp", "runnertmp", "temp", "tmp"}
 	runnerToolCacheArgs = []string{"runner_toolcache", "runnertoolcache", "toolcache"}
 	actionsArgs         = []string{"action", "actions"}
+	oreArgs             = []string{"ore", "ores"}
 )
 
 // NewCache returns the command which acts as
@@ -44,6 +45,8 @@ func NewCache() *cobra.Command {
 					cache = hostfs.RunnerToolCache
 				case fn.Includes(actionsArgs, arg):
 					cache = hostfs.ActionsCache
+				case fn.Includes(oreArgs, arg):
+					cache = hostfs.OreCache
 				default:
 					return fmt.Errorf("unknown cache %s", arg)
 				}
