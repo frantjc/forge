@@ -22,7 +22,7 @@ import (
 
 func newResource(method string) *cobra.Command {
 	var (
-		attach, bust    bool
+		attach, cache   bool
 		conf, workdir   string
 		version, params map[string]string
 		cmd             = &cobra.Command{
@@ -90,7 +90,7 @@ func newResource(method string) *cobra.Command {
 				}
 
 				var o forge.Ore = cr
-				if !bust {
+				if cache {
 					o = &ore.Cache{Ore: o}
 				}
 
@@ -115,7 +115,7 @@ func newResource(method string) *cobra.Command {
 		cmd.Flags().StringToStringVarP(&params, "param", "p", nil, "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&bust, "bust", false, "bust cache")
+	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().StringToStringVarP(&version, "version", "v", nil, "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")
