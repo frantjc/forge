@@ -18,7 +18,7 @@ jobs:
           cache-dependency-path: .github/action/yarn.lock
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.21'
+          go-version: 1.21
           cache: true
       - uses: golangci/golangci-lint-action@v3.6.0
       - run: make download
