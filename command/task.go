@@ -15,9 +15,9 @@ import (
 // the entrypoint for `forge task`.
 func NewTask() *cobra.Command {
 	var (
-		attach, bust bool
-		workdir      string
-		cmd          = &cobra.Command{
+		attach, cache bool
+		workdir       string
+		cmd           = &cobra.Command{
 			Use:           "task",
 			Short:         "Run an Azure DevOps Task",
 			Args:          cobra.ExactArgs(1),
@@ -41,7 +41,7 @@ func NewTask() *cobra.Command {
 				t := &ore.Task{}
 
 				var o forge.Ore = t
-				if !bust {
+				if cache {
 					o = &ore.Cache{Ore: o}
 				}
 
@@ -60,7 +60,7 @@ func NewTask() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&bust, "bust", false, "bust cache")
+	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 

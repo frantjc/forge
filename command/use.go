@@ -22,10 +22,10 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		attach, outputs, envVars, bust bool
-		workdir                        string
-		env, with                      map[string]string
-		cmd                            = &cobra.Command{
+		attach, outputs, envVars, cache bool
+		workdir                         string
+		env, with                       map[string]string
+		cmd                             = &cobra.Command{
 			Use:           "use",
 			Short:         "Use a GitHub Action",
 			Args:          cobra.ExactArgs(1),
@@ -87,7 +87,7 @@ func NewUse() *cobra.Command {
 				}
 
 				var o forge.Ore = a
-				if !bust {
+				if cache {
 					o = &ore.Cache{Ore: o}
 				}
 
@@ -119,7 +119,7 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&bust, "bust", false, "bust cache")
+	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
 	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
 	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")
