@@ -13,6 +13,7 @@ __debug_bin
 .env
 
 # concourse/mock-resource
+rootfs/
 privileged
 version
 

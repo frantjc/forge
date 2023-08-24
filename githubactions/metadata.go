@@ -21,8 +21,7 @@ var ErrMissingRequiredInput = errors.New("required input missing")
 
 func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
 	m := &Metadata{}
-	d := yaml.NewDecoder(r)
-	return m, d.Decode(m)
+	return m, yaml.NewDecoder(r).Decode(m)
 }
 
 func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, error) {
