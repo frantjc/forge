@@ -41,5 +41,5 @@ const (
 	EnvVarRepositoryOwner  = "GITHUB_REPOSITORY_OWNER"
 	EnvVarRetentionDays    = "GITHUB_RETENTION_DAYS"
 	EnvVarStepSummary      = "GITHUB_STEP_SUMMARY"
-	EnvVarActionRepository = "GITHUB_ACTION_REPOSITORY"
+	EnvVarActionRepository = "GITHUB_ACTION_REPOSITORY" //nolint:gosec
 )

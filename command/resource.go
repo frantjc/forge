@@ -34,7 +34,7 @@ func newResource(method string) *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx      = cmd.Context()
-					_        = forge.LoggerFrom(ctx)
+					log      = forge.LoggerFrom(ctx)
 					name     = args[0]
 					pipeline = &concourse.Pipeline{}
 					file     io.Reader
@@ -45,6 +45,8 @@ func newResource(method string) *cobra.Command {
 						Params:  params,
 					}
 				)
+
+				log.Info("resource", "version", cr.Version, "params", cr.Params)
 
 				if cmd.Flag("conf").Changed {
 					if file, err = os.Open(conf); err != nil {
@@ -112,11 +114,11 @@ func newResource(method string) *cobra.Command {
 	}
 
 	if method != "check" {
-		cmd.Flags().VarP(newStringToAnyValue(nil, &params), "param", "p", "params for resource")
+		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
-	cmd.Flags().VarP(newStringToAnyValue(nil, &version), "version", "v", "version for resource")
+	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for resource")

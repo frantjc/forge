@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.11.2
+SEMVER ?= 0.12.0
 
 .DEFAULT: install
 
@@ -46,7 +46,7 @@ internal/bin/shim_$(GOARCH):
 	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > internal/bin/fs_$(GOARCH).go
 
 clean:
-	@rm -rf dist/ vendor/ privileged version internal/bin/shim*.*
+	@rm -rf dist/ rootfs/ vendor/ privileged version internal/bin/shim*.*
 
 MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
 MINOR = $(word 2,$(subst ., ,$(SEMVER)))

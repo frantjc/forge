@@ -8,26 +8,26 @@ import (
 	"strings"
 )
 
-type stringToAnyValue struct {
+type stringToPrimitiveValue struct {
 	value   *map[string]any
 	changed bool
 }
 
-func newStringToAnyValue(val map[string]any, p *map[string]any) *stringToAnyValue {
-	ssv := new(stringToAnyValue)
+func newStringToPrimitive(val map[string]any, p *map[string]any) *stringToPrimitiveValue {
+	ssv := new(stringToPrimitiveValue)
 	ssv.value = p
 	*ssv.value = val
 	return ssv
 }
 
-func (s *stringToAnyValue) Set(val string) error {
+func (s *stringToPrimitiveValue) Set(val string) error {
 	var ss []string
 	n := strings.Count(val, "=")
 	switch n {
 	case 0:
 		return fmt.Errorf("%s must be formatted as key=value", val)
 	case 1:
-		ss = append(ss, strings.Trim(val, `"`))
+		ss = append(ss, val)
 	default:
 		r := csv.NewReader(strings.NewReader(val))
 		var err error
@@ -43,10 +43,12 @@ func (s *stringToAnyValue) Set(val string) error {
 		if len(kv) != 2 {
 			return fmt.Errorf("%s must be formatted as key=value", pair)
 		}
-		if b, err := strconv.ParseBool(kv[1]); err == nil {
+		if i, err := strconv.Atoi(kv[1]); err == nil {
+			out[kv[0]] = i
+		} else if b, err := strconv.ParseBool(kv[1]); err == nil {
 			out[kv[0]] = b
 		} else {
-			out[kv[0]] = kv[1]
+			out[kv[0]] = strings.Trim(kv[1], `"'`)
 		}
 	}
 	if !s.changed {
@@ -60,11 +62,11 @@ func (s *stringToAnyValue) Set(val string) error {
 	return nil
 }
 
-func (s *stringToAnyValue) Type() string {
-	return "stringToAny"
+func (s *stringToPrimitiveValue) Type() string {
+	return "stringToPrimitive"
 }
 
-func (s *stringToAnyValue) String() string {
+func (s *stringToPrimitiveValue) String() string {
 	records := make([]string, 0, len(*s.value)>>1)
 	for k, v := range *s.value {
 		records = append(records, fmt.Sprint(k, "=", v))

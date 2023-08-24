@@ -35,13 +35,14 @@ var (
 // GetImageForTask ...
 func GetImageForTask(ctx context.Context, containerRuntime forge.ContainerRuntime, task *azuredevops.Task) (forge.Image, error) {
 	if task != nil && task.Executions != nil {
-		if task.Executions.Node != nil {
+		switch {
+		case task.Executions.Node != nil:
 			return containerRuntime.PullImage(ctx, NodeImageReference)
-		} else if task.Executions.Node16 != nil {
+		case task.Executions.Node16 != nil:
 			return containerRuntime.PullImage(ctx, Node16ImageReference)
-		} else if task.Executions.Node10 != nil {
+		case task.Executions.Node10 != nil:
 			return containerRuntime.PullImage(ctx, Node10ImageReference)
-		} else if task.Executions.PowerShell != nil || task.Executions.PowerShell3 != nil {
+		case task.Executions.PowerShell != nil || task.Executions.PowerShell3 != nil:
 			return nil, fmt.Errorf("powershell tasks unsupported")
 		}
 	}

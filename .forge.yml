@@ -7,4 +7,5 @@ resources:
   - name: mock
     type: mock
     source:
-      log: true
+      force_version: "true"
+      log: ok
