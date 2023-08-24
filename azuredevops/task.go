@@ -1,6 +1,17 @@
 package azuredevops
 
-// Task.
+import (
+	"encoding/json"
+	"io"
+)
+
+// NewTaskFromReader ...
+func NewTaskFromReader(r io.Reader) (*Task, error) {
+	t := &Task{}
+	return t, json.NewDecoder(r).Decode(t)
+}
+
+// Task ...
 type Task struct {
 	Author string `json:"author,omitempty"`
 
@@ -18,7 +29,7 @@ type Task struct {
 	Description string `json:"description,omitempty"`
 
 	// Execution options for this task
-	Execution *Execution `json:"execution,omitempty"`
+	Executions *Executions `json:"execution,omitempty"`
 
 	// Descriptive name (spaces allowed). Must be <= 40 chars
 	FriendlyName string `json:"friendlyName,omitempty"`
@@ -65,12 +76,12 @@ type Task struct {
 	Visibility []string `json:"visibility,omitempty"`
 }
 
-// Commands Restrictions on available task commands.
+// Commands are restrictions on available task commands.
 type Commands struct {
 	Mode string `json:"mode,omitempty"`
 }
 
-// DataSourceBinding.
+// DataSourceBinding ...
 type DataSourceBinding struct {
 	CallbackContextTemplate  string      `json:"callbackContextTemplate,omitempty"`
 	CallbackRequiredTemplate string      `json:"callbackRequiredTemplate,omitempty"`
@@ -86,7 +97,7 @@ type DataSourceBinding struct {
 	Target                   string      `json:"target,omitempty"`
 }
 
-// Executions Execution options for this task.
+// Executions are options for this task.
 type Executions struct {
 	Node        *Execution `json:"Node,omitempty"`
 	Node10      *Execution `json:"Node10,omitempty"`
@@ -95,7 +106,7 @@ type Executions struct {
 	PowerShell3 *Execution `json:"PowerShell3,omitempty"`
 }
 
-// Execution.
+// Execution ...
 type Execution struct {
 	AdditionalProperties map[string]interface{} `json:"-,omitempty"`
 	ArgumentFormat       string                 `json:"argumentFormat,omitempty"`
@@ -106,7 +117,7 @@ type Execution struct {
 	WorkingDirectory string `json:"workingDirectory,omitempty"`
 }
 
-// Group.
+// Group ...
 type Group struct {
 	DisplayName string `json:"displayName"`
 	IsExpanded  bool   `json:"isExpanded,omitempty"`
@@ -116,7 +127,7 @@ type Group struct {
 	VisibleRule string `json:"visibleRule,omitempty"`
 }
 
-// Input.
+// Input ...
 type Input struct {
 	Aliases []string `json:"aliases,omitempty"`
 
@@ -147,15 +158,15 @@ type Input struct {
 	VisibleRule string `json:"visibleRule,omitempty"`
 }
 
-// Messages.
+// Messages ...
 type Messages struct{}
 
-// Options.
+// Options ...
 type Options struct {
 	AdditionalProperties map[string]interface{} `json:"-,omitempty"`
 }
 
-// OutputVariable.
+// OutputVariable ...
 type OutputVariable struct {
 	// Detailed description of the variable
 	Description string `json:"description,omitempty"`
@@ -164,10 +175,10 @@ type OutputVariable struct {
 	Name string `json:"name"`
 }
 
-// Parameters.
+// Parameters ...
 type Parameters struct{}
 
-// Properties.
+// Properties ...
 type Properties struct {
 	DisableManageLink             string `json:"DisableManageLink,omitempty"`
 	EditableOptions               string `json:"EditableOptions,omitempty"`
@@ -183,7 +194,7 @@ type Properties struct {
 	Rows                          string `json:"rows,omitempty"`
 }
 
-// Restrictions Restrictions on tasks.
+// Restrictions are restrictions on tasks.
 type Restrictions struct {
 	// Restrictions on available task commands
 	Commands *Commands `json:"commands,omitempty"`
@@ -192,12 +203,12 @@ type Restrictions struct {
 	SettableVariables *SettableVariables `json:"settableVariables,omitempty"`
 }
 
-// SettableVariables Restrictions on which variables can be set via commands.
+// SettableVariables are restrictions on which variables can be set via commands.
 type SettableVariables struct {
 	Allowed []string `json:"allowed,omitempty"`
 }
 
-// SourceDefinition.
+// SourceDefinition ...
 type SourceDefinition struct {
 	AuthKey     string `json:"authKey,omitempty"`
 	Endpoint    string `json:"endpoint,omitempty"`
@@ -206,7 +217,8 @@ type SourceDefinition struct {
 	Target      string `json:"target,omitempty"`
 }
 
-// Version Always update this when you release your task, so that the agents utilize the latest code.
+// Version should always be updated when you release your task,
+// so that the agents utilize the latest code.
 type Version struct {
 	Major float64 `json:"Major"`
 	Minor float64 `json:"Minor"`

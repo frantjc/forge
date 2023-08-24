@@ -24,3 +24,8 @@ var (
 )
 
 var OreCache = filepath.Join(CacheHome, "/ore")
+
+var (
+	AzureDevopsHome = filepath.Join(CacheHome, "/azure/devops")
+	TasksCache      = filepath.Join(AzureDevopsHome, "/tasks")
+)

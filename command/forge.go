@@ -27,7 +27,7 @@ func NewForge() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
-	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewCache())
+	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCache())
 
 	return cmd
 }
