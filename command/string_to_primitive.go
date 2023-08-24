@@ -8,19 +8,19 @@ import (
 	"strings"
 )
 
-type stringToStringOrBoolValue struct {
+type stringToPrimitiveValue struct {
 	value   *map[string]any
 	changed bool
 }
 
-func newStringToStringOrBool(val map[string]any, p *map[string]any) *stringToStringOrBoolValue {
-	ssv := new(stringToStringOrBoolValue)
+func newStringToPrimitive(val map[string]any, p *map[string]any) *stringToPrimitiveValue {
+	ssv := new(stringToPrimitiveValue)
 	ssv.value = p
 	*ssv.value = val
 	return ssv
 }
 
-func (s *stringToStringOrBoolValue) Set(val string) error {
+func (s *stringToPrimitiveValue) Set(val string) error {
 	var ss []string
 	n := strings.Count(val, "=")
 	switch n {
@@ -43,7 +43,9 @@ func (s *stringToStringOrBoolValue) Set(val string) error {
 		if len(kv) != 2 {
 			return fmt.Errorf("%s must be formatted as key=value", pair)
 		}
-		if b, err := strconv.ParseBool(kv[1]); err == nil {
+		if i, err := strconv.Atoi(kv[1]); err == nil {
+			out[kv[0]] = i
+		} else if b, err := strconv.ParseBool(kv[1]); err == nil {
 			out[kv[0]] = b
 		} else {
 			out[kv[0]] = strings.Trim(kv[1], `"'`)
@@ -60,11 +62,11 @@ func (s *stringToStringOrBoolValue) Set(val string) error {
 	return nil
 }
 
-func (s *stringToStringOrBoolValue) Type() string {
-	return "stringToStringOrBool"
+func (s *stringToPrimitiveValue) Type() string {
+	return "stringToPrimitive"
 }
 
-func (s *stringToStringOrBoolValue) String() string {
+func (s *stringToPrimitiveValue) String() string {
 	records := make([]string, 0, len(*s.value)>>1)
 	for k, v := range *s.value {
 		records = append(records, fmt.Sprint(k, "=", v))
