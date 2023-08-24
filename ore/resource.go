@@ -16,8 +16,8 @@ import (
 // any of get, put or check.
 type Resource struct {
 	Method       string                  `json:"method,omitempty"`
-	Version      map[string]string       `json:"version,omitempty"`
-	Params       map[string]string       `json:"params,omitempty"`
+	Version      map[string]any          `json:"version,omitempty"`
+	Params       map[string]any          `json:"params,omitempty"`
 	Resource     *concourse.Resource     `json:"resource,omitempty"`
 	ResourceType *concourse.ResourceType `json:"resource_type,omitempty"`
 }

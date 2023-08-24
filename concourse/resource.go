@@ -19,7 +19,7 @@ func ResourcesFrom(ctx context.Context) (resources []Resource, ok bool) {
 // Resource has the YAML encoding of a resource as it would appear
 // in the `resource` array of a Concourse pipeline configuration file.
 type Resource struct {
-	Name   string            `json:"name,omitempty"`
-	Type   string            `json:"type,omitempty"`
-	Source map[string]string `json:"source,omitempty"`
+	Name   string         `json:"name,omitempty"`
+	Type   string         `json:"type,omitempty"`
+	Source map[string]any `json:"source,omitempty"`
 }

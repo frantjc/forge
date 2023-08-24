@@ -16,6 +16,7 @@ import (
 func NewTask() *cobra.Command {
 	var (
 		attach, cache bool
+		inputs map[string]string
 		workdir       string
 		cmd           = &cobra.Command{
 			Use:           "task",
@@ -38,7 +39,10 @@ func NewTask() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
-				t := &ore.Task{}
+				t := &ore.Task{
+					Task: args[0],
+					Inputs: inputs,
+				}
 
 				var o forge.Ore = t
 				if cache {
@@ -61,6 +65,7 @@ func NewTask() *cobra.Command {
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
 	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
+	cmd.Flags().StringToStringVarP(&inputs, "input", "i", nil, "inputs")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 
