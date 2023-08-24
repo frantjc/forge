@@ -8,26 +8,26 @@ import (
 	"strings"
 )
 
-type stringToAnyValue struct {
+type stringToStringOrBoolValue struct {
 	value   *map[string]any
 	changed bool
 }
 
-func newStringToAnyValue(val map[string]any, p *map[string]any) *stringToAnyValue {
-	ssv := new(stringToAnyValue)
+func newStringToStringOrBool(val map[string]any, p *map[string]any) *stringToStringOrBoolValue {
+	ssv := new(stringToStringOrBoolValue)
 	ssv.value = p
 	*ssv.value = val
 	return ssv
 }
 
-func (s *stringToAnyValue) Set(val string) error {
+func (s *stringToStringOrBoolValue) Set(val string) error {
 	var ss []string
 	n := strings.Count(val, "=")
 	switch n {
 	case 0:
 		return fmt.Errorf("%s must be formatted as key=value", val)
 	case 1:
-		ss = append(ss, strings.Trim(val, `"`))
+		ss = append(ss, val)
 	default:
 		r := csv.NewReader(strings.NewReader(val))
 		var err error
@@ -46,7 +46,7 @@ func (s *stringToAnyValue) Set(val string) error {
 		if b, err := strconv.ParseBool(kv[1]); err == nil {
 			out[kv[0]] = b
 		} else {
-			out[kv[0]] = kv[1]
+			out[kv[0]] = strings.Trim(kv[1], `"'`)
 		}
 	}
 	if !s.changed {
@@ -60,11 +60,11 @@ func (s *stringToAnyValue) Set(val string) error {
 	return nil
 }
 
-func (s *stringToAnyValue) Type() string {
-	return "stringToAny"
+func (s *stringToStringOrBoolValue) Type() string {
+	return "stringToStringOrBool"
 }
 
-func (s *stringToAnyValue) String() string {
+func (s *stringToStringOrBoolValue) String() string {
 	records := make([]string, 0, len(*s.value)>>1)
 	for k, v := range *s.value {
 		records = append(records, fmt.Sprint(k, "=", v))
