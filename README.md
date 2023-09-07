@@ -112,6 +112,20 @@ Install and `put` a Concourse Resource with the given `params` and `config`:
 
 ### Azure DevOps Tasks
 
+For Azure DevOps, you can execute local Tasks by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively. Remote Tasks are not supported at this time as there is no standard protocol for referencing them.
+
+```sh
+forge task ./testdata/tasks/node
+```
+
+For additional debugging, you can attach to the container running the Task:
+
+```sh
+forge task -a ./testdata/tasks/node
+```
+
+> If the Task runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
+
 ## why?
 
 Automation begins with a shell script that executes a bunch of CLI commands often to test, build and publish some code. The next step is to set up some continuous integration (CI) system that executes that script in response to some event such as a commit to a Git repository's `main` branch. Such CI systems tend to identify that all of the scripts that they are executing do a lot of the same things--checkout a Git repository, setup a tool and so on.
