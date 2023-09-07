@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/azuredevops"
 )
 
 const (
@@ -32,20 +31,20 @@ var (
 	NodeImageReference = DefaultNodeImageReference
 )
 
-// GetImageForTask ...
-func GetImageForTask(ctx context.Context, containerRuntime forge.ContainerRuntime, task *azuredevops.Task) (forge.Image, error) {
-	if task != nil && task.Executions != nil {
-		switch {
-		case task.Executions.Node != nil:
-			return containerRuntime.PullImage(ctx, NodeImageReference)
-		case task.Executions.Node16 != nil:
-			return containerRuntime.PullImage(ctx, Node16ImageReference)
-		case task.Executions.Node10 != nil:
-			return containerRuntime.PullImage(ctx, Node10ImageReference)
-		case task.Executions.PowerShell != nil || task.Executions.PowerShell3 != nil:
-			return nil, fmt.Errorf("powershell tasks unsupported")
-		}
+// GetImageForExecution ...
+func GetImageForExecution(ctx context.Context, containerRuntime forge.ContainerRuntime, execution Execution) (forge.Image, error) {
+	ref := ""
+
+	switch execution {
+	case ExecutionNode:
+		ref = NodeImageReference
+	case ExecutionNode16:
+		ref = Node16ImageReference
+	case ExecutionNode10:
+		ref = Node10ImageReference
+	default:
+		return nil, fmt.Errorf("powershell tasks unsupported")
 	}
 
-	return nil, fmt.Errorf("task specified no execution")
+	return containerRuntime.PullImage(ctx, ref)
 }

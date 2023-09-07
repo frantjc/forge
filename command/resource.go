@@ -72,7 +72,7 @@ func newResource(method string) *cobra.Command {
 					return fmt.Errorf("resource not found: %s", name)
 				}
 
-				for _, t := range pipeline.ResourceTypes {
+				for _, t := range append(pipeline.ResourceTypes, concourse.BuiltinResourceTypes...) {
 					if t.Name == cr.Resource.Type {
 						resourceType := t
 						cr.ResourceType = &resourceType

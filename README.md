@@ -66,13 +66,15 @@ For additional debugging, you can attach to the container running the Action:
 forge use -a ./testdata/actions/dockerfile
 ```
 
-> If the Action runs using a custom image, that image must have `sh` on its `PATH` for the attach to work.
+> If the Action runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 > Local Actions cannot refer to files outside of the action metadata file's directory.
 
 ### Concourse Resources
 
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`.forge.yml`](.forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
+
+> Just like Concourse itself, Forge ships with [some Resource Types builtin](concourse/builtin.go) that can be overridden
 
 ```sh
 forge get mock -v version=v0.0.0
@@ -84,7 +86,7 @@ You can also attach to the container executing the Resource to snoop around:
 forge get -a mock -v version=v0.0.0
 ```
 
-> The Resource's image must have `sh` on its `PATH` for the attach to work.
+> The Resource's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 ### Setup Forge
 

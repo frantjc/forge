@@ -18,7 +18,7 @@ func NewTask() *cobra.Command {
 	var (
 		attach, cache bool
 		inputs        map[string]string
-		workdir       string
+		exec, workdir string
 		cmd           = &cobra.Command{
 			Use:           "task",
 			Short:         "Run an Azure DevOps Task",
@@ -40,9 +40,15 @@ func NewTask() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd))
 				}
 
+				execution, err := forgeazure.ParseExecution(exec)
+				if err != nil {
+					return err
+				}
+
 				t := &ore.Task{
-					Task:   args[0],
-					Inputs: inputs,
+					Task:      args[0],
+					Inputs:    inputs,
+					Execution: execution,
 				}
 
 				var o forge.Ore = t
@@ -70,6 +76,7 @@ func NewTask() *cobra.Command {
 	cmd.Flags().StringVar(&forgeazure.NodeImageReference, "node-image", forgeazure.DefaultNodeImageReference, "Node image")
 	cmd.Flags().StringVar(&forgeazure.Node10ImageReference, "node10-image", forgeazure.DefaultNode10ImageReference, "Node10 image")
 	cmd.Flags().StringVar(&forgeazure.Node16ImageReference, "node16-image", forgeazure.DefaultNode16ImageReference, "Node16 image")
+	cmd.Flags().StringVarP(&exec, "exec", "e", "Node", "task execution")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 

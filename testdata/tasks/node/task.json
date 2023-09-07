@@ -1,7 +1,8 @@
 {
     "execution": {
         "Node": {
-            "target": "index.js"
+            "target": "index.js",
+            "workingDirectory": "workdir"
         }
     }
 }
