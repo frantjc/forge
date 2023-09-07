@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)) and [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Azure DevOps Tasks](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/?view=azure-pipelines) (e.g. [Npm@1](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/npm-v1?view=azure-pipelines)).
 
 ## install
 
@@ -66,13 +66,15 @@ For additional debugging, you can attach to the container running the Action:
 forge use -a ./testdata/actions/dockerfile
 ```
 
-> If the Action runs using a custom image, that image must have `sh` on its `PATH` for the attach to work.
+> If the Action runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 > Local Actions cannot refer to files outside of the action metadata file's directory.
 
 ### Concourse Resources
 
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`.forge.yml`](.forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
+
+> Just like Concourse itself, Forge ships with [some Resource Types builtin](concourse/builtin.go) that can be overridden
 
 ```sh
 forge get mock -v version=v0.0.0
@@ -84,7 +86,7 @@ You can also attach to the container executing the Resource to snoop around:
 forge get -a mock -v version=v0.0.0
 ```
 
-> The Resource's image must have `sh` on its `PATH` for the attach to work.
+> The Resource's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 ### Setup Forge
 
@@ -107,6 +109,22 @@ Install and `put` a Concourse Resource with the given `params` and `config`:
         my-param=my-value
       config: forge.yaml
 ```
+
+### Azure DevOps Tasks
+
+For Azure DevOps, you can execute local Tasks by starting the reference with `"/"` or `"./"` to signify that it is an absolute or relative local filepath, respectively. Remote Tasks are not supported at this time as there is no standard protocol for referencing them.
+
+```sh
+forge task ./testdata/tasks/node
+```
+
+For additional debugging, you can attach to the container running the Task:
+
+```sh
+forge task -a ./testdata/tasks/node
+```
+
+> If the Task runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 ## why?
 
