@@ -26,7 +26,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           install-only: true
-      - uses: crazy-max/ghaction-upx@v2
+      - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
       - name: Run make install
