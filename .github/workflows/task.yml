@@ -17,8 +17,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: microsoft/azure-pipelines-tasks
-          sparse-checkout: |
-            Tasks/
       - uses: actions/setup-node@v3
         with:
           node-version: 16
