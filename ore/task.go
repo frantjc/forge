@@ -12,9 +12,9 @@ import (
 )
 
 type Task struct {
-	Task      string               `json:"task,omitempty"`
-	Inputs    map[string]string    `json:"inputs,omitempty"`
-	Execution forgeazure.Execution `json:"execution,omitempty"`
+	Task      string            `json:"task,omitempty"`
+	Inputs    map[string]string `json:"inputs,omitempty"`
+	Execution string            `json:"execution,omitempty"`
 }
 
 func (o *Task) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
@@ -30,13 +30,18 @@ func (o *Task) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 		return err
 	}
 
-	containerConfig, err := forgeazure.TaskToContainerConfig(ref, task, o.Execution, o.Inputs)
+	execution, err := forgeazure.ParseExecution(o.Execution)
+	if err != nil {
+		return err
+	}
+
+	containerConfig, err := forgeazure.TaskToContainerConfig(ref, task, execution, o.Inputs)
 	if err != nil {
 		return err
 	}
 	containerConfig.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)
 
-	image, err := forgeazure.GetImageForExecution(ctx, containerRuntime, o.Execution)
+	image, err := forgeazure.GetImageForExecution(ctx, containerRuntime, execution)
 	if err != nil {
 		return err
 	}

@@ -57,7 +57,7 @@ func (m *Mapping) TaskToContainerConfig(ref *azuredevops.TaskReference, task *az
 		if in, ok := inputs[input.Name]; ok {
 			env[i] = fmt.Sprintf("%s=%s", name, in)
 		} else if input.Required {
-			return nil, fmt.Errorf("required input %s not supplied", input.Name)
+			return nil, fmt.Errorf("required input %s not supplied: %s", input.Name, input.HelpMarkDown)
 		} else {
 			env[i] = fmt.Sprintf("%s=%s", name, input.DefaultValue)
 		}
