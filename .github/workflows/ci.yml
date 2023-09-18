@@ -41,14 +41,8 @@ jobs:
           path: testdata/tasks/azure-pipelines-tasks
           sparse-checkout: |
             Tasks/
-      - name: Run ls
-        run: |
-          ls testdata/
-          ls testdata/tasks/
-          ls testdata/tasks/azure-pipelines-tasks/
-          ls testdata/tasks/azure-pipelines-tasks/Tasks/
-      - name: Run forge task KubectlInstaller@V0
-        run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstaller@V0
+      - name: Run forge task KubectlInstallerV0
+        run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstallerV0
       - uses: ./
         with:
           install: false
