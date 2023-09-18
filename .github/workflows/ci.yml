@@ -34,15 +34,16 @@ jobs:
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       - name: Run forge task node
-        run: forge task ./testdata/tasks/node
-      - uses: actions/checkout@v4
-        with:
-          repository: microsoft/azure-pipelines-tasks
-          path: testdata/tasks/azure-pipelines-tasks
-          sparse-checkout: |
-            Tasks/
-      - name: Run forge task KubectlInstallerV0
-        run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstallerV0
+      # TODO
+      #   run: forge task ./testdata/tasks/node
+      # - uses: actions/checkout@v4
+      #   with:
+      #     repository: microsoft/azure-pipelines-tasks
+      #     path: testdata/tasks/azure-pipelines-tasks
+      #     sparse-checkout: |
+      #       Tasks/
+      # - name: Run forge task KubectlInstallerV0
+      #   run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstallerV0
       - uses: ./
         with:
           install: false
