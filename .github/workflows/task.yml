@@ -13,7 +13,6 @@ jobs:
   task:
     runs-on: ubuntu-latest
     steps:
-      - uses: frantjc/forge@main
       - uses: actions/checkout@v4
         with:
           repository: microsoft/azure-pipelines-tasks
@@ -24,4 +23,5 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: node make.js build --task ${{ inputs.task }}
+      - uses: frantjc/forge@main
       - run: forge task -e ${{ inputs.execution }} ${{ inputs.task }}
