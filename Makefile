@@ -22,7 +22,7 @@ build:
 	@$(GORELEASER) release --snapshot --clean
 
 .github/action .github/action/:
-	@cd .github/action && $(YARN) all
+	@cd $@ && $(YARN) all
 
 generate:
 	@$(GO) $@ ./...
