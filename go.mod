@@ -12,7 +12,7 @@ require (
 	github.com/go-logr/zapr v1.2.4
 	github.com/google/go-containerregistry v0.16.1
 	github.com/google/go-github/v50 v50.2.0
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/moby/term v0.5.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc5
