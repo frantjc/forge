@@ -9,7 +9,7 @@ require (
 	github.com/frantjc/go-fn v0.3.0
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/go-logr/logr v1.3.0
-	github.com/go-logr/zapr v1.2.4
+	github.com/go-logr/zapr v1.3.0
 	github.com/google/go-containerregistry v0.16.1
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.4.0
@@ -38,7 +38,6 @@ require (
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.8.3 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
