@@ -6,8 +6,10 @@ import (
 )
 
 // Semver is the semantic version of Forge.
-// Meant to be be overridden at build time.
-var Semver = "0.0.0"
+// Meant to be be overridden at build time,
+// but kept up-to-date sometimes to best
+// support `go install`.
+var Semver = "0.13.4"
 
 // GetSemver returns the semantic version of Forge as built from
 // Semver and debug build info.

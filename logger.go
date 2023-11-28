@@ -26,7 +26,9 @@ func LoggerFrom(ctx context.Context) Logger {
 
 // NewLogger creates a new Logger.
 func NewLogger() Logger {
-	zapLogger, err := zap.NewProduction()
+	zapLogger, err := zap.NewProduction(
+		zap.AddCallerSkip(1),
+	)
 	if err != nil {
 		panic(err)
 	}
