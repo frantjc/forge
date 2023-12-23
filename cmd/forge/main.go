@@ -15,14 +15,16 @@ import (
 
 func main() {
 	var (
-		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		err       error
 	)
 
-	if err = command.NewForge().ExecuteContext(ctx); err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
+	if err = command.NewForge().ExecuteContext(ctx); err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) && !errors.Is(err, context.Canceled) {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
 	stop()
-	os.Exit(errorcode.ExitCode(err))
+	if !errors.Is(err, context.Canceled) {
+		os.Exit(errorcode.ExitCode(err))
+	}
 }
