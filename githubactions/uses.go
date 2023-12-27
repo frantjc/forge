@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/tarutil"
+	xtar "github.com/frantjc/x/archive/tar"
 )
 
 type Uses struct {
@@ -104,7 +104,7 @@ func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, er
 		}
 		defer rc.Close()
 
-		if err = tarutil.Extract(rc, dir); err != nil {
+		if err = xtar.Extract(rc, dir); err != nil {
 			return nil, err
 		}
 

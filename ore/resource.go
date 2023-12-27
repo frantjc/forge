@@ -8,8 +8,7 @@ import (
 	"github.com/frantjc/forge/forgeconcourse"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
-	errorcode "github.com/frantjc/go-error-code"
-	"github.com/frantjc/go-fn"
+	xos "github.com/frantjc/x/os"
 )
 
 // Resource is an Ore representing a Concourse Resource--
@@ -39,19 +38,25 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 	defer container.Remove(ctx) //nolint:errcheck
 
 	if exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(drains, &concourse.Input{
-		Params: fn.Ternary(
-			o.Method == forgeconcourse.MethodCheck,
-			nil, o.Params,
-		),
+		Params: func() map[string]any {
+			if o.Method == forgeconcourse.MethodCheck {
+				return nil
+			}
+
+			return o.Params
+		}(),
 		Source: o.Resource.Source,
-		Version: fn.Ternary(
-			o.Method == forgeconcourse.MethodPut,
-			nil, o.Version,
-		),
+		Version: func() map[string]any {
+			if o.Method == forgeconcourse.MethodPut {
+				return nil
+			}
+
+			return o.Version
+		}(),
 	})); err != nil {
 		return err
 	} else if exitCode > 0 {
-		return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
+		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
 	}
 
 	return nil

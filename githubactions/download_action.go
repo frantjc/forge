@@ -10,7 +10,7 @@ import (
 	"regexp"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/tarutil"
+	xtar "github.com/frantjc/x/archive/tar"
 	"github.com/google/go-github/v50/github"
 )
 
@@ -118,5 +118,5 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	// sha is guaranteed to be a 40 character string by the above regexp.
-	return metadata, tarutil.Subdir(r, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
+	return metadata, xtar.Subdir(r, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
 }

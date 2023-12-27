@@ -13,8 +13,8 @@ import (
 
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
-	errorcode "github.com/frantjc/go-error-code"
-	"github.com/frantjc/go-fn"
+	xos "github.com/frantjc/x/os"
+	xslice "github.com/frantjc/x/slice"
 )
 
 var (
@@ -36,7 +36,7 @@ func main() {
 		os.Stderr.WriteString(help)
 	} else {
 		stop()
-		os.Exit(errorcode.ExitCode(err))
+		xos.ExitFromError(err)
 	}
 }
 
@@ -110,7 +110,7 @@ func mainE(ctx context.Context) error {
 			}
 		}
 
-		if i := fn.FindIndex(command.Env, func(s string, _ int) bool {
+		if i := xslice.FindIndex(command.Env, func(s string, _ int) bool {
 			spl := strings.Split(s, "=")
 			return len(spl) > 0 && strings.EqualFold(spl[0], "PATH")
 		}); i >= 0 {
@@ -119,7 +119,7 @@ func mainE(ctx context.Context) error {
 			command.Env = append(command.Env, path)
 		}
 
-		return errorcode.New(command.Run(), errorcode.WithExitCode(command.ProcessState.ExitCode()))
+		return xos.NewExitCodeError(command.Run(), command.ProcessState.ExitCode())
 	}
 
 	return errHelp

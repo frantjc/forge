@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
-	errorcode "github.com/frantjc/go-error-code"
+	xos "github.com/frantjc/x/os"
 )
 
 // Action is an Ore representing a GitHub Action.
@@ -65,7 +65,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		if exitCode, err := container.Exec(ctx, &cc, workflowCommandStreams); err != nil {
 			return err
 		} else if exitCode > 0 {
-			return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
+			return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
 		}
 
 		if err = container.Stop(ctx); err != nil {

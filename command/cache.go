@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge/internal/hostfs"
-	"github.com/frantjc/go-fn"
+	xslice "github.com/frantjc/x/slice"
 	"github.com/spf13/cobra"
 )
 
@@ -32,20 +32,20 @@ func NewCache() *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					cache = hostfs.CacheHome
-					arg   = strings.ToLower(fn.Find(args, func(_ string, _ int) bool {
+					arg   = strings.ToLower(xslice.Find(args, func(_ string, _ int) bool {
 						return true
 					}))
 				)
 
 				switch {
 				case arg == "":
-				case fn.Includes(runnerTmpArgs, arg):
+				case xslice.Includes(runnerTmpArgs, arg):
 					cache = hostfs.RunnerTmp
-				case fn.Includes(runnerToolCacheArgs, arg):
+				case xslice.Includes(runnerToolCacheArgs, arg):
 					cache = hostfs.RunnerToolCache
-				case fn.Includes(actionsArgs, arg):
+				case xslice.Includes(actionsArgs, arg):
 					cache = hostfs.ActionsCache
-				case fn.Includes(oreArgs, arg):
+				case xslice.Includes(oreArgs, arg):
 					cache = hostfs.OreCache
 				default:
 					return fmt.Errorf("unknown cache: %s", arg)

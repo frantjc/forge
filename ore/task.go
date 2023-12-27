@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/forgeazure"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
-	errorcode "github.com/frantjc/go-error-code"
+	xos "github.com/frantjc/x/os"
 )
 
 type Task struct {
@@ -54,7 +54,7 @@ func (o *Task) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(nil)); err != nil {
 		return err
 	} else if exitCode > 0 {
-		return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
+		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
 	}
 
 	if err = container.Stop(ctx); err != nil {

@@ -13,7 +13,7 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/envconv"
-	"github.com/frantjc/go-fn"
+	xslice "github.com/frantjc/x/slice"
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"
 )
@@ -415,7 +415,7 @@ func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext,
 	}
 
 	if conf, err := r.Config(); err == nil {
-		c.GitHubContext.Actor = fn.Coalesce(
+		c.GitHubContext.Actor = xslice.Coalesce(
 			conf.User.Name,
 			conf.Author.Name,
 			conf.Committer.Name,

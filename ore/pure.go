@@ -8,7 +8,7 @@ import (
 	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/frantjc/forge/internal/contaminate"
-	errorcode "github.com/frantjc/go-error-code"
+	xos "github.com/frantjc/x/os"
 )
 
 // Pure is an Ore for running a "pure" command inside
@@ -50,7 +50,7 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(bytes.NewReader(input))); err != nil {
 		return err
 	} else if exitCode > 0 {
-		return errorcode.New(ErrContainerExitedWithNonzeroExitCode, errorcode.WithExitCode(exitCode))
+		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
 	}
 
 	return nil

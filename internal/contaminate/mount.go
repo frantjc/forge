@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/go-fn"
+	xslice "github.com/frantjc/x/slice"
 )
 
 type mountKey struct{}
@@ -20,8 +20,8 @@ func MountsFrom(ctx context.Context) []forge.Mount {
 
 func OverrideWithMountsFrom(ctx context.Context, mounts ...forge.Mount) []forge.Mount {
 	mountsFrom := MountsFrom(ctx)
-	return append(fn.Filter(mounts, func(m forge.Mount, _ int) bool {
-		return !fn.Some(mountsFrom, func(n forge.Mount, _ int) bool {
+	return append(xslice.Filter(mounts, func(m forge.Mount, _ int) bool {
+		return !xslice.Some(mountsFrom, func(n forge.Mount, _ int) bool {
 			return m.Destination == n.Destination
 		})
 	}), mountsFrom...)

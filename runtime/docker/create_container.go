@@ -12,7 +12,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/containerfs"
-	"github.com/frantjc/go-fn"
+	xslice "github.com/frantjc/x/slice"
 )
 
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
@@ -148,7 +148,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	}
 
-	hostConfig.Mounts = append(hostConfig.Mounts, fn.Map(
+	hostConfig.Mounts = append(hostConfig.Mounts, xslice.Map(
 		config.Mounts,
 		func(m forge.Mount, _ int) mount.Mount {
 			mountType := mount.TypeVolume
