@@ -25,7 +25,7 @@ brews:
     folder: Formula
     skip_upload: auto
     homepage:  https://github.com/frantjc/forge
-    description: Easily run reusable steps from proprietary CI systems
+    description: Easily run reusable steps from proprietary CI systems.
     license: MIT
     test: |
       system "#{bin}/forge --version"
