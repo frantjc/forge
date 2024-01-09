@@ -5,16 +5,15 @@ import (
 	"strings"
 )
 
-// Semver is the semantic version of Forge.
-// Meant to be be overridden at build time,
-// but kept up-to-date sometimes to best
-// support `go install`.
-var Semver = "0.13.5"
+// VersionCore is the SemVer version core of forge.
+// Meant to be be overridden at build time, but kept
+// up-to-date sometimes to best support `go install`.
+var VersionCore = "0.13.6"
 
-// GetSemver returns the semantic version of Forge as built from
-// Semver and debug build info.
-func GetSemver() string {
-	version := Semver
+// SemVer returns the semantic version of forge as built
+// from VersionCore and debug build info.
+func SemVer() string {
+	semver := VersionCore
 
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
 		var (
@@ -36,15 +35,15 @@ func GetSemver() string {
 				i = 7
 			}
 
-			if !strings.Contains(version, revision[:i]) {
-				version += "+" + revision[:i]
+			if !strings.Contains(semver, revision[:i]) {
+				semver += "+" + revision[:i]
 			}
 		}
 
 		if modified {
-			version += "*"
+			semver += "*"
 		}
 	}
 
-	return version
+	return semver
 }

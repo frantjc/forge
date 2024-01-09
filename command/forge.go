@@ -14,7 +14,7 @@ func NewForge() *cobra.Command {
 		verbosity int
 		cmd       = &cobra.Command{
 			Use:           "forge",
-			Version:       forge.GetSemver(),
+			Version:       forge.SemVer(),
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			PersistentPreRun: func(cmd *cobra.Command, args []string) {

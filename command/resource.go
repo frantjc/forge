@@ -34,7 +34,7 @@ func newResource(method string) *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx      = cmd.Context()
-					log      = forge.LoggerFrom(ctx)
+					_        = forge.LoggerFrom(ctx)
 					name     = args[0]
 					pipeline = &concourse.Pipeline{}
 					file     io.Reader
@@ -45,8 +45,6 @@ func newResource(method string) *cobra.Command {
 						Params:  params,
 					}
 				)
-
-				log.Info("resource", "version", cr.Version, "params", cr.Params)
 
 				if cmd.Flag("conf").Changed {
 					if file, err = os.Open(conf); err != nil {
