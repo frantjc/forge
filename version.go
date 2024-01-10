@@ -8,10 +8,10 @@ import (
 // VersionCore is the SemVer version core of forge.
 // Meant to be be overridden at build time, but kept
 // up-to-date sometimes to best support `go install`.
-var VersionCore = "0.13.6"
+var VersionCore = "0.13.7"
 
-// SemVer returns the semantic version of forge as built
-// from VersionCore and debug build info.
+// SemVer returns the semantic version of forge as
+// built from VersionCore and debug build info.
 func SemVer() string {
 	semver := VersionCore
 

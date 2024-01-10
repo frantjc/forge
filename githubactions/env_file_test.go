@@ -11,6 +11,10 @@ import (
 func TestParseEnvFile(t *testing.T) {
 	var (
 		env = `# comment
+HANDLE<<_GitHubActionsFileCommandDelimeter_
+old stuff # comment
+_GitHubActionsFileCommandDelimeter_
+
 HELLO=there
 
 GENERAL<<ghadelimiter_` + uuid.NewString() + `
@@ -28,6 +32,7 @@ YOU_BETTER<<ghadelimiter_` + uuid.NewString() + `
 "believe it"
 ghadelimiter_` + uuid.NewString() + "\n"
 		expected = map[string]string{
+			"HANDLE":     "old stuff",
 			"HELLO":      "there",
 			"GENERAL":    "kenobi",
 			"YOU":        "are a",
@@ -44,7 +49,7 @@ ghadelimiter_` + uuid.NewString() + "\n"
 
 	for k, v := range actual {
 		if expected[k] != v {
-			t.Error("actual", v, "for key", k, "does not match expected", expected[k])
+			t.Error("actual", `"`+v+`"`, "for key", `"`+k+`"`, "does not match expected", `"`+expected[k]+`"`)
 			t.FailNow()
 		}
 	}

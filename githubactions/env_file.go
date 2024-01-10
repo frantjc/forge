@@ -9,18 +9,24 @@ import (
 )
 
 var (
-	valueDelimiter  = `ghadelimiter_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`
+	valueDelimiter  = `ghadelimiter_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`
 	valueDelimiterR = regexp.MustCompile(valueDelimiter)
 
 	keyDelimiter  = `(\w+)<<` + valueDelimiter
 	keyDelimiterR = regexp.MustCompile(keyDelimiter)
+
+	oldValueDelimiter  = `_GitHubActionsFileCommandDelimeter_`
+	oldValueDelimiterR = regexp.MustCompile(oldValueDelimiter)
+
+	oldKeyDelimiter  = `(\w+)<<` + oldValueDelimiter
+	oldKeyDelimiterR = regexp.MustCompile(oldKeyDelimiter)
 )
 
 // ParseEnvFile reads a GitHub Actions environment file e.g.
 //
 //		KEY1=value1
 //		# SKIPPED=comment
-//	 KEY2<<ghadelimiter_CC992248-87BA-41AF-BF33-A52DCE9681A6
+//	 	KEY2<<ghadelimiter_CC992248-87BA-41AF-BF33-A52DCE9681A6
 //		value2 # For some security reason(s), @actions/core writes to the environment this way.
 //		ghadelimiter_CC992248-87BA-41AF-BF33-A52DCE9681A6
 func ParseEnvFile(r io.Reader) (map[string]string, error) {
@@ -38,6 +44,19 @@ func ParseEnvFile(r io.Reader) (map[string]string, error) {
 				if scanner.Scan() {
 					line2 := scanner.Text()
 					if valueDelimiterR.MatchString(line2) {
+						values[matches[1]] = strings.SplitN(line1, " #", 2)[0]
+						continue
+					}
+				}
+			}
+
+			return nil, fmt.Errorf("invalid multiline environment file entry")
+		} else if matches := oldKeyDelimiterR.FindStringSubmatch(line0); len(matches) == 2 {
+			if scanner.Scan() {
+				line1 := scanner.Text()
+				if scanner.Scan() {
+					line2 := scanner.Text()
+					if oldValueDelimiterR.MatchString(line2) {
 						values[matches[1]] = strings.SplitN(line1, " #", 2)[0]
 						continue
 					}
