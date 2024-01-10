@@ -16,10 +16,7 @@ func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubact
 }
 
 func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]forge.ContainerConfig, error) {
-	var (
-		_                = forge.NewLogger()
-		containerConfigs = []forge.ContainerConfig{}
-	)
+	containerConfigs := []forge.ContainerConfig{}
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	if actionMetadata != nil {
