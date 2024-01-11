@@ -101,6 +101,10 @@ func (w *WorkflowCommandWriter) IssueCommand(wc *WorkflowCommand) (int, error) {
 }
 
 func (w *WorkflowCommandWriter) Write(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+
 	scanner := bufio.NewScanner(bytes.NewReader(p))
 
 	for scanner.Scan() {
@@ -119,10 +123,10 @@ func (w *WorkflowCommandWriter) Write(p []byte) (int, error) {
 
 		if len(b) > 0 {
 			b = append(b, '\n')
-		}
 
-		if n, err := w.Out.Write(b); err != nil {
-			return n, err
+			if n, err := w.Out.Write(b); err != nil {
+				return n, err
+			}
 		}
 	}
 
