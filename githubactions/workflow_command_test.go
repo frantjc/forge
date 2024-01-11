@@ -21,7 +21,7 @@ func TestWorkflowCommandToString(t *testing.T) {
 	)
 
 	if actual != expected {
-		t.Error("actual", actual, "does not match expected", expected)
+		t.Error("actual", `"`+actual+`"`, "does not match expected", `"`+expected+`"`)
 		t.FailNow()
 	}
 }

@@ -18,7 +18,7 @@ func TestMapFromArr(t *testing.T) {
 
 	for k, v := range actual {
 		if expected[k] != v {
-			t.Error("key", k, "actual value", v, "does not equal expected value", expected[k])
+			t.Error("key", `"`+k+`"`, "actual value", `"`+v+`"`, "does not equal expected value", `"`+expected[k]+`"`)
 			t.FailNow()
 		}
 	}
@@ -35,7 +35,7 @@ func TestToMap(t *testing.T) {
 
 	for k, v := range actual {
 		if expected[k] != v {
-			t.Error("key", k, "actual value", v, "does not equal expected value", expected[k])
+			t.Error("key", `"`+k+`"`, "actual value", `"`+v+`"`, "does not equal expected value", `"`+expected[k]+`"`)
 			t.FailNow()
 		}
 	}
@@ -62,7 +62,7 @@ func TestArrFromMap(t *testing.T) {
 		}
 
 		if !contains {
-			t.Error("actual contains", a, "but expected", expected, "does not")
+			t.Error("actual contains", `"`+a+`"`, "but expected", expected, "does not")
 			t.FailNow()
 		}
 	}
