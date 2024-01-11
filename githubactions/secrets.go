@@ -1,10 +1,16 @@
 package githubactions
 
 const (
-	SecretActionsStepDebug        = "ACTIONS_STEP_DEBUG"
-	SecretActionsStepDebugValue   = "true"
-	SecretActionsRunnerDebug      = "ACTIONS_RUNNER_DEBUG"
+	// SecretActionsStepDebug--see https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging.
+	SecretActionsStepDebug = "ACTIONS_STEP_DEBUG"
+	// SecretActionsStepDebugValue--see SecretActionsStepDebug.
+	SecretActionsStepDebugValue = "true"
+	// SecretActionsRunnerDebug--see https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging.
+	SecretActionsRunnerDebug = "ACTIONS_RUNNER_DEBUG"
+	// SecretActionsRunnerDebugValue--see SecretActionsRunnerDebug.
 	SecretActionsRunnerDebugValue = SecretActionsStepDebugValue
-	SecretRunnerDebug             = "RUNNER_DEBUG"
-	SecretRunnerDebugValue        = "1"
+	// SecretRunnerDebug--see https://github.com/actions/toolkit/blob/master/packages/core/src/core.ts#L118-L123.
+	SecretRunnerDebug = "RUNNER_DEBUG"
+	// SecretRunnerDebugValue--see SecretRunnerDebug.
+	SecretRunnerDebugValue = "1"
 )
