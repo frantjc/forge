@@ -8,9 +8,9 @@ import (
 
 func TestParseCommandNoParams(t *testing.T) {
 	var (
-		command  = "::debug::hello there"
+		command  = "::" + githubactions.CommandDebug + "::hello there"
 		expected = &githubactions.WorkflowCommand{
-			Command:    "debug",
+			Command:    githubactions.CommandDebug,
 			Parameters: map[string]string{},
 			Value:      "hello there",
 		}
@@ -22,16 +22,16 @@ func TestParseCommandNoParams(t *testing.T) {
 	}
 
 	if expected.String() != actual.String() {
-		t.Error("actual", actual, "does not equal expected", expected)
+		t.Error("actual", `"`+actual.String()+`"`, "does not equal expected", `"`+expected.String()+`"`)
 		t.FailNow()
 	}
 }
 
 func TestParseCommandOneParam(t *testing.T) {
 	var (
-		command  = "::save-state name=isPost::true"
+		command  = "::" + githubactions.CommandSaveState + " name=isPost::true"
 		expected = &githubactions.WorkflowCommand{
-			Command: "save-state",
+			Command: githubactions.CommandSaveState,
 			Parameters: map[string]string{
 				"name": "isPost",
 			},
@@ -45,16 +45,16 @@ func TestParseCommandOneParam(t *testing.T) {
 	}
 
 	if expected.String() != actual.String() {
-		t.Error("actual", actual, "does not equal expected", expected)
+		t.Error("actual", `"`+actual.String()+`"`, "does not equal expected", `"`+expected.String()+`"`)
 		t.FailNow()
 	}
 }
 
 func TestParseCommandManyParams(t *testing.T) {
 	var (
-		command  = "::save-state name=isPost,otherParam=1::true"
+		command  = "::" + githubactions.CommandSaveState + " name=isPost,otherParam=1::true"
 		expected = &githubactions.WorkflowCommand{
-			Command: "save-state",
+			Command: githubactions.CommandSaveState,
 			Parameters: map[string]string{
 				"name":       "isPost",
 				"otherParam": "1",
@@ -69,20 +69,19 @@ func TestParseCommandManyParams(t *testing.T) {
 	}
 
 	if expected.String() != actual.String() {
-		t.Error("actual", actual, "does not equal expected", expected)
+		t.Error("actual", `"`+actual.String()+`"`, "does not equal expected", `"`+expected.String()+`"`)
 		t.FailNow()
 	}
 }
 
 func TestParseCommandNoValue(t *testing.T) {
 	var (
-		command  = "::save-state name=isPost::"
+		command  = "::" + githubactions.CommandSaveState + " name=isPost::"
 		expected = &githubactions.WorkflowCommand{
-			Command: "save-state",
+			Command: githubactions.CommandSaveState,
 			Parameters: map[string]string{
 				"name": "isPost",
 			},
-			Value: "",
 		}
 		actual, err = githubactions.ParseWorkflowCommandString(command)
 	)
@@ -92,7 +91,7 @@ func TestParseCommandNoValue(t *testing.T) {
 	}
 
 	if expected.String() != actual.String() {
-		t.Error("actual", actual, "does not equal expected", expected)
+		t.Error("actual", `"`+actual.String()+`"`, "does not equal expected", `"`+expected.String()+`"`)
 		t.FailNow()
 	}
 }

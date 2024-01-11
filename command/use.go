@@ -43,7 +43,8 @@ func NewUse() *cobra.Command {
 				}
 
 				if verbosity, _ := strconv.Atoi(cmd.Flag("verbose").Value.String()); verbosity > 0 {
-					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretDebugValue
+					globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretActionsDebugValue
+					globalContext.SecretsContext[githubactions.SecretRunnerDebug] = githubactions.SecretRunnerDebugValue
 				}
 
 				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolCache} {

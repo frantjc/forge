@@ -12,6 +12,7 @@ const (
 	CommandWarning      = "warning"
 	CommandError        = "error"
 	CommandAddMask      = "add-mask"
+	CommandAddPath      = "add-path"
 	CommandEcho         = "echo"
 	CommandStopCommands = "stop-commands"
 )
@@ -38,7 +39,7 @@ func ParseWorkflowCommandString(workflowCommand string) (*WorkflowCommand, error
 
 	if len(b) > 1 {
 		for _, p := range strings.Split(b[1], ",") {
-			if f := strings.Split(p, "="); len(f) > 0 {
+			if f := strings.Split(p, "="); len(f) > 1 {
 				params[f[0]] = f[1]
 			}
 		}
