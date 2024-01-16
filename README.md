@@ -74,7 +74,7 @@ forge use -a ./testdata/actions/dockerfile
 
 For Concourse Resources, Forge will source `resource_types` and `resources` from the working directory's [`.forge.yml`](.forge.yml) (overridable with `-c`). This schema is conveniently compatible with [Concourse's pipeline schema](https://concourse-ci.org/pipelines.html).
 
-> Just like Concourse itself, Forge ships with [some Resource Types builtin](concourse/builtin.go) that can be overridden
+> Just like Concourse itself, Forge ships with [some Resource Types builtin](concourse/builtin.go) that can be overridden.
 
 ```sh
 forge get mock -v version=v0.0.0
