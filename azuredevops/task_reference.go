@@ -38,6 +38,10 @@ func Parse(ref string) (*TaskReference, error) {
 		r.Path = filepath.Clean(ref)
 	case strings.HasPrefix(ref, "."):
 		r.Path = filepath.Clean(ref)
+
+		if r.Path != "." {
+			r.Path = "./" + r.Path
+		}
 	default:
 		spl := strings.Split(ref, "@")
 		if len(spl) != 2 {
@@ -46,10 +50,6 @@ func Parse(ref string) (*TaskReference, error) {
 
 		r.Path = filepath.Clean(spl[0])
 		r.Version = spl[1]
-	}
-
-	if r.Path != "." && !filepath.IsAbs(r.Path) {
-		r.Path = "./" + r.Path
 	}
 
 	return r, nil
