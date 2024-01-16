@@ -23,8 +23,6 @@ type Action struct {
 }
 
 func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
-	_ = forge.LoggerFrom(ctx)
-
 	uses, err := githubactions.Parse(o.Uses)
 	if err != nil {
 		return err

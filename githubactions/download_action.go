@@ -1,6 +1,7 @@
 package githubactions
 
 import (
+	"archive/tar"
 	"compress/gzip"
 	"context"
 	"fmt"
@@ -118,5 +119,5 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	// sha is guaranteed to be a 40 character string by the above regexp.
-	return metadata, xtar.Subdir(r, u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
+	return metadata, xtar.Subdir(tar.NewReader(r), u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
 }

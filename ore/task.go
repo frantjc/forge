@@ -18,8 +18,6 @@ type Task struct {
 }
 
 func (o *Task) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
-	_ = forge.LoggerFrom(ctx)
-
 	ref, err := azuredevops.Parse(o.Task)
 	if err != nil {
 		return err

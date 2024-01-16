@@ -60,6 +60,10 @@ jobs:
         run: forge use ./testdata/actions/node
       - name: Run forge use dockerfile
         run: forge use ./testdata/actions/dockerfile
+      - name: Run forge use .
+        run: |
+          cd ./testdata/actions/node
+          forge use .
       - name: Run forge check resource
         run: forge check mock -v version=v0.0.0
       - name: Run forge get resource

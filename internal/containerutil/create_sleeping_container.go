@@ -10,8 +10,6 @@ import (
 )
 
 func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
-	_ = forge.LoggerFrom(ctx)
-
 	container, err := containerRuntime.CreateContainer(ctx, image, &forge.ContainerConfig{
 		Entrypoint: bin.ShimSleepEntrypoint,
 		Mounts:     containerConfig.Mounts,

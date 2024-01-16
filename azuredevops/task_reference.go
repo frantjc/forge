@@ -14,7 +14,7 @@ type TaskReference struct {
 }
 
 func (r *TaskReference) IsLocal() bool {
-	return strings.HasPrefix(r.Path, "./") || filepath.IsAbs(r.Path) || len(strings.Split(r.Path, "/")) < 2
+	return strings.HasPrefix(r.Path, ".") || filepath.IsAbs(r.Path) || len(strings.Split(r.Path, "/")) < 2
 }
 
 func (r *TaskReference) IsRemote() bool {
@@ -36,8 +36,8 @@ func Parse(ref string) (*TaskReference, error) {
 	switch {
 	case strings.HasPrefix(ref, "/"):
 		r.Path = filepath.Clean(ref)
-	case strings.HasPrefix(ref, "./"), strings.HasPrefix(ref, "../"):
-		r.Path = "./" + filepath.Clean(ref)
+	case strings.HasPrefix(ref, "."):
+		r.Path = filepath.Clean(ref)
 	default:
 		spl := strings.Split(ref, "@")
 		if len(spl) != 2 {
@@ -46,6 +46,10 @@ func Parse(ref string) (*TaskReference, error) {
 
 		r.Path = filepath.Clean(spl[0])
 		r.Version = spl[1]
+	}
+
+	if r.Path != "." && !filepath.IsAbs(r.Path) {
+		r.Path = "./" + r.Path
 	}
 
 	return r, nil

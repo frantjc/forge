@@ -1,6 +1,7 @@
 package githubactions
 
 import (
+	"archive/tar"
 	"context"
 	"fmt"
 	"io"
@@ -8,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/frantjc/forge"
 	xtar "github.com/frantjc/x/archive/tar"
 )
 
@@ -18,7 +18,7 @@ type Uses struct {
 }
 
 func (u *Uses) IsLocal() bool {
-	return strings.HasPrefix(u.Path, "./") || filepath.IsAbs(u.Path) || len(strings.Split(u.Path, "/")) < 2
+	return strings.HasPrefix(u.Path, ".") || filepath.IsAbs(u.Path) || len(strings.Split(u.Path, "/")) < 2
 }
 
 func (u *Uses) IsRemote() bool {
@@ -71,8 +71,8 @@ func Parse(uses string) (*Uses, error) {
 	switch {
 	case strings.HasPrefix(uses, "/"):
 		r.Path = filepath.Clean(uses)
-	case strings.HasPrefix(uses, "./"), strings.HasPrefix(uses, "../"):
-		r.Path = "./" + filepath.Clean(uses)
+	case strings.HasPrefix(uses, "."):
+		r.Path = filepath.Clean(uses)
 	default:
 		spl := strings.Split(uses, "@")
 		if len(spl) != 2 {
@@ -83,6 +83,10 @@ func Parse(uses string) (*Uses, error) {
 		r.Version = spl[1]
 	}
 
+	if r.Path != "." && !filepath.IsAbs(r.Path) {
+		r.Path = "./" + r.Path
+	}
+
 	return r, nil
 }
 
@@ -91,8 +95,6 @@ func (u *Uses) MarshalJSON() ([]byte, error) {
 }
 
 func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
-	_ = forge.LoggerFrom(ctx)
-
 	if r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath())); err == nil {
 		return NewMetadataFromReader(r)
 	}
@@ -104,7 +106,7 @@ func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, er
 		}
 		defer rc.Close()
 
-		if err = xtar.Extract(rc, dir); err != nil {
+		if err = xtar.Extract(tar.NewReader(rc), dir); err != nil {
 			return nil, err
 		}
 

@@ -16,18 +16,13 @@ import (
 )
 
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
-	_ = forge.LoggerFrom(ctx)
-
 	// If the Docker daemon already has the image,
 	// don't bother loading it in again.
 	ii, _, err := d.ImageInspectWithRaw(ctx, image.Name())
 	if err != nil {
-		ilr, err := d.ImageLoad(ctx, image.Blob(), true)
-		if err != nil {
+		if ilr, err := d.ImageLoad(ctx, image.Blob(), true); err != nil {
 			return nil, err
-		}
-
-		if err = ilr.Body.Close(); err != nil {
+		} else if err = ilr.Body.Close(); err != nil {
 			return nil, err
 		}
 	}
@@ -65,8 +60,8 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	}
 
 	// Also because this is the Docker runtime...
-	// If we're on linux, mount the Docker CLI into the container since then executables on
-	// the host can also be used by the container because they have a common OS.
+	// If we're on linux, mount the Docker CLI into the container since then executables
+	// on the host can also be used by the container because they have a common OS.
 	if runtime.GOOS == "linux" {
 		docker, err := exec.LookPath("docker")
 		if errors.Is(err, exec.ErrDot) {
@@ -94,15 +89,15 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 				}
 			}
 
-			// findPATHAppendBinF iterates an env array searching for PATH.
+			// findPATHAppendBinFn iterates an env array searching for PATH.
 			// If it finds it, it appends it to containerConfig.Env with bin
 			// appended to the end and marks addedPath as true so we know to
 			// stop this absurd PATH hunt.
 			//
 			// Note that we append to the very end so that we don't override
 			// a Docker CLI that already exists on the PATH and cause unexpected
-			// behavior with our arguably over-the-top helpfulness here.
-			findPATHAppendBinF := func(env []string) {
+			// behavior with our arguably over the top helpfulness here.
+			findPATHAppendBinFn := func(env []string) {
 				for _, e := range env {
 					if strings.HasPrefix(e, "PATH=") {
 						containerConfig.Env = append(containerConfig.Env, e+":"+bin)
@@ -126,16 +121,16 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 				}
 
 				if ii.Config != nil {
-					findPATHAppendBinF(ii.Config.Env)
+					findPATHAppendBinFn(ii.Config.Env)
 				}
 
 				if !addedPath && ii.ContainerConfig != nil {
-					findPATHAppendBinF(ii.ContainerConfig.Env)
+					findPATHAppendBinFn(ii.ContainerConfig.Env)
 				}
 
 				if !addedPath {
 					if imageConfig, err := image.Config(); err == nil {
-						findPATHAppendBinF(imageConfig.Env)
+						findPATHAppendBinFn(imageConfig.Env)
 					}
 				}
 			}
