@@ -5,11 +5,10 @@ import (
 	"fmt"
 
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/spf13/cobra"
 )
 
-func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, forge.Container) {
+func hookAttach(cmd *cobra.Command, workingDir string, stdoutUsed ...bool) func(context.Context, forge.Container) {
 	return func(ctx context.Context, c forge.Container) {
 		var (
 			streams = commandStreams(cmd, stdoutUsed...)
@@ -22,20 +21,19 @@ func hookAttach(cmd *cobra.Command, stdoutUsed ...bool) func(context.Context, fo
 			return
 		}
 
-		_, err = c.Exec(
+		if _, err = c.Exec(
 			ctx,
 			&forge.ContainerConfig{
 				Entrypoint: []string{"bash"},
-				WorkingDir: containerfs.WorkingDir,
+				WorkingDir: workingDir,
 			},
 			streams,
-		)
-		if err != nil {
+		); err != nil {
 			_, _ = c.Exec(
 				ctx,
 				&forge.ContainerConfig{
 					Entrypoint: []string{"sh"},
-					WorkingDir: containerfs.WorkingDir,
+					WorkingDir: workingDir,
 				},
 				streams,
 			)

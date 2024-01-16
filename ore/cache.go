@@ -17,10 +17,7 @@ type Cache struct {
 }
 
 func (o *Cache) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
-	var (
-		_      = forge.LoggerFrom(ctx)
-		cached = true
-	)
+	cached := true
 
 	d, err := digestutil.JSON(o.Ore)
 	if err != nil {

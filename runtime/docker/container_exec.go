@@ -13,7 +13,6 @@ import (
 
 func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerConfig, streams *forge.Streams) (int, error) {
 	var (
-		_              = forge.LoggerFrom(ctx)
 		stdin          io.Reader
 		stdout, stderr io.Writer
 		tty            bool

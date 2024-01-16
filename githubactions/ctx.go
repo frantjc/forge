@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/envconv"
 	xslice "github.com/frantjc/x/slice"
 	"github.com/go-git/go-git/v5"
@@ -380,9 +379,8 @@ const (
 // NewGlobalContextFromEnv returns a *GlobalContext whose values
 // are sourced from the git repository at the given path, the environment
 // and some sensible defaults.
-func NewGlobalContextFromPath(ctx context.Context, path string) (*GlobalContext, error) {
+func NewGlobalContextFromPath(path string) (*GlobalContext, error) {
 	var (
-		_             = forge.LoggerFrom(ctx)
 		c             = NewGlobalContextFromEnv()
 		currentBranch = DefaultBranch
 		currentRemote = DefaultRemote

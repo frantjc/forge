@@ -106,6 +106,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 						Cmd:        append([]string{s}, cmd...),
 						Env:        env,
 						Mounts:     mounts,
+						WorkingDir: m.Workspace,
 					})
 				}
 			}

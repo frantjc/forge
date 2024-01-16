@@ -10,7 +10,6 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/frantjc/forge"
 	xtar "github.com/frantjc/x/archive/tar"
 	"github.com/google/go-github/v50/github"
 )
@@ -23,7 +22,6 @@ var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
 // and a tarball of the GitHub Action repository.
 func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, error) {
 	var (
-		_        = forge.LoggerFrom(ctx)
 		client   *github.Client
 		metadata *Metadata
 	)

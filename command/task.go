@@ -6,6 +6,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/forgeazure"
+	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
@@ -26,10 +27,7 @@ func NewTask() *cobra.Command {
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
-				var (
-					ctx = cmd.Context()
-					_   = forge.LoggerFrom(ctx)
-				)
+				ctx := cmd.Context()
 
 				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 				if err != nil {
@@ -37,7 +35,7 @@ func NewTask() *cobra.Command {
 				}
 
 				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd))
+					hooks.ContainerStarted.Listen(hookAttach(cmd, containerfs.WorkingDir))
 				}
 
 				t := &ore.Task{

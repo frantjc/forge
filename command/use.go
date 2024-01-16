@@ -32,12 +32,9 @@ func NewUse() *cobra.Command {
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
-				var (
-					ctx = cmd.Context()
-					_   = forge.LoggerFrom(ctx)
-				)
+				ctx := cmd.Context()
 
-				globalContext, err := githubactions.NewGlobalContextFromPath(ctx, workdir)
+				globalContext, err := githubactions.NewGlobalContextFromPath(workdir)
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
@@ -60,7 +57,7 @@ func NewUse() *cobra.Command {
 				}
 
 				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd))
+					hooks.ContainerStarted.Listen(hookAttach(cmd, forgeactions.DefaultMapping.Workspace))
 				}
 
 				a := &ore.Action{

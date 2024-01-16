@@ -14,7 +14,6 @@ import (
 
 func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error) {
 	var (
-		_              = forge.LoggerFrom(ctx)
 		stdin          io.Reader
 		stdout, stderr io.Writer
 		detachKeys     string

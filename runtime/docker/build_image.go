@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/idtools"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/frantjc/forge"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
@@ -42,6 +43,14 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dir, reference s
 		Remove:     true,
 	})
 	if err != nil {
+		return nil, err
+	}
+
+	if err := jsonmessage.DisplayJSONMessagesStream(ibr.Body, io.Discard, 0, false, nil); err != nil {
+		if jerr, ok := err.(*jsonmessage.JSONError); ok {
+			return nil, jerr
+		}
+
 		return nil, err
 	}
 

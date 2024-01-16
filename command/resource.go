@@ -10,6 +10,7 @@ import (
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/forgeconcourse"
+	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/ore"
@@ -34,7 +35,6 @@ func newResource(method string) *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx      = cmd.Context()
-					_        = forge.LoggerFrom(ctx)
 					name     = args[0]
 					pipeline = &concourse.Pipeline{}
 					file     io.Reader
@@ -86,7 +86,7 @@ func newResource(method string) *cobra.Command {
 				}
 
 				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd))
+					hooks.ContainerStarted.Listen(hookAttach(cmd, containerfs.WorkingDir))
 				}
 
 				var o forge.Ore = cr

@@ -17,10 +17,7 @@ func SetGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 }
 
 func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubactions.GlobalContext, step string, container forge.Container) error {
-	var (
-		_    = forge.LoggerFrom(ctx)
-		errs []error
-	)
+	var errs []error
 	globalContext = m.ConfigureGlobalContext(globalContext)
 
 	rc, err := container.CopyFrom(ctx, m.GitHubPath)
