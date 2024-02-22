@@ -17,7 +17,7 @@ func NewForge() *cobra.Command {
 			Version:       forge.SemVer(),
 			SilenceErrors: true,
 			SilenceUsage:  true,
-			PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 				cmd.SetContext(
 					forge.WithLogger(cmd.Context(), forge.NewLogger().V(2-verbosity)),
 				)
