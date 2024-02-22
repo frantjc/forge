@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
@@ -30,7 +29,7 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 		detachKeys = streams.DetachKeys
 	}
 
-	hjr, err := c.ContainerAttach(ctx, c.ID, types.ContainerAttachOptions{
+	hjr, err := c.ContainerAttach(ctx, c.ID, container.AttachOptions{
 		Stream:     streams != nil,
 		Stdin:      stdin != nil,
 		Stdout:     stdout != nil,
@@ -78,7 +77,7 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 		}()
 	}
 
-	if err = c.ContainerStart(ctx, c.ID, types.ContainerStartOptions{}); err != nil {
+	if err = c.ContainerStart(ctx, c.ID, container.StartOptions{}); err != nil {
 		return -1, err
 	}
 

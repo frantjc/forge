@@ -124,10 +124,6 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 					findPATHAppendBinFn(ii.Config.Env)
 				}
 
-				if !addedPath && ii.ContainerConfig != nil {
-					findPATHAppendBinFn(ii.ContainerConfig.Env)
-				}
-
 				if !addedPath {
 					if imageConfig, err := image.Config(); err == nil {
 						findPATHAppendBinFn(imageConfig.Env)
