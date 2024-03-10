@@ -59,7 +59,7 @@ function run() {
             const put = core.getInput("put");
             const cwd = process.env.GITHUB_WORKSPACE;
             if (get && put) {
-                throw new Error("cannot use both `get` and `put`");
+                throw new Error("used both `get` and `put`");
             }
             const action = get ? "get" : "put";
             const resource = get || put;

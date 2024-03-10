@@ -108,7 +108,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
 		return nil, nil, err
 	} else if !matched {
-		return nil, nil, fmt.Errorf("unable to get action sha")
+		return nil, nil, fmt.Errorf("get action sha")
 	}
 
 	r, err := gzip.NewReader(res.Body)

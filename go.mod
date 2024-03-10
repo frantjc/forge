@@ -1,6 +1,6 @@
 module github.com/frantjc/forge
 
-go 1.21.4
+go 1.22.0
 
 require (
 	github.com/adrg/xdg v0.4.0
