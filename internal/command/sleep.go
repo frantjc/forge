@@ -51,4 +51,3 @@ func NewSleep() *cobra.Command {
 
 	return cmd
 }
-

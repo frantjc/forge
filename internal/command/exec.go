@@ -121,4 +121,3 @@ func NewExec() *cobra.Command {
 
 	return cmd
 }
-
