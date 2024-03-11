@@ -1,4 +1,4 @@
-name: Generate Shims
+name: Build Shims
 on:
   workflow_dispatch: {}
 permissions:
@@ -23,7 +23,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         env:
           COMMIT_MESSAGE: |
-            Update shims built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
+            Update internal/bin/shim_amd64 and internal/bin/shim_arm64 built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
         with:
           add-paths: |
             internal/bin/shim_amd64
