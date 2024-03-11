@@ -5,7 +5,7 @@ permissions:
   contents: write
   pull-requests: write
 jobs:
-  generate:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
-      - name: Run make generate
+      - name: Run make shim
         run: |
           make shim GOARCH=amd64
           make shim GOARCH=arm64
