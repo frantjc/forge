@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/adrg/xdg v0.4.0
-	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/docker v25.0.4+incompatible
 	github.com/frantjc/x v0.0.0-20240116053316-78497031a101
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/go-logr/logr v1.4.1
