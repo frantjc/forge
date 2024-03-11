@@ -23,7 +23,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         env:
           COMMIT_MESSAGE: |
-            Update internal/bin/shim_amd64 and internal/bin/shim_arm64 built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
+            Update [internal/bin/shim_*](internal/bin) built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
         with:
           add-paths: |
             internal/bin/shim_amd64
@@ -31,7 +31,7 @@ jobs:
           reviewers: |
             ${{ github.actor }}
           title: |
-            Build internal/bin/shim_amd64 and internal/bin/shim_arm64
+            Build internal/bin/shim_*
           commit-message: ${{ env.COMMIT_MESSAGE }}
           body: ${{ env.COMMIT_MESSAGE }}
           branch: github-actions/gen/internal/bin
