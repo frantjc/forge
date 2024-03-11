@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/frantjc/forge/command"
+	"github.com/frantjc/forge/internal/command"
 	xerrors "github.com/frantjc/x/errors"
 	xos "github.com/frantjc/x/os"
 )
