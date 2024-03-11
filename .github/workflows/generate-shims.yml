@@ -1,4 +1,4 @@
-name: Generate
+name: Generate Shims
 on:
   workflow_dispatch: {}
 permissions:
@@ -16,7 +16,6 @@ jobs:
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
-      - uses: golangci/golangci-lint-action@v4.0.0
       - name: Run make generate
         run: |
           make shim GOARCH=amd64
@@ -31,4 +30,4 @@ jobs:
           title: |
             Workflow generated shims
           body: |
-            Update shims built by GitHub Actions Workflow ${{ github.workflow }} run ${{ github.run_id }} for ${{ github.actor }} from commit ${{ github.sha }}.
+            Update shims built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.repositoryUrl }}/actions/${{ github.run_id }} for ${{ github.actor }} from commit ${{ github.sha }}.

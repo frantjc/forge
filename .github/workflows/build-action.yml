@@ -1,0 +1,37 @@
+name: Build Action
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/action/**
+      - .github/workflows/build-action.yml
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: .github/action/yarn.lock
+      - name: Run make action
+        run: |
+          cd .github/action
+          yarn
+          cd ../..
+          make action
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            .github/action
+          reviewers: |
+            ${{ github.actor }}
+          title: |
+            Workflow generated action
+          body: |
+            Update setup-forge built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.repositoryUrl }}/actions/${{ github.run_id }} for ${{ github.actor }} from commit ${{ github.sha }}.
