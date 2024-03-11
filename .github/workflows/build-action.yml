@@ -38,6 +38,6 @@ jobs:
             Build .github/action
           commit-message: ${{ env.COMMIT_MESSAGE }}
           body: ${{ env.COMMIT_MESSAGE }}
-          branch: github-actions/generated/github.com/frantjc/forge/.github/action
+          branch: github-actions/gen/.github/action
           delete-branch: true
           labels: github_actions

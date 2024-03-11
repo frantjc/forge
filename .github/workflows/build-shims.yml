@@ -34,6 +34,6 @@ jobs:
             Build internal/bin/shim_amd64 and internal/bin/shim_arm64
           commit-message: ${{ env.COMMIT_MESSAGE }}
           body: ${{ env.COMMIT_MESSAGE }}
-          branch: github-actions/generated/github.com/frantjc/forge/internal/bin/shims
+          branch: github-actions/gen/internal/bin
           delete-branch: true
           labels: go
