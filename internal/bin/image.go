@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	ShimPath            = filepath.Join(containerfs.WorkingDir, ShimName)
-	ShimEntrypoint      = []string{ShimPath}
-	ShimSleepEntrypoint = append(ShimEntrypoint, "sleep", "--wd", containerfs.WorkingDir)
+	ShimPath       = filepath.Join(containerfs.WorkingDir, ShimName)
+	ShimEntrypoint = []string{ShimPath}
 )

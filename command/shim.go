@@ -43,6 +43,8 @@ func NewShim() *cobra.Command {
 	return cmd
 }
 
+// NewSleep returns the command which acts as
+// the entrypoint for `shim sleep`.
 func NewSleep() *cobra.Command {
 	var (
 		workingdir string
@@ -56,7 +58,11 @@ func NewSleep() *cobra.Command {
 				ctx := cmd.Context()
 
 				if len(mounts) > 0 && workingdir != "" {
-					if lis, err := net.Listen("unix", filepath.Join(workingdir, "forge.sock")); err == nil {
+					forgeSock := filepath.Join(workingdir, "forge.sock")
+
+					if lis, err := net.Listen("unix", forgeSock); err == nil {
+						defer os.Remove(forgeSock)
+
 						if dockerHost := os.Getenv("DOCKER_HOST"); dockerHost != "" {
 							if dockerSock, err := url.Parse(dockerHost); err == nil {
 								return dind.NewProxy(ctx, mounts, lis, dockerSock)
@@ -79,6 +85,8 @@ func NewSleep() *cobra.Command {
 	return cmd
 }
 
+// NewExec returns the command which acts as
+// the entrypoint for `shim exec`.
 func NewExec() *cobra.Command {
 	var (
 		workingdir string
@@ -172,6 +180,8 @@ func NewExec() *cobra.Command {
 				if useForgeSock && !injectedDockerHost {
 					command.Env = append(command.Env, dockerHost)
 				}
+
+				// TODO: Wait on forge.sock to be ready.
 
 				return xos.NewExitCodeError(command.Run(), command.ProcessState.ExitCode())
 			},

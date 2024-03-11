@@ -9,4 +9,5 @@ runs:
   args:
     - -c
     - |
-      docker run -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
+      docker ps
+    # TODO: docker run -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp

@@ -28,7 +28,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 			}
 
 			var (
-				entrypoint = []string{bin.ShimPath, "exec", "--wd", containerfs.WorkingDir}
+				entrypoint = []string{bin.ShimPath, "exec", "--wd", containerfs.WorkingDir, "--"}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
 				cmd        = actionMetadata.Runs.Args
 				mounts     = []forge.Mount{

@@ -7,11 +7,12 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/bin"
+	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/hooks"
 )
 
 func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
-	entrypoint := bin.ShimSleepEntrypoint
+	entrypoint := []string{bin.ShimPath, "sleep", "-VV", "--wd", containerfs.WorkingDir}
 
 	for _, mount := range containerConfig.Mounts {
 		if mount.Source != "" && mount.Destination != "" {
