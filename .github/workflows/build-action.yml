@@ -26,6 +26,9 @@ jobs:
           cd ../..
           make action
       - uses: peter-evans/create-pull-request@v6
+        env:
+          COMMIT_MESSAGE: |
+            Update .github/action built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
         with:
           add-paths: |
             .github/action
@@ -33,9 +36,8 @@ jobs:
             ${{ github.actor }}
           title: |
             Build .github/action
-          commit-message: &body |
-            Update setup-forge built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
-          body: *body
+          commit-message: ${{ env.COMMIT_MESSAGE }}
+          body: ${{ env.COMMIT_MESSAGE }}
           branch: github-actions/generated/github.com/frantjc/forge/.github/action
           delete-branch: true
           labels: github_actions
