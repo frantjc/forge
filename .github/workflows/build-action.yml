@@ -6,6 +6,8 @@ on:
     paths:
       - .github/action/**
       - .github/workflows/build-action.yml
+    paths-ignore:
+      - .github/action/dist/**
 permissions:
   contents: write
   pull-requests: write
