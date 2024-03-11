@@ -29,5 +29,9 @@ jobs:
             ${{ github.actor }}
           title: |
             Build internal/bin/shim_amd64 and internal/bin/shim_arm64
-          body: |
+          commit-message: &body |
             Update shims built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
+          body: *body
+          branch: github-actions/generated/github.com/frantjc/forge/internal/bin/shims
+          delete-branch: true
+          labels: go

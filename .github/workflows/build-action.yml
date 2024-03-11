@@ -33,5 +33,9 @@ jobs:
             ${{ github.actor }}
           title: |
             Build .github/action
-          body: |
+          commit-message: &body |
             Update setup-forge built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
+          body: *body
+          branch: github-actions/generated/github.com/frantjc/forge/.github/action
+          delete-branch: true
+          labels: github_actions
