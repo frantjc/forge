@@ -16,6 +16,9 @@ const (
 	// DefaultNode16ImageReference is the default image to use
 	// when an action specifies that it runs using "node16".
 	DefaultNode16ImageReference = "docker.io/library/node:16"
+	// DefaultNode16ImageReference is the default image to use
+	// when an action specifies that it runs using "node20".
+	DefaultNode20ImageReference = "docker.io/library/node:20"
 )
 
 var (
@@ -27,6 +30,10 @@ var (
 	// when an action specifies that it runs using "node16".
 	// var so as to be overridable.
 	Node16ImageReference = DefaultNode16ImageReference
+	// Node16ImageReference is the image to use when an action
+	// when an action specifies that it runs using "node20".
+	// var so as to be overridable.
+	Node20ImageReference = DefaultNode16ImageReference
 )
 
 // GetImageForMetadata is a re-export of DefaultMapping.GetImageForMetadata
@@ -89,6 +96,8 @@ func MetadataToImageReference(actionMetadata *githubactions.Metadata) string {
 		return Node12ImageReference
 	case githubactions.RunsUsingNode16:
 		return Node16ImageReference
+	case githubactions.RunsUsingNode20:
+		return Node20ImageReference
 	case githubactions.RunsUsingDocker:
 		if strings.HasPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix) {
 			return strings.TrimPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix)

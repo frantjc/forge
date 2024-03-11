@@ -9,5 +9,5 @@ import (
 var (
 	ShimPath            = filepath.Join(containerfs.WorkingDir, ShimName)
 	ShimEntrypoint      = []string{ShimPath}
-	ShimSleepEntrypoint = append(ShimEntrypoint, "-s")
+	ShimSleepEntrypoint = append(ShimEntrypoint, "sleep", "--wd", containerfs.WorkingDir)
 )

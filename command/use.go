@@ -125,6 +125,7 @@ func NewUse() *cobra.Command {
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
 	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
 	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")
+	cmd.Flags().StringVar(&forgeactions.Node20ImageReference, "node20-image", forgeactions.DefaultNode20ImageReference, "node20 image")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 

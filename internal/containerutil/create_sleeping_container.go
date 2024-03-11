@@ -2,6 +2,7 @@ package containerutil
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	"github.com/frantjc/forge"
@@ -10,8 +11,18 @@ import (
 )
 
 func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
+	entrypoint := bin.ShimSleepEntrypoint
+
+	for _, mount := range containerConfig.Mounts {
+		if mount.Source != "" && mount.Destination != "" {
+			entrypoint = append(entrypoint,
+				fmt.Sprintf("--mount=%s=%s", mount.Source, mount.Destination),
+			)
+		}
+	}
+
 	container, err := containerRuntime.CreateContainer(ctx, image, &forge.ContainerConfig{
-		Entrypoint: bin.ShimSleepEntrypoint,
+		Entrypoint: entrypoint,
 		Mounts:     containerConfig.Mounts,
 		Env:        containerConfig.Env,
 	})

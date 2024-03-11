@@ -26,5 +26,5 @@ inputs:
     description: |
       Config file to use.
 runs:
-  using: node16
+  using: node20
   main: .github/action/dist/index.js

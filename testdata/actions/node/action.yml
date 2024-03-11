@@ -3,5 +3,5 @@ description: |
   Test action
 author: frantjc
 runs:
-  using: node16
+  using: node20
   main: main.js

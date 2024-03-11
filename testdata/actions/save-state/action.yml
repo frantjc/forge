@@ -3,6 +3,6 @@ description: |
   Save State action
 author: frantjc
 runs:
-  using: node16
+  using: node20
   pre: pre.js
   main: main.js

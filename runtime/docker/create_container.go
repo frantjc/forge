@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -49,14 +50,14 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 
 	// Because this is the Docker runtime...
 	// Mount the Docker daemon into the container for use by the process inside the container.
-	if addr != "" {
+	if strings.HasPrefix(addr, "unix://") {
 		sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
 		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 			Source: strings.TrimPrefix(addr, "unix://"),
 			Target: sock,
 			Type:   mount.TypeBind,
 		})
-		containerConfig.Env = append(containerConfig.Env, "DOCKER_HOST=unix://"+sock)
+		containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("DOCKER_HOST=unix://%s", sock))
 	}
 
 	// Also because this is the Docker runtime...
@@ -83,7 +84,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 			// If there already is a PATH, add to it.
 			for i, e := range containerConfig.Env {
 				if strings.HasPrefix(e, "PATH=") {
-					containerConfig.Env[i] = e + ":" + bin
+					containerConfig.Env[i] = fmt.Sprintf("%s:%s", e, bin)
 					addedPath = true
 					break
 				}
@@ -100,7 +101,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 			findPATHAppendBinFn := func(env []string) {
 				for _, e := range env {
 					if strings.HasPrefix(e, "PATH=") {
-						containerConfig.Env = append(containerConfig.Env, e+":"+bin)
+						containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s:%s", e, bin))
 						addedPath = true
 						break
 					}
@@ -134,7 +135,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 			// If we still didn't find the PATH on the imageConfig to modify,
 			// we just add PATH ourselves.
 			if !addedPath {
-				containerConfig.Env = append(containerConfig.Env, "PATH="+bin)
+				containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("PATH=%s", bin))
 			}
 		}
 	}

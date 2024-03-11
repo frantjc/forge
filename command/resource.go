@@ -118,7 +118,7 @@ func newResource(method string) *cobra.Command {
 	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
-	_ = cmd.MarkFlagFilename("conf", "yaml", "yml", "json")
+	_ = cmd.MarkFlagFilename("conf", ".yaml", ".yml", ".json")
 	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for resource")
 	_ = cmd.MarkFlagDirname("workdir")
 

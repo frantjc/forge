@@ -1,0 +1,34 @@
+name: Generate
+on:
+  workflow_dispatch: {}
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: .github/action/yarn.lock
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: ${{ github.ref_name == 'main' }}
+      - uses: crazy-max/ghaction-upx@v3
+        with:
+          install-only: true
+      - uses: golangci/golangci-lint-action@v4.0.0
+      - run: |
+          make generate
+      - name: Run git config
+        run: |
+          git config --global user.email "$GIT_USER"
+          git config --global user.name "$GIT_USER"
+        env:
+          GIT_USER: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+      - name: Run git push
+        run: |
+          git add .
+          git commit -m "generate"
+          git push

@@ -9,6 +9,7 @@ import (
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/bin"
+	"github.com/frantjc/forge/internal/containerfs"
 )
 
 func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]forge.ContainerConfig, error) {
@@ -27,7 +28,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 			}
 
 			var (
-				entrypoint = []string{bin.ShimPath, "-e"}
+				entrypoint = []string{bin.ShimPath, "exec", "--wd", containerfs.WorkingDir}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
 				cmd        = actionMetadata.Runs.Args
 				mounts     = []forge.Mount{
@@ -49,7 +50,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 			)
 
 			switch actionMetadata.Runs.Using {
-			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16:
+			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16, githubactions.RunsUsingNode20:
 				entrypoint = append(entrypoint, "node")
 				if pre := actionMetadata.Runs.Pre; pre != "" {
 					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, pre))

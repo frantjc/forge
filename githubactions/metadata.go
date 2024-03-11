@@ -15,6 +15,7 @@ const (
 	RunsUsingComposite         = "composite"
 	RunsUsingNode12            = "node12"
 	RunsUsingNode16            = "node16"
+	RunsUsingNode20            = "node20"
 )
 
 var ErrMissingRequiredInput = errors.New("required input missing")

@@ -1,0 +1,12 @@
+name: Test
+description: |
+  Test action
+author: frantjc
+runs:
+  using: docker
+  image: Dockerfile
+  entrypoint: sh
+  args:
+    - -c
+    - |
+      docker run -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
