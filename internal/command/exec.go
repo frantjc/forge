@@ -2,83 +2,19 @@ package command
 
 import (
 	"fmt"
-	"net"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 
-	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
-	"github.com/frantjc/forge/internal/dind"
 	xos "github.com/frantjc/x/os"
 	"github.com/spf13/cobra"
 )
 
-// NewShim returns the command which acts as
-// the entrypoint for `shim`.
-func NewShim() *cobra.Command {
-	var (
-		verbosity int
-		cmd       = &cobra.Command{
-			Use:           "shim",
-			Version:       forge.SemVer(),
-			SilenceErrors: true,
-			SilenceUsage:  true,
-			PersistentPreRun: func(cmd *cobra.Command, _ []string) {
-				cmd.SetContext(
-					forge.WithLogger(cmd.Context(), forge.NewLogger().V(2-verbosity)),
-				)
-			},
-		}
-	)
-
-	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
-	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
-	cmd.AddCommand(NewSleep(), NewExec())
-
-	return cmd
-}
-
-func NewSleep() *cobra.Command {
-	var (
-		workingdir string
-		mounts     map[string]string
-		cmd        = &cobra.Command{
-			Use:           "sleep",
-			Short:         "Sleep until signalled",
-			SilenceErrors: true,
-			SilenceUsage:  true,
-			RunE: func(cmd *cobra.Command, _ []string) error {
-				ctx := cmd.Context()
-
-				if len(mounts) > 0 && workingdir != "" {
-					if lis, err := net.Listen("unix", filepath.Join(workingdir, "forge.sock")); err == nil {
-						if dockerHost := os.Getenv("DOCKER_HOST"); dockerHost != "" {
-							if dockerSock, err := url.Parse(dockerHost); err == nil {
-								return dind.NewProxy(ctx, mounts, lis, dockerSock)
-							}
-						}
-					}
-				}
-
-				<-ctx.Done()
-
-				return ctx.Err()
-			},
-		}
-	)
-
-	cmd.Flags().StringToStringVar(&mounts, "mount", nil, "mounts for forge")
-	cmd.Flags().StringVar(&workingdir, "wd", "", "working directory for forge")
-	_ = cmd.MarkFlagDirname("wd")
-
-	return cmd
-}
-
+// NewExec returns the command which acts as
+// the entrypoint for `shim exec`.
 func NewExec() *cobra.Command {
 	var (
 		workingdir string
@@ -172,6 +108,8 @@ func NewExec() *cobra.Command {
 				if useForgeSock && !injectedDockerHost {
 					command.Env = append(command.Env, dockerHost)
 				}
+
+				// TODO: Wait on forge.sock to be ready.
 
 				return xos.NewExitCodeError(command.Run(), command.ProcessState.ExitCode())
 			},

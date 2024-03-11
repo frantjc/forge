@@ -140,8 +140,12 @@ function run() {
             }
         }
         catch (err) {
-            if (typeof err === "string" || err instanceof Error)
+            if (typeof err === "string" || err instanceof Error) {
                 core.setFailed(err);
+            }
+            else {
+                core.setFailed(`caught unknown error ${err}`);
+            }
         }
     });
 }
@@ -707,7 +711,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.message}`);
+        Error Message: ${error.result.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -3838,7 +3842,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports._readLinuxVersionFile = exports._getOsVersion = exports._findMatch = void 0;
-const semver = __importStar(__nccwpck_require__(562));
+const semver = __importStar(__nccwpck_require__(5911));
 const core_1 = __nccwpck_require__(2186);
 // needs to be require for core node modules to be mocked
 /* eslint @typescript-eslint/no-require-imports: 0 */
@@ -4073,7 +4077,7 @@ const mm = __importStar(__nccwpck_require__(2473));
 const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
 const httpm = __importStar(__nccwpck_require__(6255));
-const semver = __importStar(__nccwpck_require__(562));
+const semver = __importStar(__nccwpck_require__(5911));
 const stream = __importStar(__nccwpck_require__(2781));
 const util = __importStar(__nccwpck_require__(3837));
 const assert_1 = __nccwpck_require__(9491);
@@ -4700,7 +4704,7 @@ function _unique(values) {
 
 /***/ }),
 
-/***/ 562:
+/***/ 5911:
 /***/ ((module, exports) => {
 
 exports = module.exports = SemVer
@@ -4731,42 +4735,14 @@ var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
 // Max safe segment length for coercion.
 var MAX_SAFE_COMPONENT_LENGTH = 16
 
-var MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6
-
 // The actual regexps go on exports.re
 var re = exports.re = []
-var safeRe = exports.safeRe = []
 var src = exports.src = []
 var t = exports.tokens = {}
 var R = 0
 
 function tok (n) {
   t[n] = R++
-}
-
-var LETTERDASHNUMBER = '[a-zA-Z0-9-]'
-
-// Replace some greedy regex tokens to prevent regex dos issues. These regex are
-// used internally via the safeRe object since all inputs in this library get
-// normalized first to trim and collapse all extra whitespace. The original
-// regexes are exported for userland consumption and lower level usage. A
-// future breaking change could export the safer regex only with a note that
-// all input should have extra whitespace removed.
-var safeRegexReplacements = [
-  ['\\s', 1],
-  ['\\d', MAX_LENGTH],
-  [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH],
-]
-
-function makeSafeRe (value) {
-  for (var i = 0; i < safeRegexReplacements.length; i++) {
-    var token = safeRegexReplacements[i][0]
-    var max = safeRegexReplacements[i][1]
-    value = value
-      .split(token + '*').join(token + '{0,' + max + '}')
-      .split(token + '+').join(token + '{1,' + max + '}')
-  }
-  return value
 }
 
 // The following Regular Expressions can be used for tokenizing,
@@ -4778,14 +4754,14 @@ function makeSafeRe (value) {
 tok('NUMERICIDENTIFIER')
 src[t.NUMERICIDENTIFIER] = '0|[1-9]\\d*'
 tok('NUMERICIDENTIFIERLOOSE')
-src[t.NUMERICIDENTIFIERLOOSE] = '\\d+'
+src[t.NUMERICIDENTIFIERLOOSE] = '[0-9]+'
 
 // ## Non-numeric Identifier
 // Zero or more digits, followed by a letter or hyphen, and then zero or
 // more letters, digits, or hyphens.
 
 tok('NONNUMERICIDENTIFIER')
-src[t.NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-]' + LETTERDASHNUMBER + '*'
+src[t.NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*'
 
 // ## Main Version
 // Three dot-separated numeric identifiers.
@@ -4827,7 +4803,7 @@ src[t.PRERELEASELOOSE] = '(?:-?(' + src[t.PRERELEASEIDENTIFIERLOOSE] +
 // Any combination of digits, letters, or hyphens.
 
 tok('BUILDIDENTIFIER')
-src[t.BUILDIDENTIFIER] = LETTERDASHNUMBER + '+'
+src[t.BUILDIDENTIFIER] = '[0-9A-Za-z-]+'
 
 // ## Build Metadata
 // Plus sign, followed by one or more period-separated build metadata
@@ -4907,7 +4883,6 @@ src[t.COERCE] = '(^|[^\\d])' +
               '(?:$|[^\\d])'
 tok('COERCERTL')
 re[t.COERCERTL] = new RegExp(src[t.COERCE], 'g')
-safeRe[t.COERCERTL] = new RegExp(makeSafeRe(src[t.COERCE]), 'g')
 
 // Tilde ranges.
 // Meaning is "reasonably at or greater than"
@@ -4917,7 +4892,6 @@ src[t.LONETILDE] = '(?:~>?)'
 tok('TILDETRIM')
 src[t.TILDETRIM] = '(\\s*)' + src[t.LONETILDE] + '\\s+'
 re[t.TILDETRIM] = new RegExp(src[t.TILDETRIM], 'g')
-safeRe[t.TILDETRIM] = new RegExp(makeSafeRe(src[t.TILDETRIM]), 'g')
 var tildeTrimReplace = '$1~'
 
 tok('TILDE')
@@ -4933,7 +4907,6 @@ src[t.LONECARET] = '(?:\\^)'
 tok('CARETTRIM')
 src[t.CARETTRIM] = '(\\s*)' + src[t.LONECARET] + '\\s+'
 re[t.CARETTRIM] = new RegExp(src[t.CARETTRIM], 'g')
-safeRe[t.CARETTRIM] = new RegExp(makeSafeRe(src[t.CARETTRIM]), 'g')
 var caretTrimReplace = '$1^'
 
 tok('CARET')
@@ -4955,7 +4928,6 @@ src[t.COMPARATORTRIM] = '(\\s*)' + src[t.GTLT] +
 
 // this one has to use the /g flag
 re[t.COMPARATORTRIM] = new RegExp(src[t.COMPARATORTRIM], 'g')
-safeRe[t.COMPARATORTRIM] = new RegExp(makeSafeRe(src[t.COMPARATORTRIM]), 'g')
 var comparatorTrimReplace = '$1$2$3'
 
 // Something like `1.2.3 - 1.2.4`
@@ -4984,14 +4956,6 @@ for (var i = 0; i < R; i++) {
   debug(i, src[i])
   if (!re[i]) {
     re[i] = new RegExp(src[i])
-
-    // Replace all greedy whitespace to prevent regex dos issues. These regex are
-    // used internally via the safeRe object since all inputs in this library get
-    // normalized first to trim and collapse all extra whitespace. The original
-    // regexes are exported for userland consumption and lower level usage. A
-    // future breaking change could export the safer regex only with a note that
-    // all input should have extra whitespace removed.
-    safeRe[i] = new RegExp(makeSafeRe(src[i]))
   }
 }
 
@@ -5016,7 +4980,7 @@ function parse (version, options) {
     return null
   }
 
-  var r = options.loose ? safeRe[t.LOOSE] : safeRe[t.FULL]
+  var r = options.loose ? re[t.LOOSE] : re[t.FULL]
   if (!r.test(version)) {
     return null
   }
@@ -5071,7 +5035,7 @@ function SemVer (version, options) {
   this.options = options
   this.loose = !!options.loose
 
-  var m = version.trim().match(options.loose ? safeRe[t.LOOSE] : safeRe[t.FULL])
+  var m = version.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL])
 
   if (!m) {
     throw new TypeError('Invalid Version: ' + version)
@@ -5516,7 +5480,6 @@ function Comparator (comp, options) {
     return new Comparator(comp, options)
   }
 
-  comp = comp.trim().split(/\s+/).join(' ')
   debug('comparator', comp, options)
   this.options = options
   this.loose = !!options.loose
@@ -5533,7 +5496,7 @@ function Comparator (comp, options) {
 
 var ANY = {}
 Comparator.prototype.parse = function (comp) {
-  var r = this.options.loose ? safeRe[t.COMPARATORLOOSE] : safeRe[t.COMPARATOR]
+  var r = this.options.loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR]
   var m = comp.match(r)
 
   if (!m) {
@@ -5657,16 +5620,9 @@ function Range (range, options) {
   this.loose = !!options.loose
   this.includePrerelease = !!options.includePrerelease
 
-  // First reduce all whitespace as much as possible so we do not have to rely
-  // on potentially slow regexes like \s*. This is then stored and used for
-  // future error messages as well.
-  this.raw = range
-    .trim()
-    .split(/\s+/)
-    .join(' ')
-
   // First, split based on boolean or ||
-  this.set = this.raw.split('||').map(function (range) {
+  this.raw = range
+  this.set = range.split(/\s*\|\|\s*/).map(function (range) {
     return this.parseRange(range.trim())
   }, this).filter(function (c) {
     // throw out any that are not relevant for whatever reason
@@ -5674,7 +5630,7 @@ function Range (range, options) {
   })
 
   if (!this.set.length) {
-    throw new TypeError('Invalid SemVer Range: ' + this.raw)
+    throw new TypeError('Invalid SemVer Range: ' + range)
   }
 
   this.format()
@@ -5693,19 +5649,20 @@ Range.prototype.toString = function () {
 
 Range.prototype.parseRange = function (range) {
   var loose = this.options.loose
+  range = range.trim()
   // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
-  var hr = loose ? safeRe[t.HYPHENRANGELOOSE] : safeRe[t.HYPHENRANGE]
+  var hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE]
   range = range.replace(hr, hyphenReplace)
   debug('hyphen replace', range)
   // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
-  range = range.replace(safeRe[t.COMPARATORTRIM], comparatorTrimReplace)
-  debug('comparator trim', range, safeRe[t.COMPARATORTRIM])
+  range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace)
+  debug('comparator trim', range, re[t.COMPARATORTRIM])
 
   // `~ 1.2.3` => `~1.2.3`
-  range = range.replace(safeRe[t.TILDETRIM], tildeTrimReplace)
+  range = range.replace(re[t.TILDETRIM], tildeTrimReplace)
 
   // `^ 1.2.3` => `^1.2.3`
-  range = range.replace(safeRe[t.CARETTRIM], caretTrimReplace)
+  range = range.replace(re[t.CARETTRIM], caretTrimReplace)
 
   // normalize spaces
   range = range.split(/\s+/).join(' ')
@@ -5713,7 +5670,7 @@ Range.prototype.parseRange = function (range) {
   // At this point, the range is completely trimmed and
   // ready to be split into comparators.
 
-  var compRe = loose ? safeRe[t.COMPARATORLOOSE] : safeRe[t.COMPARATOR]
+  var compRe = loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR]
   var set = range.split(' ').map(function (comp) {
     return parseComparator(comp, this.options)
   }, this).join(' ').split(/\s+/)
@@ -5813,7 +5770,7 @@ function replaceTildes (comp, options) {
 }
 
 function replaceTilde (comp, options) {
-  var r = options.loose ? safeRe[t.TILDELOOSE] : safeRe[t.TILDE]
+  var r = options.loose ? re[t.TILDELOOSE] : re[t.TILDE]
   return comp.replace(r, function (_, M, m, p, pr) {
     debug('tilde', comp, _, M, m, p, pr)
     var ret
@@ -5854,7 +5811,7 @@ function replaceCarets (comp, options) {
 
 function replaceCaret (comp, options) {
   debug('caret', comp, options)
-  var r = options.loose ? safeRe[t.CARETLOOSE] : safeRe[t.CARET]
+  var r = options.loose ? re[t.CARETLOOSE] : re[t.CARET]
   return comp.replace(r, function (_, M, m, p, pr) {
     debug('caret', comp, _, M, m, p, pr)
     var ret
@@ -5913,7 +5870,7 @@ function replaceXRanges (comp, options) {
 
 function replaceXRange (comp, options) {
   comp = comp.trim()
-  var r = options.loose ? safeRe[t.XRANGELOOSE] : safeRe[t.XRANGE]
+  var r = options.loose ? re[t.XRANGELOOSE] : re[t.XRANGE]
   return comp.replace(r, function (ret, gtlt, M, m, p, pr) {
     debug('xRange', comp, ret, gtlt, M, m, p, pr)
     var xM = isX(M)
@@ -5988,7 +5945,7 @@ function replaceXRange (comp, options) {
 function replaceStars (comp, options) {
   debug('replaceStars', comp, options)
   // Looseness is ignored here.  star is always as loose as it gets!
-  return comp.trim().replace(safeRe[t.STAR], '')
+  return comp.trim().replace(re[t.STAR], '')
 }
 
 // This function is passed to string.replace(re[t.HYPHENRANGE])
@@ -6314,7 +6271,7 @@ function coerce (version, options) {
 
   var match = null
   if (!options.rtl) {
-    match = version.match(safeRe[t.COERCE])
+    match = version.match(re[t.COERCE])
   } else {
     // Find the right-most coercible string that does not share
     // a terminus with a more left-ward coercible string.
@@ -6325,17 +6282,17 @@ function coerce (version, options) {
     // Stop when we get a match that ends at the string end, since no
     // coercible string can be more right-ward without the same terminus.
     var next
-    while ((next = safeRe[t.COERCERTL].exec(version)) &&
+    while ((next = re[t.COERCERTL].exec(version)) &&
       (!match || match.index + match[0].length !== version.length)
     ) {
       if (!match ||
           next.index + next[0].length !== match.index + match[0].length) {
         match = next
       }
-      safeRe[t.COERCERTL].lastIndex = next.index + next[1].length + next[2].length
+      re[t.COERCERTL].lastIndex = next.index + next[1].length + next[2].length
     }
     // leave it in a clean state
-    safeRe[t.COERCERTL].lastIndex = -1
+    re[t.COERCERTL].lastIndex = -1
   }
 
   if (match === null) {
@@ -8227,19 +8184,19 @@ function foldNewline(source, offset) {
     return { fold, offset };
 }
 const escapeCodes = {
-    '0': '\0', // null character
-    a: '\x07', // bell character
-    b: '\b', // backspace
-    e: '\x1b', // escape character
-    f: '\f', // form feed
-    n: '\n', // line feed
-    r: '\r', // carriage return
-    t: '\t', // horizontal tab
-    v: '\v', // vertical tab
-    N: '\u0085', // Unicode next line
-    _: '\u00a0', // Unicode non-breaking space
-    L: '\u2028', // Unicode line separator
-    P: '\u2029', // Unicode paragraph separator
+    '0': '\0',
+    a: '\x07',
+    b: '\b',
+    e: '\x1b',
+    f: '\f',
+    n: '\n',
+    r: '\r',
+    t: '\t',
+    v: '\v',
+    N: '\u0085',
+    _: '\u00a0',
+    L: '\u2028',
+    P: '\u2029',
     ' ': ' ',
     '"': '"',
     '/': '/',
@@ -9256,19 +9213,12 @@ class Directives {
                 onError('Verbatim tags must end with a >');
             return verbatim;
         }
-        const [, handle, suffix] = source.match(/^(.*!)([^!]*)$/s);
+        const [, handle, suffix] = source.match(/^(.*!)([^!]*)$/);
         if (!suffix)
             onError(`The ${source} tag has no suffix`);
         const prefix = this.tags[handle];
-        if (prefix) {
-            try {
-                return prefix + decodeURIComponent(suffix);
-            }
-            catch (error) {
-                onError(String(error));
-                return null;
-            }
-        }
+        if (prefix)
+            return prefix + decodeURIComponent(suffix);
         if (handle === '!')
             return source; // local tag
         onError(`Could not resolve tag: ${source}`);
@@ -9458,8 +9408,6 @@ function debug(logLevel, ...messages) {
 }
 function warn(logLevel, warning) {
     if (logLevel === 'debug' || logLevel === 'warn') {
-        // https://github.com/typescript-eslint/typescript-eslint/issues/7478
-        // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
         if (typeof process !== 'undefined' && process.emitWarning)
             process.emitWarning(warning);
         else
@@ -10241,7 +10189,7 @@ function stringifyKey(key, jsKey, ctx) {
         return '';
     if (typeof jsKey !== 'object')
         return String(jsKey);
-    if (identity.isNode(key) && ctx?.doc) {
+    if (identity.isNode(key) && ctx && ctx.doc) {
         const strCtx = stringify.createStringifyContext(ctx.doc, {});
         strCtx.anchors = new Set();
         for (const node of ctx.anchors.keys())
@@ -13226,7 +13174,7 @@ var Scalar = __nccwpck_require__(9338);
 var stringifyString = __nccwpck_require__(6226);
 
 const binary = {
-    identify: value => value instanceof Uint8Array, // Buffer inherits from Uint8Array
+    identify: value => value instanceof Uint8Array,
     default: false,
     tag: 'tag:yaml.org,2002:binary',
     /**
@@ -13620,9 +13568,8 @@ function createPairs(schema, iterable, ctx) {
                     key = keys[0];
                     value = it[key];
                 }
-                else {
-                    throw new TypeError(`Expected tuple with one key, not ${keys.length} keys`);
-                }
+                else
+                    throw new TypeError(`Expected { key: value } tuple: ${it}`);
             }
             else {
                 key = it;
@@ -14199,6 +14146,7 @@ exports.stringify = stringify;
 "use strict";
 
 
+var Collection = __nccwpck_require__(3466);
 var identity = __nccwpck_require__(5589);
 var stringify = __nccwpck_require__(8409);
 var stringifyComment = __nccwpck_require__(5182);
@@ -14296,7 +14244,7 @@ function stringifyFlowCollection({ comment, items }, ctx, { flowChars, itemInden
                 if (iv.commentBefore)
                     reqNewline = true;
             }
-            else if (item.value == null && ik?.comment) {
+            else if (item.value == null && ik && ik.comment) {
                 comment = ik.comment;
             }
         }
@@ -14320,7 +14268,7 @@ function stringifyFlowCollection({ comment, items }, ctx, { flowChars, itemInden
     else {
         if (!reqNewline) {
             const len = lines.reduce((sum, line) => sum + line.length + 2, 2);
-            reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth;
+            reqNewline = len > Collection.Collection.maxFlowStringSingleLineLength;
         }
         if (reqNewline) {
             str = start;
@@ -14922,7 +14870,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
 function plainString(item, ctx, onComment, onChompKeep) {
     const { type, value } = item;
     const { actualString, implicitKey, indent, indentStep, inFlow } = ctx;
-    if ((implicitKey && value.includes('\n')) ||
+    if ((implicitKey && /[\n[\]{},]/.test(value)) ||
         (inFlow && /[[\]{},]/.test(value))) {
         return quotedString(value, ctx);
     }

@@ -59,6 +59,8 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		if err != nil {
 			return err
 		}
+		defer container.Stop(ctx)   //nolint:errcheck
+		defer container.Remove(ctx) //nolint:errcheck
 
 		if exitCode, err := container.Exec(ctx, &cc, workflowCommandStreams); err != nil {
 			return err
@@ -66,15 +68,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 			return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
 		}
 
-		if err = container.Stop(ctx); err != nil {
-			return err
-		}
-
 		if err = forgeactions.SetGlobalContextFromEnvFiles(ctx, o.GlobalContext, o.ID, container); err != nil {
-			return err
-		}
-
-		if err = container.Remove(ctx); err != nil {
 			return err
 		}
 	}

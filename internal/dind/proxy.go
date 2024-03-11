@@ -18,6 +18,18 @@ import (
 	xslice "github.com/frantjc/x/slice"
 )
 
+// NewProxy listens on the given listener for traffic intended for `dockerd`.
+// It proxies responses back from `dockerd` directly, but modifies requests
+// to `dockerd` to try to translate them for the host `dockerd` when the
+// client is calling from inside of a container.
+//
+// As of writing, it only does this by modifying CreateContainer HostConfig.Binds
+// to use the host path equivalent of the client's mount source. Note that this
+// only works if the client's mount source is mounted from the host, which, in
+// `forge`, is often the case. Unfortunately, it can't support _everything_.
+//
+// It always returns an error and doesn't exit until the given context.Context
+// is done or an error is encountered, similar to http.Serve.
 func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, dockerSock *url.URL) error {
 	var (
 		errC    = make(chan error)
@@ -43,8 +55,13 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 					return err
 				}
 
-				// Copy responses from the Docker daemon straight back to the client.
+				// Copy responses from `dockerd` straight back to the client.
 				go func() {
+					// Close the client connection once we
+					// reach EOF on the response.
+					defer moby.Close()
+					defer cli.Close()
+
 					errC <- func() error {
 						if _, err = io.Copy(cli, moby); err != nil {
 							return err
@@ -54,70 +71,83 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 					}()
 				}()
 
-				go func() {
+				// Intercept, inspect and potentially modify requests to
+				// `dockerd` from the client.
+				errC <- func() error {
 					buf := bufio.NewReader(cli)
 
-					errC <- func() error {
-						for {
-							req, err := http.ReadRequest(buf)
-							if errors.Is(err, io.EOF) {
-								break
-							} else if err != nil {
-								return err
-							}
-
-							if req.Method == http.MethodPost && strings.HasSuffix(req.URL.Path, "/containers/create") {
-								body := &struct {
-									HostConfig *container.HostConfig
-									Rest       json.RawMessage
-								}{
-									HostConfig: &container.HostConfig{},
-								}
-
-								if err := json.NewDecoder(req.Body).Decode(body); err != nil {
-									return err
-								}
-
-								if err = req.Body.Close(); err != nil {
-									return err
-								}
-
-								body.HostConfig.Binds = xslice.Map(body.HostConfig.Binds, func(bind string, _ int) string {
-									var (
-										parts = strings.SplitN(bind, ":", 2)
-										src   = parts[0]
-										dst   = parts[1]
-									)
-
-									for k, v := range mounts {
-										if strings.HasPrefix(src, v) {
-											return fmt.Sprintf("%s:%s",
-												filepath.Join(
-													k, strings.TrimPrefix(src, v),
-												),
-												dst,
-											)
-										}
-									}
-
-									return bind
-								})
-								buf := new(bytes.Buffer)
-
-								if err = json.NewEncoder(buf).Encode(body); err != nil {
-									return err
-								}
-
-								req.Body = io.NopCloser(buf)
-							}
-
-							if err := req.Write(moby); err != nil {
-								return err
-							}
+					for {
+						req, err := http.ReadRequest(buf)
+						if errors.Is(err, io.EOF) {
+							break
+						} else if err != nil {
+							return err
 						}
 
-						return nil
-					}()
+						// TODO: Presumably there are other requests that
+						// need intercepted and modified to work properly.
+						if req.Method == http.MethodPost && strings.HasSuffix(req.URL.Path, "/containers/create") {
+							body := &struct {
+								HostConfig       container.HostConfig
+								NetworkingConfig map[string]any
+								container.Config `json:",inline"`
+							}{}
+
+							if err := json.NewDecoder(req.Body).Decode(body); err != nil {
+								return err
+							}
+
+							if err = req.Body.Close(); err != nil {
+								return err
+							}
+
+							// Replace requested mount sources with
+							// their host path equivalents if possible.
+							//
+							// For example, if the client is running in container1 which
+							// has mount `/host/path:/container1/path` and requests mount
+							// `/container1/path/subpath:/container2/path`, then we modify the
+							// request to be for the mount `/host/path/subpath:/container2/path`.
+							body.HostConfig.Binds = xslice.Map(body.HostConfig.Binds, func(bind string, _ int) string {
+								var (
+									parts = strings.SplitN(bind, ":", 2)
+									src   = parts[0]
+									dst   = parts[1]
+								)
+
+								for k, v := range mounts {
+									if strings.HasPrefix(src, v) {
+										return fmt.Sprintf("%s:%s",
+											filepath.Join(
+												k, strings.TrimPrefix(src, v),
+											),
+											dst,
+										)
+									}
+								}
+
+								return bind
+							})
+
+							buf := new(bytes.Buffer)
+
+							if err = json.NewEncoder(buf).Encode(body); err != nil {
+								return err
+							}
+
+							// Since we possibly modified the request body,
+							// the Content-Length has possibly changed.
+							req.Body = io.NopCloser(buf)
+							req.Header.Set("Content-Length", fmt.Sprint(buf.Len()))
+							req.ContentLength = int64(buf.Len())
+						}
+
+						if err := req.WriteProxy(moby); err != nil {
+							return err
+						}
+					}
+
+					return nil
 				}()
 			}
 		}()
