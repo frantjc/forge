@@ -28,6 +28,6 @@ jobs:
           reviewers: |
             ${{ github.actor }}
           title: |
-            Workflow generated shims
+            Build internal/bin/shim_amd64 and internal/bin/shim_arm64
           body: |
-            Update shims built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.repositoryUrl }}/actions/${{ github.run_id }} for ${{ github.actor }} from commit ${{ github.sha }}.
+            Update shims built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.

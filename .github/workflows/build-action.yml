@@ -32,6 +32,6 @@ jobs:
           reviewers: |
             ${{ github.actor }}
           title: |
-            Workflow generated action
+            Build .github/action
           body: |
-            Update setup-forge built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.repositoryUrl }}/actions/${{ github.run_id }} for ${{ github.actor }} from commit ${{ github.sha }}.
+            Update setup-forge built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github_repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
