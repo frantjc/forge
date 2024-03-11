@@ -19,8 +19,9 @@ jobs:
         with:
           install-only: true
       - uses: golangci/golangci-lint-action@v4.0.0
-      - run: |
-          make generate
+      - name: Run make generate
+        run: |
+          make download generate
       - name: Run git config
         run: |
           git config --global user.email "$GIT_USER"
