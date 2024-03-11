@@ -1,6 +1,5 @@
 name: Build Shims
-on:
-  workflow_dispatch: {}
+on: [workflow_dispatch]
 permissions:
   contents: write
   pull-requests: write
