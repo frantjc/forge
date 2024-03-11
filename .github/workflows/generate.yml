@@ -18,7 +18,7 @@ jobs:
       - uses: golangci/golangci-lint-action@v4.0.0
       - name: Run make generate
         run: |
-          make download fmt lint shim action GOARCH=amd64
+          make shim GOARCH=amd64
           make shim GOARCH=arm64
       - name: Run git config
         run: |
