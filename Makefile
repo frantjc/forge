@@ -41,7 +41,7 @@ lint:
 	@$(GOLANGCI-LINT) run --fix
 
 internal/bin/shim_$(GOARCH):
-	@GOOS=linux GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
+	@GOOS=linux GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags "-s -w -X github.com/frantjc/forge.VersionCore=$(SEMVER)" -o $@ ./internal/cmd/shim
 	@$(UPX) --ultra-brute $@
 
 internal/bin/fs_$(GOARCH).go:

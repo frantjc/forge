@@ -111,7 +111,11 @@ func NewExec() *cobra.Command {
 
 				// TODO: Wait on forge.sock to be ready.
 
-				return xos.NewExitCodeError(command.Run(), command.ProcessState.ExitCode())
+				if err = command.Run(); err != nil {
+					return xos.NewExitCodeError(err, command.ProcessState.ExitCode())
+				}
+
+				return nil
 			},
 		}
 	)
