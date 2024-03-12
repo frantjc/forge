@@ -10,7 +10,6 @@ BIN = /usr/local/bin
 
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
-CGO_ENABLED = 0
 
 SEMVER ?= 0.14.0
 
@@ -42,7 +41,7 @@ lint:
 	@$(GOLANGCI-LINT) run --fix
 
 internal/bin/shim_$(GOARCH):
-	@GOOS=linux $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
+	@GOOS=linux GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
 	@$(UPX) --ultra-brute $@
 
 internal/bin/fs_$(GOARCH).go:
