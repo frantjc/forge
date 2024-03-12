@@ -29,7 +29,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         env:
           COMMIT_MESSAGE: |
-            Update [.github/action](.github/action) built by GitHub Actions Workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
+            Update [.github/action](.github/action) built by GitHub Actions workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
         with:
           add-paths: |
             .github/action

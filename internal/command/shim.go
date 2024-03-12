@@ -26,7 +26,7 @@ func NewShim() *cobra.Command {
 	)
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
-	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
+	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for shim")
 	cmd.AddCommand(NewSleep(), NewExec())
 
 	return cmd

@@ -42,7 +42,7 @@ lint:
 
 internal/bin/shim_$(GOARCH):
 	@GOOS=linux $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
-	@$(UPX) --ultra-brute $@
+	@$(UPX) --brute $@
 
 internal/bin/fs_$(GOARCH).go:
 	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > $@
