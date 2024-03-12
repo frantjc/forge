@@ -10,6 +10,7 @@ BIN = /usr/local/bin
 
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
+CGO_ENABLED = 0
 
 SEMVER ?= 0.14.0
 
@@ -42,7 +43,7 @@ lint:
 
 internal/bin/shim_$(GOARCH):
 	@GOOS=linux $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
-# @$(UPX) --brute $@
+	@$(UPX) --ultra-brute $@
 
 internal/bin/fs_$(GOARCH).go:
 	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > $@
