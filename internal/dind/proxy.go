@@ -73,81 +73,83 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 
 				// Intercept, inspect and potentially modify requests to
 				// `dockerd` from the client.
-				errC <- func() error {
-					buf := bufio.NewReader(cli)
+				go func() {
+					errC <- func() error {
+						buf := bufio.NewReader(cli)
 
-					for {
-						req, err := http.ReadRequest(buf)
-						if errors.Is(err, io.EOF) {
-							break
-						} else if err != nil {
-							return err
-						}
-
-						// TODO: Presumably there are other requests that
-						// need intercepted and modified to work properly.
-						if req.Method == http.MethodPost && strings.HasSuffix(req.URL.Path, "/containers/create") {
-							body := &struct {
-								HostConfig       container.HostConfig
-								NetworkingConfig map[string]any
-								container.Config `json:",inline"`
-							}{}
-
-							if err := json.NewDecoder(req.Body).Decode(body); err != nil {
+						for {
+							req, err := http.ReadRequest(buf)
+							if errors.Is(err, io.EOF) {
+								break
+							} else if err != nil {
 								return err
 							}
 
-							if err = req.Body.Close(); err != nil {
-								return err
-							}
+							// TODO: Presumably there are other requests that
+							// need intercepted and modified to work properly.
+							if req.Method == http.MethodPost && strings.HasSuffix(req.URL.Path, "/containers/create") {
+								body := &struct {
+									HostConfig       container.HostConfig
+									NetworkingConfig map[string]any
+									container.Config `json:",inline"`
+								}{}
 
-							// Replace requested mount sources with
-							// their host path equivalents if possible.
-							//
-							// For example, if the client is running in container1 which
-							// has mount `/host/path:/container1/path` and requests mount
-							// `/container1/path/subpath:/container2/path`, then we modify the
-							// request to be for the mount `/host/path/subpath:/container2/path`.
-							body.HostConfig.Binds = xslice.Map(body.HostConfig.Binds, func(bind string, _ int) string {
-								var (
-									parts = strings.SplitN(bind, ":", 2)
-									src   = parts[0]
-									dst   = parts[1]
-								)
-
-								for k, v := range mounts {
-									if strings.HasPrefix(src, v) {
-										return fmt.Sprintf("%s:%s",
-											filepath.Join(
-												k, strings.TrimPrefix(src, v),
-											),
-											dst,
-										)
-									}
+								if err := json.NewDecoder(req.Body).Decode(body); err != nil {
+									return err
 								}
 
-								return bind
-							})
+								if err = req.Body.Close(); err != nil {
+									return err
+								}
 
-							buf := new(bytes.Buffer)
+								// Replace requested mount sources with
+								// their host path equivalents if possible.
+								//
+								// For example, if the client is running in container1 which
+								// has mount `/host/path:/container1/path` and requests mount
+								// `/container1/path/subpath:/container2/path`, then we modify the
+								// request to be for the mount `/host/path/subpath:/container2/path`.
+								body.HostConfig.Binds = xslice.Map(body.HostConfig.Binds, func(bind string, _ int) string {
+									var (
+										parts = strings.SplitN(bind, ":", 2)
+										src   = parts[0]
+										dst   = parts[1]
+									)
 
-							if err = json.NewEncoder(buf).Encode(body); err != nil {
-								return err
+									for k, v := range mounts {
+										if strings.HasPrefix(src, v) {
+											return fmt.Sprintf("%s:%s",
+												filepath.Join(
+													k, strings.TrimPrefix(src, v),
+												),
+												dst,
+											)
+										}
+									}
+
+									return bind
+								})
+
+								buf := new(bytes.Buffer)
+
+								if err = json.NewEncoder(buf).Encode(body); err != nil {
+									return err
+								}
+
+								// Since we possibly modified the request body,
+								// the Content-Length has possibly changed.
+								req.Body = io.NopCloser(buf)
+								req.Header.Set("Content-Length", fmt.Sprint(buf.Len()))
+								req.ContentLength = int64(buf.Len())
 							}
 
-							// Since we possibly modified the request body,
-							// the Content-Length has possibly changed.
-							req.Body = io.NopCloser(buf)
-							req.Header.Set("Content-Length", fmt.Sprint(buf.Len()))
-							req.ContentLength = int64(buf.Len())
+							if err := req.WriteProxy(moby); err != nil {
+								return err
+							}
 						}
 
-						if err := req.WriteProxy(moby); err != nil {
-							return err
-						}
-					}
-
-					return nil
+						return nil
+					}()
 				}()
 			}
 		}()
