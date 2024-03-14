@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/docker/docker/client"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
 	xos "github.com/frantjc/x/os"
@@ -17,8 +18,8 @@ import (
 // the entrypoint for `shim exec`.
 func NewExec() *cobra.Command {
 	var (
-		workingdir string
-		cmd        = &cobra.Command{
+		forgeSock string
+		cmd       = &cobra.Command{
 			Use:           "exec",
 			Short:         "Execute the given command after sourcing $GITHUB_PATH and $GITHUB_ENV, if set",
 			SilenceErrors: true,
@@ -77,10 +78,9 @@ func NewExec() *cobra.Command {
 					}
 				}
 
-				forgeSock := filepath.Join(workingdir, "forge.sock")
 				_, err := os.Stat(forgeSock)
-				useForgeSock := workingdir != "" && err == nil
-				dockerHost := fmt.Sprintf("DOCKER_HOST=unix://%s", forgeSock)
+				useForgeSock := forgeSock != "" && err == nil
+				dockerHost := fmt.Sprintf("%s=unix://%s", client.EnvOverrideHost, forgeSock)
 
 				var (
 					injectedPath       = false
@@ -94,7 +94,7 @@ func NewExec() *cobra.Command {
 						if !injectedPath && strings.EqualFold(key, "PATH") {
 							command.Env[i] = path
 							injectedPath = true
-						} else if useForgeSock && !injectedDockerHost && strings.EqualFold(key, "DOCKER_HOST") {
+						} else if useForgeSock && !injectedDockerHost && strings.EqualFold(key, client.EnvOverrideHost) {
 							command.Env[i] = dockerHost
 							injectedDockerHost = true
 						}
@@ -120,8 +120,8 @@ func NewExec() *cobra.Command {
 		}
 	)
 
-	cmd.Flags().StringVar(&workingdir, "wd", "", "working directory for forge")
-	_ = cmd.MarkFlagDirname("wd")
+	cmd.Flags().StringVar(&forgeSock, "sock", "", "unix socket for forge")
+	_ = cmd.MarkFlagFilename("sock", ".sock")
 
 	return cmd
 }

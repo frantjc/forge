@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	xslice "github.com/frantjc/x/slice"
 )
@@ -50,7 +51,7 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 					return err
 				}
 
-				moby, err := net.Dial(network, address)
+				dockerd, err := net.Dial(network, address)
 				if err != nil {
 					return err
 				}
@@ -59,11 +60,11 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 				go func() {
 					// Close the client connection once we
 					// reach EOF on the response.
-					defer moby.Close()
+					defer dockerd.Close()
 					defer cli.Close()
 
 					errC <- func() error {
-						if _, err = io.Copy(cli, moby); err != nil {
+						if _, err = io.Copy(cli, dockerd); err != nil {
 							return err
 						}
 
@@ -102,13 +103,14 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 									return err
 								}
 
-								// Replace requested mount sources with
-								// their host path equivalents if possible.
+								// Replace requested mount sources with their
+								// host path equivalents. Error if impossible.
 								//
 								// For example, if the client is running in container1 which
 								// has mount `/host/path:/container1/path` and requests mount
 								// `/container1/path/subpath:/container2/path`, then we modify the
 								// request to be for the mount `/host/path/subpath:/container2/path`.
+								mountsOk := true
 								body.HostConfig.Binds = xslice.Map(body.HostConfig.Binds, func(bind string, _ int) string {
 									var (
 										parts = strings.SplitN(bind, ":", 2)
@@ -125,12 +127,37 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 												dst,
 											)
 										}
+
+										mountsOk = false
 									}
 
 									return bind
 								})
 
 								buf := new(bytes.Buffer)
+
+								if !mountsOk {
+									if err = json.NewEncoder(buf).Encode(&types.ErrorResponse{
+										Message: "one or more requested mounts cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running",
+									}); err != nil {
+										return err
+									}
+
+									if err = (&http.Response{
+										Status:        http.StatusText(http.StatusInternalServerError),
+										StatusCode:    http.StatusInternalServerError,
+										Proto:         req.Proto,
+										ProtoMajor:    req.ProtoMajor,
+										ProtoMinor:    req.ProtoMinor,
+										Body:          io.NopCloser(buf),
+										ContentLength: int64(buf.Len()),
+										Request:       req,
+									}).Write(cli); err != nil {
+										return err
+									}
+
+									return nil
+								}
 
 								if err = json.NewEncoder(buf).Encode(body); err != nil {
 									return err
@@ -143,7 +170,7 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 								req.ContentLength = int64(buf.Len())
 							}
 
-							if err := req.WriteProxy(moby); err != nil {
+							if err := req.WriteProxy(dockerd); err != nil {
 								return err
 							}
 						}

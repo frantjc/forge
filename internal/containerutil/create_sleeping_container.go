@@ -12,7 +12,7 @@ import (
 )
 
 func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
-	entrypoint := []string{bin.ShimPath, "sleep", "-VV", "--wd", containerfs.WorkingDir}
+	entrypoint := []string{bin.ShimPath, "sleep", "--sock", containerfs.ForgeSock}
 
 	for _, mount := range containerConfig.Mounts {
 		if mount.Source != "" && mount.Destination != "" {

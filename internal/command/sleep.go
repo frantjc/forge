@@ -4,8 +4,8 @@ import (
 	"net"
 	"net/url"
 	"os"
-	"path/filepath"
 
+	"github.com/docker/docker/client"
 	"github.com/frantjc/forge/internal/dind"
 	"github.com/spf13/cobra"
 )
@@ -14,9 +14,9 @@ import (
 // the entrypoint for `shim sleep`.
 func NewSleep() *cobra.Command {
 	var (
-		workingdir string
-		mounts     map[string]string
-		cmd        = &cobra.Command{
+		forgeSock string
+		mounts    map[string]string
+		cmd       = &cobra.Command{
 			Use:           "sleep",
 			Short:         "Sleep until signalled",
 			SilenceErrors: true,
@@ -24,13 +24,11 @@ func NewSleep() *cobra.Command {
 			RunE: func(cmd *cobra.Command, _ []string) error {
 				ctx := cmd.Context()
 
-				if len(mounts) > 0 && workingdir != "" {
-					forgeSock := filepath.Join(workingdir, "forge.sock")
-
+				if forgeSock != "" {
 					if lis, err := net.Listen("unix", forgeSock); err == nil {
 						defer os.Remove(forgeSock)
 
-						if dockerHost := os.Getenv("DOCKER_HOST"); dockerHost != "" {
+						if dockerHost := os.Getenv(client.EnvOverrideHost); dockerHost != "" {
 							if dockerSock, err := url.Parse(dockerHost); err == nil {
 								return dind.NewProxy(ctx, mounts, lis, dockerSock)
 							}
@@ -46,8 +44,8 @@ func NewSleep() *cobra.Command {
 	)
 
 	cmd.Flags().StringToStringVar(&mounts, "mount", nil, "mounts for forge")
-	cmd.Flags().StringVar(&workingdir, "wd", "", "working directory for forge")
-	_ = cmd.MarkFlagDirname("wd")
+	cmd.Flags().StringVar(&forgeSock, "sock", "", "unix socket for forge")
+	_ = cmd.MarkFlagFilename("sock", ".sock")
 
 	return cmd
 }

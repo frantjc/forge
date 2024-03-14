@@ -42,7 +42,7 @@ lint:
 
 internal/bin/shim_$(GOARCH):
 	@GOOS=linux GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags "-s -w -X github.com/frantjc/forge.VersionCore=$(SEMVER)" -o $@ ./internal/cmd/shim
-# @$(UPX) --ultra-brute $@
+	@$(UPX) --ultra-brute $@
 
 internal/bin/fs_$(GOARCH).go:
 	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > $@

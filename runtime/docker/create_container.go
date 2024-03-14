@@ -11,6 +11,7 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/containerfs"
 	xslice "github.com/frantjc/x/slice"
@@ -57,7 +58,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 			Target: sock,
 			Type:   mount.TypeBind,
 		})
-		containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("DOCKER_HOST=unix://%s", sock))
+		containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s=unix://%s", client.EnvOverrideHost, sock))
 	}
 
 	// Also because this is the Docker runtime...
