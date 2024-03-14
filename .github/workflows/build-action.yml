@@ -27,18 +27,17 @@ jobs:
           cd ../..
           make action
       - uses: peter-evans/create-pull-request@v6
-        env:
-          COMMIT_MESSAGE: |
-            Update [.github/action](.github/action) built by GitHub Actions workflow "${{ github.workflow }}" run ${{ github.server_url }}/${{ github.repository }}/actions/${{ github.run_id }} for user ${{ github.actor }} from commit ${{ github.sha }}.
         with:
           add-paths: |
             .github/action
           reviewers: |
             ${{ github.actor }}
           title: |
-            Build .github/action
-          commit-message: ${{ env.COMMIT_MESSAGE }}
-          body: ${{ env.COMMIT_MESSAGE }}
+            Bump .github/action
+          commit-message: |
+            Update .github/action built by GitHub Actions workflow "${{ github.workflow }}" for user ${{ github.actor }} from commit ${{ github.sha }}.
+          body: |
+            Update [.github/action](.github/action) built by [GitHub Actions workflow "${{ github.workflow }}"](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for user ${{ github.actor }} from commit ${{ github.sha }}.
           branch: github-actions/gen/github/action
           delete-branch: true
           labels: github_actions
