@@ -118,14 +118,16 @@ func NewProxy(ctx context.Context, mounts map[string]string, lis net.Listener, d
 										dst   = parts[1]
 									)
 
-									for k, v := range mounts {
-										if strings.HasPrefix(src, v) {
-											return fmt.Sprintf("%s:%s",
-												filepath.Join(
-													k, strings.TrimPrefix(src, v),
-												),
-												dst,
-											)
+									if mountsOk {
+										for k, v := range mounts {
+											if strings.HasPrefix(src, v) {
+												return fmt.Sprintf("%s:%s",
+													filepath.Join(
+														k, strings.TrimPrefix(src, v),
+													),
+													dst,
+												)
+											}
 										}
 
 										mountsOk = false
