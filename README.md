@@ -38,8 +38,6 @@ In GitHub Actions:
   - uses: frantjc/forge@v0
 ```
 
-> Forge will not work inside of Forge e.g. `forge use /path/to/frantjc/forge` will fail due to the nesting of containers mixing up volume mount paths.
-
 ## usage
 
 ### GitHub Actions
@@ -142,5 +140,5 @@ Forge aims to remedy this.
 - `make` is _required_
 - `go` 1.20 is _required_ for multi-error handling
 - `docker` is _required_ to test as it is its only runtime
-- [`upx`](https://github.com/upx/upx) is _required_ for compressing [`shim`](internal/cmd/shim)
-- `node` 16 is _required_ for developing the [`action`](.github/action)
+- [`upx`](https://github.com/upx/upx) is _required_ for compressing [`shim`](internal/cmd/shim/main.go)
+- `node` 20 is _required_ for developing the [`action`](.github/action)

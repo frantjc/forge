@@ -1,9 +1,9 @@
 package forgeazure
 
 import (
+	"fmt"
 	"path/filepath"
 
-	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/azuredevops"
 )
 
@@ -20,5 +20,5 @@ func (m *Mapping) TaskReferenceToDirectory(ref *azuredevops.TaskReference) (stri
 		return filepath.Abs(ref.Path)
 	}
 
-	return "", forge.ErrUnimplemented
+	return "", fmt.Errorf("remote Azure DevOps tasks are not implemented")
 }

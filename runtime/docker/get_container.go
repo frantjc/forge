@@ -7,6 +7,9 @@ import (
 )
 
 func (d *ContainerRuntime) GetContainer(ctx context.Context, id string) (forge.Container, error) {
-	_, err := d.ContainerInspect(ctx, id)
-	return &Container{id, d.Client}, err
+	if _, err := d.ContainerInspect(ctx, id); err != nil {
+		return nil, err
+	}
+
+	return &Container{id, d.Client}, nil
 }
