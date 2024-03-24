@@ -50,13 +50,13 @@ type ImageBuilder interface {
 	BuildDockerfile(context.Context, string, string) (forge.Image, error)
 }
 
-// ErrCantBuildDockerfile will be returned when a forge.ContainerRuntime
+// ErrCannotBuildDockerfile will be returned when a forge.ContainerRuntime
 // does not implement ImageBuilder.
-var ErrCantBuildDockerfile = errors.New("runtime cannot build Dockerfile")
+var ErrCannotBuildDockerfile = errors.New("runtime cannot build Dockerfile")
 
 // GetImageForMetadata takes an action.yml and returns the OCI image that forge
 // should run it inside of. If the action.yml runs using "dockerfile" and the
-// forge.ContainerRuntime does not implement ImageBuilder, returns ErrCantBuildDockerfile.
+// forge.ContainerRuntime does not implement ImageBuilder, returns ErrCannotBuildDockerfile.
 func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forge.ContainerRuntime, actionMetadata *githubactions.Metadata, uses *githubactions.Uses) (forge.Image, error) {
 	if actionMetadata.IsDockerfile() {
 		dir, err := m.UsesToActionDirectory(uses)
@@ -74,7 +74,7 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 			return imageBuilder.BuildDockerfile(ctx, dir, reference)
 		}
 
-		return nil, ErrCantBuildDockerfile
+		return nil, ErrCannotBuildDockerfile
 	}
 
 	return containerRuntime.PullImage(ctx, MetadataToImageReference(actionMetadata))

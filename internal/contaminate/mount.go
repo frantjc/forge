@@ -10,7 +10,8 @@ import (
 type mountKey struct{}
 
 func WithMounts(ctx context.Context, mounts ...forge.Mount) context.Context {
-	return context.WithValue(ctx, mountKey{}, mounts)
+	mountsFrom := MountsFrom(ctx)
+	return context.WithValue(ctx, mountKey{}, append(mountsFrom, mounts...))
 }
 
 func MountsFrom(ctx context.Context) []forge.Mount {

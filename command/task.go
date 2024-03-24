@@ -6,7 +6,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/forgeazure"
-	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
@@ -17,13 +16,15 @@ import (
 // the entrypoint for `forge task`.
 func NewTask() *cobra.Command {
 	var (
-		attach, cache      bool
+		attach             bool
 		inputs             map[string]string
 		execution, workdir string
 		cmd                = &cobra.Command{
 			Use:           "task",
+			Aliases:       []string{"azure", "ado", "az"},
 			Short:         "Run an Azure DevOps Task",
 			Args:          cobra.ExactArgs(1),
+			Hidden:        true,
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
@@ -35,7 +36,7 @@ func NewTask() *cobra.Command {
 				}
 
 				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd, containerfs.WorkingDir))
+					hooks.ContainerStarted.Listen(hookAttach(cmd, forgeazure.DefaultTaskPath))
 				}
 
 				t := &ore.Task{
@@ -44,14 +45,9 @@ func NewTask() *cobra.Command {
 					Execution: execution,
 				}
 
-				var o forge.Ore = t
-				if cache {
-					o = &ore.Cache{Ore: o}
-				}
-
 				return forge.NewFoundry(docker.New(c)).Process(
 					ctx,
-					o,
+					t,
 					commandDrains(cmd),
 				)
 			},
@@ -64,7 +60,6 @@ func NewTask() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().StringToStringVarP(&inputs, "input", "i", nil, "inputs")
 	cmd.Flags().StringVar(&forgeazure.NodeImageReference, "node-image", forgeazure.DefaultNodeImageReference, "Node image")
 	cmd.Flags().StringVar(&forgeazure.Node10ImageReference, "node10-image", forgeazure.DefaultNode10ImageReference, "Node10 image")

@@ -23,7 +23,7 @@ func NewCache() *cobra.Command {
 	var (
 		clean bool
 		cmd   = &cobra.Command{
-			Use:           "cache",
+			Use:           "cache [name] [--clean]",
 			Short:         "Interact with the Forge cache",
 			SilenceErrors: true,
 			SilenceUsage:  true,
