@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/adrg/xdg v0.4.0
-	github.com/docker/docker v25.0.5+incompatible
+	github.com/docker/docker v26.0.0+incompatible
 	github.com/frantjc/x v0.0.0-20240229201132-06b4d1884a27
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/go-logr/logr v1.4.1
@@ -21,6 +21,8 @@ require (
 	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+require github.com/moby/docker-image-spec v1.3.1 // indirect
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
