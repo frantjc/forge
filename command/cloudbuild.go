@@ -11,12 +11,13 @@ import (
 	"github.com/frantjc/forge/forgecloudbuild"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hooks"
+	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
 	"github.com/spf13/cobra"
 )
 
-// NewCheck returns the command which acts as
+// NewCloudBuild returns the command which acts as
 // the entrypoint for `forge cloudbuild`.
 func NewCloudBuild() *cobra.Command {
 	var (
@@ -88,23 +89,18 @@ func NewCloudBuild() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd, forgecloudbuild.DefaultCloudBuildPath))
 				}
 
-				runtime := docker.New(c)
-				vol, err := runtime.CreateVolume(ctx, "forge-cloudbuild-workspace")
-				if err != nil {
-					return err
-				}
-
-				return forge.NewFoundry(runtime).Process(
+				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx,
-						forge.Mount{
-							Source:      workdir,
-							Destination: forgecloudbuild.DefaultCloudBuildPath,
-						},
-						forge.Mount{
-							Source:      vol.GetID(),
-							Destination: "/workspace",
-						},
-					),
+						[]forge.Mount{
+							{
+								Source:      workdir,
+								Destination: forgecloudbuild.DefaultCloudBuildPath,
+							},
+							{
+								Source:      hostfs.CloudBuildWorkspace,
+								Destination: cloudbuild.WorkspacePath,
+							},
+						}...),
 					cb,
 					commandDrains(cmd),
 				)

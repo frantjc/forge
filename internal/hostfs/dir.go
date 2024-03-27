@@ -11,21 +11,16 @@ import (
 var CacheHome = filepath.Join(xdg.CacheHome, "forge")
 
 var (
-	GitHubActionsHome = filepath.Join(CacheHome, "/github/actions")
+	gitHubActionsHome = filepath.Join(CacheHome, "/github/actions")
 	// ActionsCache is the directory on the host machine where
 	// all GitHub Action repositories are stored.
-	ActionsCache = filepath.Join(GitHubActionsHome, "/actions")
+	ActionsCache = filepath.Join(gitHubActionsHome, "/actions")
 	// RunnerTmp is the the directory on the host machine used as the source
 	// for the mount at RUNNER_TEMP.
-	RunnerTmp = filepath.Join(GitHubActionsHome, "/runner/tmp")
+	RunnerTmp = filepath.Join(gitHubActionsHome, "/runner/tmp")
 	// RunnerTmp is the the directory on the host machine used as the source
 	// for the mount at RUNNER_TOOLCACHE.
-	RunnerToolCache = filepath.Join(GitHubActionsHome, "/runner/toolcache")
+	RunnerToolCache = filepath.Join(gitHubActionsHome, "/runner/toolcache")
 )
 
-var OreCache = filepath.Join(CacheHome, "/ore")
-
-var (
-	AzureDevopsHome = filepath.Join(CacheHome, "/azure/devops")
-	TasksCache      = filepath.Join(AzureDevopsHome, "/tasks")
-)
+var CloudBuildWorkspace = filepath.Join(CacheHome, "/cloudbuild/workspace")
