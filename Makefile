@@ -50,6 +50,7 @@ internal/bin/fs_$(GOARCH).go:
 clean:
 	@rm -rf dist/ rootfs/ vendor/ privileged version internal/bin/shim*.*
 
+ifeq (,$(findstring -,$(SEMVER)))
 MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
 MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 
@@ -60,6 +61,13 @@ release:
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
 	@$(GIT) push --tags -f
+else
+release:
+	@cd .github/actions/setup-forge && \
+		$(YARN) version --new-version $(SEMVER)
+	@$(GIT) push
+	@$(GIT) push --tags
+endif
 
 action: .github/actions/setup-forge
 gen: generate
