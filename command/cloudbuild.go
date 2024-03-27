@@ -88,11 +88,21 @@ func NewCloudBuild() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd, forgecloudbuild.DefaultCloudBuildPath))
 				}
 
-				return forge.NewFoundry(docker.New(c)).Process(
+				runtime := docker.New(c)
+				vol, err := runtime.CreateVolume(ctx, "forge-cloudbuild-workspace")
+				if err != nil {
+					return err
+				}
+
+				return forge.NewFoundry(runtime).Process(
 					contaminate.WithMounts(ctx,
 						forge.Mount{
 							Source:      workdir,
 							Destination: forgecloudbuild.DefaultCloudBuildPath,
+						},
+						forge.Mount{
+							Source:      vol.GetID(),
+							Destination: "/workspace",
 						},
 					),
 					cb,

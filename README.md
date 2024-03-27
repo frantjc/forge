@@ -88,24 +88,10 @@ forge get -a mock -v version=v0.0.0
 
 ### Setup Forge
 
-Skip install and `get` a Concourse Resource using a pre-installed `forge`:
+Install `forge`:
 
 ```yml
   - uses: frantjc/forge@v0
-    with:
-      install: false
-      get: my-resource
-```
-
-Install and `put` a Concourse Resource with the given `params` and `config`:
-
-```yml
-  - uses: frantjc/forge@v0
-    with:
-      put: my-resource
-      params: |
-        my-param=my-value
-      config: forge.yaml
 ```
 
 ### Azure DevOps Tasks

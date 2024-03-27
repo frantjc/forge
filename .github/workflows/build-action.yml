@@ -4,8 +4,8 @@ on:
     branches:
       - main
     paths:
-      - .github/action/**
-      - "!.github/action/dist/**"
+      - .github/actions/setup-forge/**
+      - "!.github/actions/setup-forge/dist/**"
       - .github/workflows/build-action.yml
   workflow_dispatch: {}
 permissions:
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: .github/action/yarn.lock
+          cache-dependency-path: .github/actions/setup-forge/yarn.lock
       - name: Run make action
         run: |
           cd .github/action
