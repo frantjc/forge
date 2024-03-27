@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -109,7 +110,18 @@ func NewExec() *cobra.Command {
 					command.Env = append(command.Env, dockerHost)
 				}
 
-				// TODO: Wait on forge.sock to be ready.
+				// Wait on forge.sock to be ready (it probably is, but want to avoid race condition).
+				if useForgeSock {
+					for {
+						if conn, err := net.Dial("unix", forgeSock); err == nil {
+							if err = conn.Close(); err != nil {
+								return err
+							}
+
+							break
+						}
+					}
+				}
 
 				if err = command.Run(); err != nil {
 					return xos.NewExitCodeError(err, command.ProcessState.ExitCode())
