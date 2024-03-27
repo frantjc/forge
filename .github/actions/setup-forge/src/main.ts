@@ -7,19 +7,19 @@ import path from "path";
 import yaml from "yaml";
 
 const packageJSON = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../package.json")).toString(),
+  fs.readFileSync(path.join(__dirname, "../package.json")).toString()
 );
 
 const goreleaserYML = yaml.parse(
-  fs.readFileSync(path.join(__dirname, "../../../.goreleaser.yaml")).toString(),
+  fs
+    .readFileSync(path.join(__dirname, "../../../../.goreleaser.yaml"))
+    .toString()
 );
 
 async function run(): Promise<void> {
   try {
     const tool = "forge";
     const version = core.getInput("version") || packageJSON.version;
-
-    const cwd = process.env.GITHUB_WORKSPACE;
 
     // Turn RUNNER_ARCH into GOARCH.
     let arch;
@@ -87,14 +87,14 @@ async function run(): Promise<void> {
           path.join(
             await tc.extractTar(
               await tc.downloadTool(
-                `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`,
-              ),
+                `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
+              )
             ),
-            tool,
+            tool
           ),
           tool,
           tool,
-          versionOs,
+          versionOs
         );
       }
 
