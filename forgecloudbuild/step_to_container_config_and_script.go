@@ -50,7 +50,6 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 		}
 	}
 
-
 	if step.Script != "" {
 		if step.Entrypoint != "" || len(step.Args) > 0 {
 			return nil, "", fmt.Errorf("cannot specify args or entrypoint with script")
