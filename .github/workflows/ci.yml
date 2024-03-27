@@ -33,23 +33,8 @@ jobs:
         run: make INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
-      - name: Run forge task node
-        run: forge task ./testdata/tasks/node
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      # TODO
-      # - uses: actions/checkout@v4
-      #   with:
-      #     repository: microsoft/azure-pipelines-tasks
-      #     path: testdata/tasks/azure-pipelines-tasks
-      #     sparse-checkout: |
-      #       Tasks/
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      # - name: Run forge task KubectlInstallerV0
-      #   run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstallerV0
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
+      - name: Run forge cloudbuild
+        run: forge cloudbuild ...
       - uses: ./
         with:
           install: false
