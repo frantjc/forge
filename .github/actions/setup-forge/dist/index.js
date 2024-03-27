@@ -55,16 +55,7 @@ function run() {
         try {
             const tool = "forge";
             const version = core.getInput("version") || packageJSON.version;
-            const get = core.getInput("get");
-            const put = core.getInput("put");
             const cwd = process.env.GITHUB_WORKSPACE;
-            if (get && put) {
-                throw new Error("used both `get` and `put`");
-            }
-            const action = get ? "get" : "put";
-            const resource = get || put;
-            const params = core.getMultilineInput("params");
-            const config = core.getInput("config");
             // Turn RUNNER_ARCH into GOARCH.
             let arch;
             switch (process.env.RUNNER_ARCH) {
@@ -128,16 +119,6 @@ function run() {
             }
             // Sanity check that forge was installed correctly.
             yield cp.exec(bin, ["-v"]);
-            // Inputs for `get` and `put` are not required so that this action can be used to
-            // only install forge. Note that we checked above if both were set, so at most
-            // one of these conditions could evaluate to true.
-            if (resource) {
-                let args = [action, resource, ...params.map((param) => `-p=${param}`)];
-                if (config) {
-                    args = [...args, `-c=${config}`];
-                }
-                yield cp.exec(bin, args, { cwd });
-            }
         }
         catch (err) {
             if (typeof err === "string" || err instanceof Error) {
