@@ -71,6 +71,12 @@ func NewCloudBuild() *cobra.Command {
 					cb.Script = string(b)
 				}
 
+				for _, dir := range []string{hostfs.CloudBuildWorkspace} {
+					if err := os.MkdirAll(dir, 0o755); err != nil {
+						return err
+					}
+				}
+
 				subs, err := cloudbuild.NewSubstituionsFromPath(workdir, substitutions)
 				if err != nil {
 					if subs, err = cloudbuild.NewSubstitutionsFromEnv(substitutions); err != nil {
