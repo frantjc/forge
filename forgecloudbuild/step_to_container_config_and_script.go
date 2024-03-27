@@ -10,17 +10,18 @@ import (
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/internal/bin"
+	"github.com/frantjc/forge/internal/containerfs"
 	xslice "github.com/frantjc/x/slice"
 )
 
-func StepToContainerConfigAndScript(step *cloudbuild.Step, home string) (*forge.ContainerConfig, string, error) {
-	return DefaultMapping.StepToContainerConfigAndScript(step, home)
+func StepToContainerConfigAndScript(step *cloudbuild.Step, home string, image forge.Image) (*forge.ContainerConfig, string, error) {
+	return DefaultMapping.StepToContainerConfigAndScript(step, home, image)
 }
 
-func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home string) (*forge.ContainerConfig, string, error) {
+func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home string, image forge.Image) (*forge.ContainerConfig, string, error) {
 	var (
 		containerConfig = &forge.ContainerConfig{
-			Cmd:        step.Args,
+			Entrypoint: []string{bin.ShimPath, "exec", "--sock", containerfs.ForgeSock, "--"},
 			Env:        step.Env,
 			WorkingDir: m.CloudBuildPath,
 		}
@@ -55,9 +56,28 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 			return nil, "", fmt.Errorf("cannot specify args or entrypoint with script")
 		}
 
-		containerConfig.Entrypoint = bin.ScriptEntrypoint
-	} else if step.Entrypoint != "" {
-		containerConfig.Entrypoint = []string{step.Entrypoint}
+		containerConfig.Cmd = bin.ScriptEntrypoint
+	} else {
+		if lenArgs := len(step.Args); step.Entrypoint == "" || lenArgs == 0 {
+			config, err := image.Config()
+			if err != nil {
+				return nil, "", err
+			}
+
+			if step.Entrypoint != "" {
+				containerConfig.Cmd = []string{step.Entrypoint}
+			} else {
+				containerConfig.Cmd = config.Entrypoint
+			}
+
+			if lenArgs == 0 {
+				containerConfig.Cmd = append(containerConfig.Cmd, config.Cmd...)
+			} else {
+				containerConfig.Cmd = append(containerConfig.Cmd, step.Args...)
+			}
+		} else {
+			containerConfig.Cmd = append([]string{step.Entrypoint}, step.Args...)
+		}
 	}
 
 	if step.DynamicSubstitutions {
@@ -67,10 +87,6 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 			}
 		}
 	}
-
-	containerConfig.Entrypoint = xslice.Map(containerConfig.Entrypoint, func(s string, _ int) string {
-		return os.Expand(s, mapping)
-	})
 
 	containerConfig.Cmd = xslice.Map(containerConfig.Cmd, func(s string, _ int) string {
 		return os.Expand(s, mapping)

@@ -32,7 +32,7 @@ func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime forge.Contain
 		}
 	}
 
-	containerConfig, script, err := forgecloudbuild.StepToContainerConfigAndScript(&o.Step, home)
+	containerConfig, script, err := forgecloudbuild.StepToContainerConfigAndScript(&o.Step, home, image)
 	if err != nil {
 		return err
 	}
