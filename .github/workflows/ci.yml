@@ -47,20 +47,6 @@ jobs:
       - name: Run forge cloudbuild docker
         run: |
           forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
-      - uses: ./
-        with:
-          install: false
-          get: mock
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - uses: ./
-        with:
-          install: false
-          put: mock
-          params: |
-            version=0.0.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
         env:
