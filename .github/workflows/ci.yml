@@ -33,8 +33,18 @@ jobs:
         run: make INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
-      - name: Run forge cloudbuild
-        run: forge cloudbuild ...
+      - name: Run forge cloudbuild --script env
+        run: |
+          echo ZW52Cg== | base64 -d | forge cloudbuild bash --script -
+      - name: Run forge cloudbuild --script \#!/bin/bash env
+        run: |
+          echo IyEvYmluL2Jhc2gKZW52Cg== | base64 -d | forge cloudbuild bash --script -
+      - name: Run forge cloudbuild --script \#!/usr/bin/env node
+        run: |
+          echo IyEvdXNyL2Jpbi9lbnYgbm9kZQpmb3IgKGNvbnN0IFtrLCB2XSBvZiBPYmplY3QuZW50cmllcyhwcm9jZXNzLmVudikpIHsKICAgIGNvbnNvbGUubG9nKGAke2t9PSR7dn1gKTsKfQo= | base64 -d | forge cloudbuild node --script -
+      # See https://cloud.google.com/build/docs/building/build-go.
+      - name: run forge cloudbuild docker
+        run: forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - uses: ./
         with:
           install: false
