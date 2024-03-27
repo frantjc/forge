@@ -56,7 +56,7 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 		}
 
 		containerConfig.Entrypoint = bin.ScriptEntrypoint
-	} else {
+	} else if step.Entrypoint != "" {
 		containerConfig.Entrypoint = []string{step.Entrypoint}
 	}
 
