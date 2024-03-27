@@ -40,12 +40,16 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 		}
 	}
 
-	containerConfig.Mounts = []forge.Mount{
-		{
-			Source:      filepath.Join(_home, ".config/gcloud"),
-			Destination: filepath.Join(home, ".config/gcloud"),
-		},
+	source := filepath.Join(_home, ".config/gcloud")
+	if _, err := os.Stat(source); err == nil {
+		containerConfig.Mounts = []forge.Mount{
+			{
+				Source:      source,
+				Destination: filepath.Join(home, ".config/gcloud"),
+			},
+		}
 	}
+
 
 	if step.Script != "" {
 		if step.Entrypoint != "" || len(step.Args) > 0 {
