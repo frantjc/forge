@@ -99,8 +99,7 @@ func (s *Substitutions) Env() []string {
 // NewSubstitutionsFromEnv returns a map of default substitutions
 // whose values are sourced from the environment.
 // See https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#using_default_substitutions.
-// nolint: gocyclo
-func NewSubstitutionsFromEnv(userDefinedSubstitutions map[string]string) (*Substitutions, error) {
+func NewSubstitutionsFromEnv(userDefinedSubstitutions map[string]string) (*Substitutions, error) { //nolint: gocyclo
 	substitutionsM := map[string]string{
 		EnvVarProjectID:              os.Getenv(EnvVarProjectID),
 		EnvVarBuildID:                os.Getenv(EnvVarBuildID),
