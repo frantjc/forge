@@ -55,8 +55,8 @@ test("run install", () => {
             ...env,
             INPUT_INSTALL: "true",
           },
-        },
+        }
       )
-      .toString(),
+      .toString()
   ).toContain("forge -v");
 });

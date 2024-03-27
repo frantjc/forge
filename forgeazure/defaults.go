@@ -2,11 +2,9 @@ package forgeazure
 
 import "github.com/frantjc/forge/internal/containerfs"
 
-var DefaultMapping = &Mapping{
-	TaskPath: DefaultTaskPath,
-}
-
 var (
-	DefaultRootPath = containerfs.WorkingDir
-	DefaultTaskPath = DefaultRootPath + "/task"
+	DefaultTaskPath = containerfs.WorkingDir + "/task"
+	DefaultMapping  = &Mapping{
+		TaskPath: DefaultTaskPath,
+	}
 )

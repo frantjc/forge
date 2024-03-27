@@ -425,8 +425,7 @@ func NewGlobalContextFromPath(path string) (*GlobalContext, error) {
 
 		for _, remote := range conf.Remotes {
 			for _, rurl := range remote.URLs {
-				prurl, err := url.Parse(rurl)
-				if err == nil {
+				if prurl, err := url.Parse(rurl); err == nil {
 					c.GitHubContext.Repository = strings.TrimSuffix(
 						strings.TrimPrefix(prurl.Path, "/"),
 						".git",
