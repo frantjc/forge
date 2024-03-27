@@ -72,38 +72,34 @@ async function run(): Promise<void> {
       throw new Error(`unsupported OS ${process.env.RUNNER_OS}`);
     }
 
-    // Default to looking it up on PATH if install is explicitly set to false.
-    let bin = tool;
-    if (core.getBooleanInput("install")) {
-      core.startGroup("install");
+    core.startGroup("install");
 
-      // Look for forge in the cache.
-      let dir = tc.find(tool, versionOs);
+    // Look for forge in the cache.
+    let dir = tc.find(tool, versionOs);
 
-      // If we don't find forge in the cache, download, extract and cache it
-      // from its GitHub release.
-      if (!dir) {
-        dir = await tc.cacheFile(
-          path.join(
-            await tc.extractTar(
-              await tc.downloadTool(
-                `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
-              )
-            ),
-            tool
+    // If we don't find forge in the cache, download, extract and cache it
+    // from its GitHub release.
+    if (!dir) {
+      dir = await tc.cacheFile(
+        path.join(
+          await tc.extractTar(
+            await tc.downloadTool(
+              `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
+            )
           ),
-          tool,
-          tool,
-          versionOs
-        );
-      }
-
-      bin = path.join(dir, bin);
-
-      core.addPath(dir);
-
-      core.endGroup();
+          tool
+        ),
+        tool,
+        tool,
+        versionOs
+      );
     }
+
+    const bin = path.join(dir, tool);
+
+    core.addPath(dir);
+
+    core.endGroup();
 
     // Sanity check that forge was installed correctly.
     await cp.exec(bin, ["-v"]);

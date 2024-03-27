@@ -103,21 +103,17 @@ function run() {
             if (!goreleaserYML.builds[0].goos.includes(os)) {
                 throw new Error(`unsupported OS ${process.env.RUNNER_OS}`);
             }
-            // Default to looking it up on PATH if install is explicitly set to false.
-            let bin = tool;
-            if (core.getBooleanInput("install")) {
-                core.startGroup("install");
-                // Look for forge in the cache.
-                let dir = tc.find(tool, versionOs);
-                // If we don't find forge in the cache, download, extract and cache it
-                // from its GitHub release.
-                if (!dir) {
-                    dir = yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs);
-                }
-                bin = path_1.default.join(dir, bin);
-                core.addPath(dir);
-                core.endGroup();
+            core.startGroup("install");
+            // Look for forge in the cache.
+            let dir = tc.find(tool, versionOs);
+            // If we don't find forge in the cache, download, extract and cache it
+            // from its GitHub release.
+            if (!dir) {
+                dir = yield tc.cacheFile(path_1.default.join(yield tc.extractTar(yield tc.downloadTool(`https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`)), tool), tool, tool, versionOs);
             }
+            const bin = path_1.default.join(dir, tool);
+            core.addPath(dir);
+            core.endGroup();
             // Sanity check that forge was installed correctly.
             yield cp.exec(bin, ["-v"]);
         }
