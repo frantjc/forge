@@ -112,14 +112,20 @@ func NewExec() *cobra.Command {
 
 				// Wait on forge.sock to be ready (it probably is, but want to avoid race condition).
 				if useForgeSock {
-					for {
-						if conn, err := net.Dial("unix", forgeSock); err == nil {
-							if err = conn.Close(); err != nil {
-								return err
+					if err = func() error {
+						for {
+							select {
+							case <-ctx.Done():
+								return ctx.Err()
+							default:
+								if conn, err := net.Dial("unix", forgeSock); err == nil {
+									defer conn.Close()
+									return nil
+								}
 							}
-
-							break
 						}
+					}(); err != nil {
+						return err
 					}
 				}
 

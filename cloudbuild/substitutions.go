@@ -57,6 +57,13 @@ func (s *Substitutions) Env() []string {
 		githubPRNumber = fmt.Sprint(s.ProjectNumber)
 	}
 
+	repoName := s.RepoName
+	if repoName == "" {
+		if parts := strings.Split(s.RepoFullName, "/"); len(parts) == 2 {
+			repoName = parts[1]
+		}
+	}
+
 	substitutionsM := map[string]string{
 		EnvVarProjectID:              s.ProjectID,
 		EnvVarBuildID:                s.BuildID,
@@ -65,7 +72,7 @@ func (s *Substitutions) Env() []string {
 		EnvVarTriggerName:            s.TriggerName,
 		EnvVarCommitSha:              xslice.Coalesce(s.CommitSha, s.RevisionID),
 		EnvVarRevisionID:             xslice.Coalesce(s.RevisionID, s.CommitSha),
-		EnvVarRepoName:               xslice.Coalesce(s.RepoName, strings.Split(s.RepoFullName, "/")[1]),
+		EnvVarRepoName:               repoName,
 		EnvVarRepoFullName:           s.RepoFullName,
 		EnvVarBranchName:             xslice.Coalesce(s.BranchName, s.RefName),
 		EnvVarTagName:                xslice.Coalesce(s.TagName, s.RefName),
