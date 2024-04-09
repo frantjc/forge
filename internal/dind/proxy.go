@@ -130,9 +130,10 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 						// request to be for the mount `/host/path/subpath:/container2/path`.
 						for i, bind := range body.HostConfig.Binds {
 							var (
-								parts = strings.SplitN(bind, ":", 2)
-								src   = parts[0]
-								dst   = parts[1]
+								parts     = strings.SplitN(bind, ":", 2)
+								src       = parts[0]
+								dst       = parts[1]
+								satisfied bool
 							)
 
 							for k, v := range mounts {
@@ -143,11 +144,14 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 										),
 										dst,
 									)
-									continue
+									satisfied = true
+									break
 								}
 							}
 
-							return fmt.Errorf("one or more requested mounts cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running")
+							if !satisfied {
+								return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running", bind)
+							}
 						}
 
 						buf := new(bytes.Buffer)
