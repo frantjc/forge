@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -12,8 +13,6 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -33,9 +32,9 @@ import (
 // is done or an error is encountered, similar to http.Serve.
 func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Listener, dockerSock *url.URL) error {
 	var (
+		errC    = make(chan error)
 		network = "tcp"
 		address = dockerSock.Host
-		errC    = make(chan error, 1)
 	)
 
 	if strings.EqualFold("unix", dockerSock.Scheme) {
@@ -44,159 +43,150 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 	}
 
 	go func() {
-		errC <- (&http.Server{
-			ReadHeaderTimeout: time.Second * 5,
-			BaseContext: func(_ net.Listener) context.Context {
-				return ctx
-			},
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				var (
-					statusCode = http.StatusInternalServerError
-					errC2      = make(chan error, 1)
-				)
-
-				conn, cli, err := func() (net.Conn, *bufio.ReadWriter, error) {
-					h, ok := w.(http.Hijacker)
-					if !ok {
-						return nil, nil, fmt.Errorf("not a hijacker")
-					}
-
-					return h.Hijack()
-				}()
+		errC <- func() error {
+			for {
+				cli, err := lis.Accept()
 				if err != nil {
-					_ = json.NewEncoder(w).Encode(&types.ErrorResponse{
-						Message: err.Error(),
-					})
-					return
+					return err
 				}
 
-				closeConn := sync.OnceFunc(func() {
-					_ = cli.Flush()
-					_ = conn.Close()
-				})
-				defer closeConn()
+				dockerd, err := net.Dial(network, address)
+				if err != nil {
+					return err
+				}
 
-				if err = func() error {
-					daemon, err := net.Dial(network, address)
-					if err != nil {
-						return err
-					}
+				// Copy responses from `dockerd` straight back to the client.
+				go func() {
+					// Close the client connection once we
+					// reach EOF on the response.
+					defer dockerd.Close()
+					defer cli.Close()
 
-					// Copy responses from `dockerd` straight back to the client.
-					go func() {
-						// Close the client connection once we
-						// reach EOF on the response.
-						defer closeConn()
-						defer daemon.Close()
+					errC <- func() error {
+						if _, err = io.Copy(cli, dockerd); err != nil {
+							return err
+						}
 
-						buf := bufio.NewReader(daemon)
-
-						errC2 <- func() error {
-							res, err := http.ReadResponse(buf, r)
-							if err != nil {
-								return err
-							}
-
-							if err = res.Write(cli); err != nil {
-								return err
-							}
-
-							return nil
-						}()
+						return nil
 					}()
+				}()
 
-					// Intercept, inspect and potentially modify requests to
-					// `dockerd` from the client.
-					// TODO: Presumably there are other requests that
-					// need intercepted and modified to work properly.
-					if r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/containers/create") {
-						body := &struct {
-							HostConfig       container.HostConfig
-							NetworkingConfig map[string]any
-							container.Config `json:",inline"`
-						}{}
+				// Intercept, inspect and potentially modify requests to
+				// `dockerd` from the client.
+				go func() {
+					errC <- func() error {
+						buf := bufio.NewReader(cli)
 
-						if err := json.NewDecoder(cli).Decode(body); err != nil {
-							return err
-						}
+						for {
+							req, err := http.ReadRequest(buf)
+							if errors.Is(err, io.EOF) {
+								break
+							} else if err != nil {
+								return err
+							}
 
-						// Replace requested mount sources with their
-						// host path equivalents. Error if impossible.
-						//
-						// For example, if the client is running in container1 which
-						// has mount `/host/path:/container1/path` and requests mount
-						// `/container1/path/subpath:/container2/path`, then we modify the
-						// request to be for the mount `/host/path/subpath:/container2/path`.
-						for i, bind := range body.HostConfig.Binds {
-							var (
-								parts     = strings.SplitN(bind, ":", 2)
-								src       = parts[0]
-								dst       = parts[1]
-								satisfied bool
-							)
+							// TODO: Presumably there are other requests that
+							// need intercepted and modified to work properly.
+							if req.Method == http.MethodPost && strings.HasSuffix(req.URL.Path, "/containers/create") {
+								body := &struct {
+									HostConfig       container.HostConfig
+									NetworkingConfig map[string]any
+									container.Config `json:",inline"`
+								}{}
 
-							for k, v := range mounts {
-								if strings.HasPrefix(src, v) {
-									body.HostConfig.Binds[i] = fmt.Sprintf("%s:%s",
-										filepath.Join(
-											k, strings.TrimPrefix(src, v),
-										),
-										dst,
-									)
-									satisfied = true
-									break
+								if err := json.NewDecoder(req.Body).Decode(body); err != nil {
+									return err
 								}
+
+								if err = req.Body.Close(); err != nil {
+									return err
+								}
+
+								buf := new(bytes.Buffer)
+
+								// Replace requested mount sources with their
+								// host path equivalents. Error if impossible.
+								//
+								// For example, if the client is running in container1 which
+								// has mount `/host/path:/container1/path` and requests mount
+								// `/container1/path/subpath:/container2/path`, then we modify the
+								// request to be for the mount `/host/path/subpath:/container2/path`.
+								for i, bind := range body.HostConfig.Binds {
+									var (
+										parts     = strings.SplitN(bind, ":", 2)
+										src       = parts[0]
+										dst       = parts[1]
+										satisfied bool
+									)
+
+									for k, v := range mounts {
+										if strings.HasPrefix(src, v) {
+											body.HostConfig.Binds[i] = fmt.Sprintf("%s:%s",
+												filepath.Join(
+													k, strings.TrimPrefix(src, v),
+												),
+												dst,
+											)
+											satisfied = true
+											break
+										}
+									}
+
+									if !satisfied {
+										if err = json.NewEncoder(buf).Encode(&types.ErrorResponse{
+											Message: fmt.Sprintf("volume `%s` cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running", bind),
+										}); err != nil {
+											return err
+										}
+
+										if err = (&http.Response{
+											Status:        http.StatusText(http.StatusInternalServerError),
+											StatusCode:    http.StatusInternalServerError,
+											Proto:         req.Proto,
+											ProtoMajor:    req.ProtoMajor,
+											ProtoMinor:    req.ProtoMinor,
+											Body:          io.NopCloser(buf),
+											ContentLength: int64(buf.Len()),
+											Request:       req,
+										}).Write(cli); err != nil {
+											return err
+										}
+
+										return nil
+									}
+								}
+
+								if err = json.NewEncoder(buf).Encode(body); err != nil {
+									return err
+								}
+
+								// Since we possibly modified the request body,
+								// the Content-Length has possibly changed.
+								req.Body = io.NopCloser(buf)
+								req.Header.Set("Content-Length", fmt.Sprint(buf.Len()))
+								req.ContentLength = int64(buf.Len())
 							}
 
-							if !satisfied {
-								return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running", bind)
+							if err := req.WriteProxy(dockerd); err != nil {
+								return err
 							}
 						}
 
-						buf := new(bytes.Buffer)
-
-						if err = json.NewEncoder(buf).Encode(body); err != nil {
-							return err
-						}
-
-						// Since we possibly modified the request body,
-						// the Content-Length has possibly changed.
-						lenBuf := buf.Len()
-						r.Body = io.NopCloser(buf)
-						r.Header.Set("Content-Length", fmt.Sprint(lenBuf))
-						r.ContentLength = int64(lenBuf)
-					}
-
-					if err := r.WriteProxy(daemon); err != nil {
-						return err
-					}
-
-					return <-errC2
-				}(); err != nil {
-					buf := new(bytes.Buffer)
-
-					_ = json.NewEncoder(buf).Encode(&types.ErrorResponse{
-						Message: err.Error(),
-					})
-
-					_ = (&http.Response{
-						Status:     http.StatusText(statusCode),
-						StatusCode: statusCode,
-						Proto:      r.Proto,
-						ProtoMajor: r.ProtoMajor,
-						ProtoMinor: r.ProtoMajor,
-						Request:    r,
-						Body:       io.NopCloser(buf),
-					}).Write(cli)
-				}
-			}),
-		}).Serve(lis)
+						return nil
+					}()
+				}()
+			}
+		}()
 	}()
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-errC:
-		return err
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case err := <-errC:
+			if err != nil {
+				return err
+			}
+		}
 	}
 }

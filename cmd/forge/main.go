@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -22,11 +23,8 @@ func main() {
 		)
 	)
 
-	if pErr := xerrors.Ignore(
-		err,
-		ore.ErrContainerExitedWithNonzeroExitCode,
-	); pErr != nil {
-		fmt.Fprintln(os.Stderr, pErr.Error())
+	if !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
 	stop()
