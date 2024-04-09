@@ -17,14 +17,16 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 	entrypoint := []string{bin.ShimPath, "sleep"}
 
 	if !NoUseForgeSock {
-		entrypoint = append(entrypoint, "--sock", containerfs.ForgeSock)
-	}
+		entrypoint = append(entrypoint,
+			fmt.Sprintf("--sock=%s", containerfs.ForgeSock),
+		)
 
-	for _, mount := range containerConfig.Mounts {
-		if mount.Source != "" && mount.Destination != "" {
-			entrypoint = append(entrypoint,
-				fmt.Sprintf("--mount=%s=%s", mount.Source, mount.Destination),
-			)
+		for _, mount := range containerConfig.Mounts {
+			if mount.Source != "" && mount.Destination != "" {
+				entrypoint = append(entrypoint,
+					fmt.Sprintf("--mount=%s=%s", mount.Source, mount.Destination),
+				)
+			}
 		}
 	}
 
