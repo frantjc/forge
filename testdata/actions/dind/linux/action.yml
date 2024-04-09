@@ -9,6 +9,6 @@ runs:
   args:
     - -c
     - |
-      ls
-      ls ..
+      ls -al ../bin
+      echo $PATH
       docker run --rm -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
