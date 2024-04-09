@@ -23,7 +23,7 @@ func main() {
 		)
 	)
 
-	if !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
+	if err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
