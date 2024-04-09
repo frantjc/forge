@@ -4,7 +4,7 @@ description: |
 author: frantjc
 runs:
   using: docker
-  image: alpine
+  image: docker://alpine:3.19
   entrypoint: sh
   args:
     - -c
