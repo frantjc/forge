@@ -28,7 +28,7 @@ func NewForge() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
-	cmd.PersistentFlags().BoolVar(&containerutil.NoUseForgeSock, "no-forge-sock", false, "disable use of forge.sock")
+	cmd.PersistentFlags().BoolVar(&containerutil.NoUseForgeSock, "no-sock", false, "disable use of forge.sock")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
 
 	return cmd
