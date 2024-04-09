@@ -43,7 +43,7 @@ jobs:
       - name: Run forge cloudbuild --script node
         run: |
           forge cloudbuild node:20 --script testdata/cloudbuild/scripts/node
-      # See https://cloud.google.com/build/docs/building/build-go.
+      # See https://cloud.google.com/build/docs/building/build-containers.
       - name: Run forge cloudbuild docker
         run: |
           forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile

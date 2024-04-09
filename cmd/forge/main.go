@@ -14,17 +14,19 @@ import (
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-
-	err := xerrors.Ignore(
-		xerrors.Ignore(
+	var (
+		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		err       = xerrors.Ignore(
 			command.NewForge().ExecuteContext(ctx),
-			ore.ErrContainerExitedWithNonzeroExitCode,
-		),
-		context.Canceled,
+			context.Canceled,
+		)
 	)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+
+	if pErr := xerrors.Ignore(
+		err,
+		ore.ErrContainerExitedWithNonzeroExitCode,
+	); pErr != nil {
+		fmt.Fprintln(os.Stderr, pErr.Error())
 	}
 
 	stop()
