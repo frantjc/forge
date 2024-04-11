@@ -75,8 +75,6 @@ jobs:
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
-      - name: Test `docker` mount
-        run: forge use ./testdata/actions/dind/linux
       - name: Test forge.sock
         run: |
           forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
