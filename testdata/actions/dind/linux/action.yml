@@ -11,4 +11,4 @@ runs:
     - |
       ls -al ../bin
       echo $PATH
-      docker run --rm -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
+      ../bin/docker run --rm -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
