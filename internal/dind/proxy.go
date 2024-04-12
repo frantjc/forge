@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -42,6 +43,45 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 		address = dockerSock.Path
 	}
 
+	var (
+		dialer = &net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}
+		transport, ok = http.DefaultTransport.(*http.Transport)
+	)
+	if !ok {
+		return fmt.Errorf("default transport is not a transport")
+	}
+
+	// We want to use http.DefaultTransport, but it won't dial non-http schemes by default,
+	// so convince it that it's not and override the dialer to always connect to `dockerd`.
+	transport.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
+		return dialer.DialContext(ctx, network, address)
+	}
+
+	daemon := &httputil.ReverseProxy{
+		// This directory just makes http.DefaultTransport
+		// happy just long enough for it to use our dialer.
+		Director: func(r *http.Request) {
+			r.URL.Scheme = "http"
+
+			if r.Host == "" {
+				r.Host = "api.moby.localhost"
+			}
+		},
+		Transport: transport,
+		// Return errors to the client instead of logging them server-side.
+		ErrorLog: log.New(io.Discard, "", 0),
+		ErrorHandler: func(w http.ResponseWriter, _ *http.Request, err error) {
+			w.WriteHeader(http.StatusBadGateway)
+
+			_ = json.NewEncoder(w).Encode(&types.ErrorResponse{
+				Message: err.Error(),
+			})
+		},
+	}
+
 	go func() {
 		errC <- (&http.Server{
 			ReadHeaderTimeout: time.Second * 5,
@@ -60,6 +100,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 						}{}
 
 						if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+							errStatusCode = http.StatusBadRequest
 							return err
 						}
 
@@ -71,8 +112,14 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 						// `/container1/path/subpath:/container2/path`, then we modify the
 						// request to be for the mount `/host/path/subpath:/container2/path`.
 						for i, bind := range body.HostConfig.Binds {
+							parts := strings.SplitN(bind, ":", 2)
+
+							if len(parts) != 2 {
+								errStatusCode = http.StatusBadRequest
+								return fmt.Errorf("invalid volume `%s`", bind)
+							}
+
 							var (
-								parts     = strings.SplitN(bind, ":", 2)
 								src       = parts[0]
 								dst       = parts[1]
 								satisfied bool
@@ -92,6 +139,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 							}
 
 							if !satisfied {
+								errStatusCode = http.StatusBadRequest
 								return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running", bind)
 							}
 						}
@@ -110,35 +158,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 						r.ContentLength = int64(lenBuf)
 					}
 
-					var (
-						dialer = &net.Dialer{
-							Timeout:   30 * time.Second,
-							KeepAlive: 30 * time.Second,
-						}
-						transport, ok = http.DefaultTransport.(*http.Transport)
-					)
-					if !ok {
-						return fmt.Errorf("default transport is not a transport")
-					}
-
-					transport.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
-						return dialer.DialContext(ctx, network, address)
-					}
-
-					(&httputil.ReverseProxy{
-						Director: func(r *http.Request) {
-							fmt.Println(r.Header)
-							r.URL.Scheme = "http"
-
-							if r.Host == "" {
-								r.Host = "api.moby.localhost"
-							}
-
-							r.URL.Host = r.Host
-							r.Header.Set("Host", r.Host)
-						},
-						Transport: transport,
-					}).ServeHTTP(w, r)
+					daemon.ServeHTTP(w, r)
 
 					return nil
 				}(); err != nil {
