@@ -62,8 +62,8 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 	}
 
 	daemon := &httputil.ReverseProxy{
-		// This directory just makes http.DefaultTransport
-		// happy just long enough for it to use our dialer.
+		// This directory makes http.DefaultTransport happy
+		// just long enough for it to use our transport.
 		Director: func(r *http.Request) {
 			if r.URL.Scheme != "https" {
 				r.URL.Scheme = "http"
