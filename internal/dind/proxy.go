@@ -65,10 +65,12 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 		// This directory just makes http.DefaultTransport
 		// happy just long enough for it to use our dialer.
 		Director: func(r *http.Request) {
-			r.URL.Scheme = "http"
+			if r.URL.Scheme != "https" {
+				r.URL.Scheme = "http"
+			}
 
-			if r.Host == "" {
-				r.Host = "api.moby.localhost"
+			if r.URL.Host == "" {
+				r.URL.Host = "api.moby.localhost"
 			}
 		},
 		Transport: transport,
