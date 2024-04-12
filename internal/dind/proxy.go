@@ -49,7 +49,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 				return ctx
 			},
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				var errStatusCode = http.StatusInternalServerError
+				errStatusCode := http.StatusInternalServerError
 
 				if err := func() error {
 					if r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/containers/create") {
@@ -130,7 +130,6 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 							fmt.Println(r.Header)
 							r.URL.Scheme = "http"
 
-							
 							if r.Host == "" {
 								r.Host = "api.moby.localhost"
 							}
