@@ -17,6 +17,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/volume"
 )
 
 // ServeDockerdProxy listens on the given listener for traffic intended for `dockerd`.
@@ -140,7 +141,48 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 
 							if !satisfied {
 								errStatusCode = http.StatusBadRequest
-								return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it exists inside of the container that Forge is running your process inside of, but not on the host where the Docker daemon is running", bind)
+								return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it does not exist on the host where the Docker daemon is running", bind)
+							}
+						}
+
+						buf := new(bytes.Buffer)
+
+						if err := json.NewEncoder(buf).Encode(body); err != nil {
+							return err
+						}
+
+						// Since we possibly modified the request body,
+						// the Content-Length has possibly changed.
+						lenBuf := buf.Len()
+						r.Body = io.NopCloser(buf)
+						r.Header.Set("Content-Length", fmt.Sprint(lenBuf))
+						r.ContentLength = int64(lenBuf)
+					} else if r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/volumes/create") {
+						body := &volume.CreateOptions{}
+
+						if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+							errStatusCode = http.StatusBadRequest
+							return err
+						}
+
+						if strings.EqualFold("local", body.Driver) && strings.EqualFold("none", body.DriverOpts["type"]) {
+							if device, ok := body.DriverOpts["device"]; ok {
+								var satisfied bool
+
+								for k, v := range mounts {
+									if strings.HasPrefix(device, v) {
+										body.DriverOpts["device"] = filepath.Join(
+											k, strings.TrimPrefix(device, v),
+										)
+										satisfied = true
+										break
+									}
+								}
+
+								if !satisfied {
+									errStatusCode = http.StatusBadRequest
+									return fmt.Errorf("volume `%s` cannot be satisfied by Forge because it does not exist on the host where the Docker daemon is running", device)
+								}
 							}
 						}
 
