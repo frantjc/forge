@@ -14,6 +14,7 @@ import (
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -61,6 +62,7 @@ func NewUse() *cobra.Command {
 				}
 
 				a := &ore.Action{
+					ID:            uuid.NewString(),
 					Uses:          args[0],
 					With:          with,
 					Env:           env,
