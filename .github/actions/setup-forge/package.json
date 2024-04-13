@@ -1,6 +1,6 @@
 {
   "name": "setup-forge",
-  "version": "0.15.0-alpha0",
+  "version": "0.15.0-alpha1",
   "private": true,
   "scripts": {
     "all": "npm-run-all fmt build",
