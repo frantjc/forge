@@ -42,8 +42,8 @@ func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime forge.Contain
 	if err != nil {
 		return err
 	}
-	defer container.Stop(ctx)   //nolint:errcheck
-	defer container.Remove(ctx) //nolint:errcheck
+	defer container.Stop(ctx) //nolint:errcheck
+	// defer container.Remove(ctx) //nolint:errcheck
 
 	if err = forgecloudbuild.CopyScriptToContainer(ctx, container, script); err != nil {
 		return err

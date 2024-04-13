@@ -1,6 +1,7 @@
 package dind
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,8 +12,10 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -32,7 +35,7 @@ import (
 //
 // It always returns an error and doesn't exit until the given context.Context
 // is done or an error is encountered, similar to http.Serve.
-func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Listener, dockerSock *url.URL) error {
+func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Listener, dockerSock *url.URL) error { //nolint: gocyclo
 	var (
 		network = "tcp"
 		address = dockerSock.Host
@@ -45,26 +48,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 	}
 
 	var (
-		dialer = &net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}
-		transport, ok = http.DefaultTransport.(*http.Transport)
-	)
-	if !ok {
-		return fmt.Errorf("default transport is not a transport")
-	}
-
-	// We want to use http.DefaultTransport, but it won't dial non-http schemes by default,
-	// so convince it that it's not and override the dialer to always connect to `dockerd`.
-	transport.DialContext = func(ctx context.Context, _, _ string) (net.Conn, error) {
-		return dialer.DialContext(ctx, network, address)
-	}
-
-	daemon := &httputil.ReverseProxy{
-		// This directory makes http.DefaultTransport happy
-		// just long enough for it to use our transport.
-		Director: func(r *http.Request) {
+		director = func(r *http.Request) {
 			if r.URL.Scheme != "https" {
 				r.URL.Scheme = "http"
 			}
@@ -72,18 +56,21 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 			if r.URL.Host == "" {
 				r.URL.Host = "api.moby.localhost"
 			}
-		},
-		Transport: transport,
+		}
 		// Return errors to the client instead of logging them server-side.
-		ErrorLog: log.New(io.Discard, "", 0),
-		ErrorHandler: func(w http.ResponseWriter, _ *http.Request, err error) {
+		errorLog     = log.New(io.Discard, "", 0)
+		errorHandler = func(w http.ResponseWriter, _ *http.Request, err error) {
 			w.WriteHeader(http.StatusBadGateway)
 
 			_ = json.NewEncoder(w).Encode(&types.ErrorResponse{
 				Message: err.Error(),
 			})
-		},
-	}
+		}
+		dialer = &net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}
+	)
 
 	go func() {
 		errC <- (&http.Server{
@@ -202,7 +189,89 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 						r.ContentLength = int64(lenBuf)
 					}
 
-					daemon.ServeHTTP(w, r)
+					daemon, err := dialer.DialContext(r.Context(), network, address)
+					if err != nil {
+						return err
+					}
+					closeDaemon := sync.OnceFunc(func() {
+						_ = daemon.Close()
+					})
+					defer closeDaemon()
+
+					if strings.HasSuffix(r.URL.Path, "/attach") {
+						h, ok := w.(http.Hijacker)
+						if !ok {
+							return fmt.Errorf("not a hijacker")
+						}
+
+						cli, buf, err := h.Hijack()
+						if err != nil {
+							return err
+						}
+						closeCli := sync.OnceFunc(func() {
+							_ = buf.Flush()
+							_ = cli.Close()
+						})
+						defer closeCli()
+
+						_errC := make(chan error, 1)
+
+						// Copy responses from `dockerd` straight back to the client.
+						go func() {
+							// Close the client connection once we
+							// reach EOF on the response.
+							defer closeCli()
+							defer closeDaemon()
+
+							bufD := bufio.NewReader(daemon)
+
+							_errC <- func() error {
+								res, err := http.ReadResponse(bufD, r)
+								if err != nil {
+									return err
+								}
+
+								if err = res.Write(cli); err != nil {
+									return err
+								}
+
+								if _, err = io.Copy(buf, daemon); err != nil {
+									return err
+								}
+
+								return nil
+							}()
+						}()
+
+						if err = r.Write(io.MultiWriter(daemon, os.Stdout)); err != nil {
+							return err
+						}
+
+						if err := <-_errC; err != nil {
+							return err
+						}
+					} else {
+						transport, ok := http.DefaultTransport.(*http.Transport)
+						if !ok {
+							return fmt.Errorf("default transport is not a transport")
+						}
+
+						// We want to use http.DefaultTransport, but it won't dial non-http schemes by default,
+						// so convince it that it's not and override the dialer to always connect to `dockerd`.
+						transport.DialContext = func(_ context.Context, _, _ string) (net.Conn, error) {
+							return daemon, nil
+						}
+
+						(&httputil.ReverseProxy{
+							// This director makes http.DefaultTransport happy
+							// just long enough for it to use our transport.
+							Director:  director,
+							Transport: transport,
+							// Return errors to the client instead of logging them server-side.
+							ErrorLog:     errorLog,
+							ErrorHandler: errorHandler,
+						}).ServeHTTP(w, r)
+					}
 
 					return nil
 				}(); err != nil {

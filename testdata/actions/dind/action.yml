@@ -9,4 +9,9 @@ runs:
   args:
     - -c
     - |
+      docker volume rm \
+        $(docker volume create \
+          --opt type=none \
+          --opt device=$GITHUB_WORKSPACE\
+        )
       docker run --rm -v $GITHUB_WORKSPACE:/tmp alpine ls /tmp
