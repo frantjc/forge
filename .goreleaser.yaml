@@ -12,7 +12,6 @@ builds:
       - arm64
 release:
   prerelease: auto
-  make_latest: {{ if eq .Prerelease "" }}true{{ else }}false{{ end }}
 changelog:
   use: github
   filters:
