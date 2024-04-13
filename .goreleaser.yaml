@@ -10,6 +10,9 @@ builds:
     goarch:
       - amd64
       - arm64
+release:
+  prerelease: auto
+  make_latest: {{ .Prerelease == "" }}
 changelog:
   use: github
   filters:
