@@ -7,13 +7,13 @@ import path from "path";
 import yaml from "yaml";
 
 const packageJSON = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../package.json")).toString(),
+  fs.readFileSync(path.join(__dirname, "../package.json")).toString()
 );
 
 const goreleaserYML = yaml.parse(
   fs
     .readFileSync(path.join(__dirname, "../../../../.goreleaser.yaml"))
-    .toString(),
+    .toString()
 );
 
 async function run(): Promise<void> {
@@ -84,14 +84,14 @@ async function run(): Promise<void> {
         path.join(
           await tc.extractTar(
             await tc.downloadTool(
-              `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`,
-            ),
+              `https://github.com/frantjc/${tool}/releases/download/v${version}/${tool}_${version}_${os}_${arch}.tar.gz`
+            )
           ),
-          tool,
+          tool
         ),
         tool,
         tool,
-        versionOs,
+        versionOs
       );
     }
 
