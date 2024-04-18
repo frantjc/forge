@@ -42,12 +42,12 @@ func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
-	input := contaminate.InputFrom(ctx)
-	if len(input) == 0 {
-		input = o.Input
+	stdin := contaminate.StdinFrom(ctx)
+	if stdin == nil {
+		stdin = bytes.NewReader(o.Input)
 	}
 
-	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(bytes.NewReader(input))); err != nil {
+	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(stdin)); err != nil {
 		return err
 	} else if exitCode > 0 {
 		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)

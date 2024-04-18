@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Google Cloudbuild Steps](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration) (e.g. [gcr.io/cloud-builders/docker](https://cloud.google.com/build/docs/building/build-containers)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Google Cloudbuild Steps](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers)).
 
 ## install
 
@@ -97,6 +97,8 @@ forge get -a mock -v version=v0.0.0
 For Google Cloudbuild, Forge will try to source the default substitutions from the working directory's Git configuration as well as `~/.config/gcloud`.
 
 ```sh
+# The -- is important to signify to forge that the rest of the arguments are meant to be passed to the underlying command, not parsed by `forge` itself.
+# The '' are important to keep your shell from doing the substitution before `forge` can get ahold of it to the substitution itself.
 forge cloudbuild gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
@@ -107,6 +109,52 @@ forge cloudbuild -a gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_I
 ```
 
 > The Cloudbuild's image must have `bash` or `sh` on its `PATH` for the attach to work.
+
+### as a library
+
+```go
+import (
+	// Some std imports omitted for brevity.
+
+	"github.com/docker/docker/client"
+	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/githubactions"
+	"github.com/frantjc/forge/ore"
+	"github.com/frantjc/forge/runtime/docker"
+)
+
+func main() {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	globalContext := githubactions.NewGlobalContextFromEnv()
+	globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretActionsStepDebugValue
+	globalContext.SecretsContext[githubactions.SecretRunnerDebug] = githubactions.SecretRunnerDebugValue
+	globalContext.SecretsContext[githubactions.SecretActionsRunnerDebug] = githubactions.SecretActionsRunnerDebugValue
+	globalContext.GitHubContext.Repository = "frantjc/forge"
+
+	if err = forge.NewFoundry(docker.New(cli)).Process(
+		ctx,
+		&ore.Lava{
+			From: &ore.Action{
+				Uses:          "actions/checkout@v4",
+				GlobalContext: globalContext,
+			},
+			To: &ore.Pure{
+				Image:      "alpine:3.19",
+				Entrypoint: []string{"grep", "debug"},
+			},
+		},
+		forge.StdDrains(),
+	); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+```
 
 ## why?
 
