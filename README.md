@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and local [Azure DevOps Tasks](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/?view=azure-pipelines) (e.g. [Npm@1](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/npm-v1?view=azure-pipelines)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Google Cloudbuild Steps](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration) (e.g. [gcr.io/cloud-builders/docker](https://cloud.google.com/build/docs/building/build-containers)).
 
 ## install
 
@@ -36,6 +36,12 @@ In GitHub Actions:
 
 ```yml
   - uses: frantjc/forge@v0
+```
+
+As a library:
+
+```sh
+go get -u github.com/frantjc/forge
 ```
 
 ## usage
@@ -86,29 +92,21 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
-### Setup Forge
+### Google Cloudbuild Tasks
 
-Install `forge`:
-
-```yml
-  - uses: frantjc/forge@v0
-```
-
-### Azure DevOps Tasks
-
-For Azure DevOps, you can execute local Tasks by starting the reference with `"/"` or `"."` to signify that it is an absolute or relative local filepath, respectively. Remote Tasks are not supported at this time as there is no standard protocol for referencing them.
+For Google Cloudbuild, Forge will try to source the default substitutions from the working directory's Git configuration as well as `~/.config/gcloud`.
 
 ```sh
-forge task ./testdata/tasks/node
+forge cloudbuild gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
-For additional debugging, you can attach to the container running the Task:
+For additional debugging, you can attach to the container running the Cloudbuild:
 
 ```sh
-forge task -a ./testdata/tasks/node
+forge cloudbuild -a gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
-> If the Task runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
+> The Cloudbuild's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 ## why?
 
