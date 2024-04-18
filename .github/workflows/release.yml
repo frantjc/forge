@@ -19,6 +19,10 @@ jobs:
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
+      - name: Run make shim
+        run: |
+          make shim GOARCH=amd64
+          make shim GOARCH=arm64
       - uses: goreleaser/goreleaser-action@v5
         with:
           args: release --clean

@@ -148,9 +148,9 @@ func main() {
 	globalContext.SecretsContext[githubactions.SecretActionsRunnerDebug] = githubactions.SecretActionsRunnerDebugValue
 	globalContext.GitHubContext.Repository = "frantjc/forge"
 
-  // Checkout https://github.com/frantjc/forge, using
-  // https://github.com/actions/checkout, grepping to
-  // only print debug logs.
+  	// Checkout https://github.com/frantjc/forge, using
+  	// https://github.com/actions/checkout, grepping to
+  	// only print debug logs.
 	if err = forge.NewFoundry(docker.New(cli)).Process(
 		ctx,
 		&ore.Lava{
