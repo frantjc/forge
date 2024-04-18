@@ -84,6 +84,8 @@ For Concourse Resources, Forge will source `resource_types` and `resources` from
 forge get mock -v version=v0.0.0
 ```
 
+Forge mounts the current working directory to the resource's.
+
 You can also attach to the container executing the Resource to snoop around:
 
 ```sh
@@ -97,18 +99,28 @@ forge get -a mock -v version=v0.0.0
 For Google Cloudbuild, Forge will try to source the default substitutions from the working directory's Git configuration as well as `~/.config/gcloud`.
 
 ```sh
-# The -- is important to signify to forge that the rest of the arguments are meant to be passed to the underlying command, not parsed by `forge` itself.
-# The '' are important to keep your shell from doing the substitution before `forge` can get ahold of it to the substitution itself.
+# The `--` is important to signify to forge that the rest of the arguments are meant to be passed to the underlying command, not parsed by `forge` itself.
+# The `''` are important to keep your shell from doing the substitution before `forge` can get ahold of it to the substitution itself.
 forge cloudbuild gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
-For additional debugging, you can attach to the container running the Cloudbuild:
+Using a different entrypoint:
+
+```sh
+# The `""` are important to pass the entire `docker` command
+# as the value to `bash`'s `-c` flag.
+forge cloudbuild --entrypoint bash gcr.io/cloud-builders/docker -- -c "docker build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' ."
+```
+
+Forge mounts the current working directory to the step's as well as a cache directory respecting the XDG Base Directory Specification to the step's `/workspace`.
+
+For additional debugging, you can attach to the container running the step:
 
 ```sh
 forge cloudbuild -a gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
-> The Cloudbuild's image must have `bash` or `sh` on its `PATH` for the attach to work.
+> The step's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
 ### as a library
 
@@ -136,6 +148,9 @@ func main() {
 	globalContext.SecretsContext[githubactions.SecretActionsRunnerDebug] = githubactions.SecretActionsRunnerDebugValue
 	globalContext.GitHubContext.Repository = "frantjc/forge"
 
+  // Checkout https://github.com/frantjc/forge, using
+  // https://github.com/actions/checkout, grepping to
+  // only print debug logs.
 	if err = forge.NewFoundry(docker.New(cli)).Process(
 		ctx,
 		&ore.Lava{
