@@ -10,11 +10,11 @@ import (
 	"github.com/frantjc/forge/forgeactions"
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/contaminate"
-	"github.com/frantjc/forge/internal/digestutil"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -22,11 +22,12 @@ import (
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		attach, outputs, envVars, cache bool
-		workdir                         string
-		env, with                       map[string]string
-		cmd                             = &cobra.Command{
-			Use:           "use",
+		attach, outputs, envVars bool
+		workdir                  string
+		env, with                map[string]string
+		cmd                      = &cobra.Command{
+			Use:           "use [flags] (action)",
+			Aliases:       []string{"github", "action", "act", "gh"},
 			Short:         "Use a GitHub Action",
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
@@ -61,17 +62,12 @@ func NewUse() *cobra.Command {
 				}
 
 				a := &ore.Action{
+					ID:            uuid.NewString(),
 					Uses:          args[0],
 					With:          with,
 					Env:           env,
 					GlobalContext: globalContext,
 				}
-
-				d, err := digestutil.JSON(a)
-				if err != nil {
-					return err
-				}
-				a.ID = d.Encoded()
 
 				if outputs {
 					defer func() {
@@ -83,11 +79,6 @@ func NewUse() *cobra.Command {
 					defer func() {
 						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.EnvContext)
 					}()
-				}
-
-				var o forge.Ore = a
-				if cache {
-					o = &ore.Cache{Ore: o}
 				}
 
 				return forge.NewFoundry(docker.New(c)).Process(
@@ -105,7 +96,7 @@ func NewUse() *cobra.Command {
 							Destination: forgeactions.DefaultRunnerToolCache,
 						},
 					}...),
-					o,
+					a,
 					commandDrains(cmd, outputs, envVars),
 				)
 			},
@@ -118,7 +109,6 @@ func NewUse() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
 	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
 	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")

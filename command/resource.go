@@ -10,7 +10,6 @@ import (
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/forgeconcourse"
-	"github.com/frantjc/forge/internal/containerfs"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/ore"
@@ -23,11 +22,11 @@ import (
 
 func newResource(method string) *cobra.Command {
 	var (
-		attach, cache   bool
+		attach          bool
 		conf, workdir   string
 		version, params map[string]any
 		cmd             = &cobra.Command{
-			Use:           method,
+			Use:           fmt.Sprintf("%s [flags] (resource)", method),
 			Short:         fmt.Sprintf("%s a Concourse resource", cases.Title(language.English).String(method)),
 			Args:          cobra.ExactArgs(1),
 			SilenceErrors: true,
@@ -85,21 +84,18 @@ func newResource(method string) *cobra.Command {
 					return err
 				}
 
-				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd, containerfs.WorkingDir))
-				}
+				destination := filepath.Join(forgeconcourse.DefaultRootPath, cr.Resource.Name)
 
-				var o forge.Ore = cr
-				if cache {
-					o = &ore.Cache{Ore: o}
+				if attach {
+					hooks.ContainerStarted.Listen(hookAttach(cmd, destination))
 				}
 
 				return forge.NewFoundry(docker.New(c)).Process(
 					contaminate.WithMounts(ctx, forge.Mount{
 						Source:      workdir,
-						Destination: filepath.Join(forgeconcourse.DefaultRootPath, cr.Resource.Name),
+						Destination: destination,
 					}),
-					o,
+					cr,
 					commandDrains(cmd),
 				)
 			},
@@ -115,7 +111,6 @@ func newResource(method string) *cobra.Command {
 		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", "params for resource")
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&cache, "cache", false, "use cache")
 	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "version for resource")
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
 	_ = cmd.MarkFlagFilename("conf", ".yaml", ".yml", ".json")

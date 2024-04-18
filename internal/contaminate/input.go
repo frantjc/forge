@@ -1,14 +1,17 @@
 package contaminate
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 type inputKey struct{}
 
-func WithInput(ctx context.Context, input []byte) context.Context {
-	return context.WithValue(ctx, inputKey{}, input)
+func WithStdin(ctx context.Context, stdin io.Reader) context.Context {
+	return context.WithValue(ctx, inputKey{}, stdin)
 }
 
-func InputFrom(ctx context.Context) []byte {
-	input, _ := ctx.Value(inputKey{}).([]byte)
-	return input
+func StdinFrom(ctx context.Context) io.Reader {
+	stdin, _ := ctx.Value(inputKey{}).(io.Reader)
+	return stdin
 }

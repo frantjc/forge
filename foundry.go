@@ -21,8 +21,6 @@ func (f *Foundry) Process(ctx context.Context, ore Ore, drains *Drains) error {
 		return fmt.Errorf("nil container runtime")
 	}
 
-	_ = LoggerFrom(ctx)
-
 	return ore.Liquify(ctx, f.ContainerRuntime, drains)
 }
 

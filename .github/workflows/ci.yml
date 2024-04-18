@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: .github/action/yarn.lock
+          cache-dependency-path: .github/actions/setup-forge/yarn.lock
       - uses: actions/setup-go@v5
         with:
           go-version: 1.22
@@ -33,37 +33,20 @@ jobs:
         run: make INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
-      - name: Run forge task node
-        run: forge task ./testdata/tasks/node
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      # TODO
-      # - uses: actions/checkout@v4
-      #   with:
-      #     repository: microsoft/azure-pipelines-tasks
-      #     path: testdata/tasks/azure-pipelines-tasks
-      #     sparse-checkout: |
-      #       Tasks/
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      # - name: Run forge task KubectlInstallerV0
-      #   run: forge task -e node16 ./testdata/tasks/azure-pipelines-tasks/Tasks/KubectlInstallerV0
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      - uses: ./
-        with:
-          install: false
-          get: mock
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - uses: ./
-        with:
-          install: false
-          put: mock
-          params: |
-            version=0.0.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      # See https://cloud.google.com/build/docs/configuring-builds/run-bash-scripts.
+      - name: Run forge cloudbuild --script noshebang
+        run: |
+          forge cloudbuild alpine --script testdata/cloudbuild/scripts/sh
+      - name: Run forge cloudbuild --script bash
+        run: |
+          forge cloudbuild bash --script testdata/cloudbuild/scripts/bash
+      - name: Run forge cloudbuild --script node
+        run: |
+          forge cloudbuild node:20 --script testdata/cloudbuild/scripts/node
+      # See https://cloud.google.com/build/docs/building/build-containers.
+      - name: Run forge cloudbuild docker
+        run: |
+          forge --no-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
         env:
@@ -92,4 +75,7 @@ jobs:
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
+      - name: Test forge.sock
+        run: |
+          forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - run: forge cache --clean

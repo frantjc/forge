@@ -11,14 +11,22 @@ import (
 	"github.com/frantjc/forge/internal/hooks"
 )
 
-func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
-	entrypoint := []string{bin.ShimPath, "sleep", "--sock", containerfs.ForgeSock}
+var NoUseForgeSock bool
 
-	for _, mount := range containerConfig.Mounts {
-		if mount.Source != "" && mount.Destination != "" {
-			entrypoint = append(entrypoint,
-				fmt.Sprintf("--mount=%s=%s", mount.Source, mount.Destination),
-			)
+func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
+	entrypoint := []string{bin.ShimPath, "sleep"}
+
+	if !NoUseForgeSock {
+		entrypoint = append(entrypoint,
+			fmt.Sprintf("--sock=%s", containerfs.ForgeSock),
+		)
+
+		for _, mount := range containerConfig.Mounts {
+			if mount.Source != "" && mount.Destination != "" {
+				entrypoint = append(entrypoint,
+					fmt.Sprintf("--mount=%s=%s", mount.Source, mount.Destination),
+				)
+			}
 		}
 	}
 

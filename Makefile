@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.14.0
+SEMVER ?= 0.15.0
 
 .DEFAULT: install
 
@@ -21,7 +21,7 @@ install: build
 build:
 	@$(GORELEASER) release --snapshot --clean
 
-.github/action .github/action/:
+.github/actions/setup-forge .github/actions/setup-forge/:
 	@cd $@ && $(YARN) all
 
 generate:
@@ -32,7 +32,7 @@ fmt test:
 
 download:
 	@$(GO) mod $@
-	@cd .github/action && $(YARN)
+	@cd .github/actions/setup-forge && $(YARN)
 
 vendor verify:
 	@$(GO) mod $@
@@ -50,18 +50,26 @@ internal/bin/fs_$(GOARCH).go:
 clean:
 	@rm -rf dist/ rootfs/ vendor/ privileged version internal/bin/shim*.*
 
+ifeq (,$(findstring -,$(SEMVER)))
 MAJOR = $(word 1,$(subst ., ,$(SEMVER)))
 MINOR = $(word 2,$(subst ., ,$(SEMVER)))
 
 release:
-	@cd .github/action && \
+	@cd .github/actions/setup-forge && \
 		$(YARN) version --new-version $(SEMVER)
 	@$(GIT) push
 	@$(GIT) tag -f v$(MAJOR)
 	@$(GIT) tag -f v$(MAJOR).$(MINOR)
 	@$(GIT) push --tags -f
+else
+release:
+	@cd .github/actions/setup-forge && \
+		$(YARN) version --new-version $(SEMVER)
+	@$(GIT) push
+	@$(GIT) push --tags
+endif
 
-action: .github/action
+action: .github/actions/setup-forge
 gen: generate
 dl: download
 ven: vendor
@@ -71,6 +79,6 @@ i: install
 shim: shim_$(GOARCH)
 shim_$(GOARCH): internal/bin/shim_$(GOARCH) internal/bin/fs_$(GOARCH).go
 
-.PHONY: .github/action .github/action/ action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/fs_$(GOARCH).go internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
+.PHONY: .github/actions/setup-forge .github/actions/setup-forge/ action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/fs_$(GOARCH).go internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
 -include docs/docs.mk

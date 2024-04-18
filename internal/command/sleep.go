@@ -30,7 +30,7 @@ func NewSleep() *cobra.Command {
 
 						if dockerHost := os.Getenv(client.EnvOverrideHost); dockerHost != "" {
 							if dockerSock, err := url.Parse(dockerHost); err == nil {
-								return dind.NewProxy(ctx, mounts, lis, dockerSock)
+								return dind.ServeDockerdProxy(ctx, mounts, lis, dockerSock)
 							}
 						}
 					}

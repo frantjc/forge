@@ -6,7 +6,7 @@
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and local [Azure DevOps Tasks](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/?view=azure-pipelines) (e.g. [Npm@1](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/npm-v1?view=azure-pipelines)).
+Forge currently exposes running [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse Resources](https://concourse-ci.org/resources.html) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Google Cloudbuild Steps](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers)).
 
 ## install
 
@@ -36,6 +36,12 @@ In GitHub Actions:
 
 ```yml
   - uses: frantjc/forge@v0
+```
+
+As a library:
+
+```sh
+go get -u github.com/frantjc/forge
 ```
 
 ## usage
@@ -78,6 +84,8 @@ For Concourse Resources, Forge will source `resource_types` and `resources` from
 forge get mock -v version=v0.0.0
 ```
 
+Forge mounts the current working directory to the resource's.
+
 You can also attach to the container executing the Resource to snoop around:
 
 ```sh
@@ -86,43 +94,82 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
-### Setup Forge
+### Google Cloudbuild steps
 
-Skip install and `get` a Concourse Resource using a pre-installed `forge`:
-
-```yml
-  - uses: frantjc/forge@v0
-    with:
-      install: false
-      get: my-resource
-```
-
-Install and `put` a Concourse Resource with the given `params` and `config`:
-
-```yml
-  - uses: frantjc/forge@v0
-    with:
-      put: my-resource
-      params: |
-        my-param=my-value
-      config: forge.yaml
-```
-
-### Azure DevOps Tasks
-
-For Azure DevOps, you can execute local Tasks by starting the reference with `"/"` or `"."` to signify that it is an absolute or relative local filepath, respectively. Remote Tasks are not supported at this time as there is no standard protocol for referencing them.
+For Google Cloudbuild, Forge will try to source the default substitutions from the working directory's Git configuration as well as `~/.config/gcloud`.
 
 ```sh
-forge task ./testdata/tasks/node
+# The `--` is important to signify to forge that the rest of the arguments are meant to be passed to the underlying command, not parsed by `forge` itself.
+# The `''` are important to keep your shell from doing the substitution before `forge` can get ahold of it to the substitution itself.
+forge cloudbuild gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
 ```
 
-For additional debugging, you can attach to the container running the Task:
+Using a different entrypoint:
 
 ```sh
-forge task -a ./testdata/tasks/node
+# The `""` are important to pass the entire `docker` command
+# as the value to `bash`'s `-c` flag.
+forge cloudbuild --entrypoint bash gcr.io/cloud-builders/docker -- -c "docker build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' ."
 ```
 
-> If the Task runs using a custom image, that image must have `bash` or `sh` on its `PATH` for the attach to work.
+Forge mounts the current working directory to the step's as well as a cache directory respecting the XDG Base Directory Specification to the step's `/workspace`.
+
+For additional debugging, you can attach to the container running the step:
+
+```sh
+forge cloudbuild -a gcr.io/cloud-builders/docker -- build -t 'gcr.io/${PROJECT_ID}/my-image:${SHORT_SHA}' .
+```
+
+> The step's image must have `bash` or `sh` on its `PATH` for the attach to work.
+
+### as a library
+
+```go
+import (
+	// Some std imports omitted for brevity.
+
+	"github.com/docker/docker/client"
+	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/githubactions"
+	"github.com/frantjc/forge/ore"
+	"github.com/frantjc/forge/runtime/docker"
+)
+
+func main() {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	globalContext := githubactions.NewGlobalContextFromEnv()
+	globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretActionsStepDebugValue
+	globalContext.SecretsContext[githubactions.SecretRunnerDebug] = githubactions.SecretRunnerDebugValue
+	globalContext.SecretsContext[githubactions.SecretActionsRunnerDebug] = githubactions.SecretActionsRunnerDebugValue
+	globalContext.GitHubContext.Repository = "frantjc/forge"
+
+  // Checkout https://github.com/frantjc/forge, using
+  // https://github.com/actions/checkout, grepping to
+  // only print debug logs.
+	if err = forge.NewFoundry(docker.New(cli)).Process(
+		ctx,
+		&ore.Lava{
+			From: &ore.Action{
+				Uses:          "actions/checkout@v4",
+				GlobalContext: globalContext,
+			},
+			To: &ore.Pure{
+				Image:      "alpine:3.19",
+				Entrypoint: []string{"grep", "debug"},
+			},
+		},
+		forge.StdDrains(),
+	); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+```
 
 ## why?
 

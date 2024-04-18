@@ -1,8 +1,8 @@
 package ore
 
 import (
-	"bytes"
 	"context"
+	"io"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/contaminate"
@@ -16,16 +16,19 @@ type Lava struct {
 }
 
 func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (err error) {
-	buf := new(bytes.Buffer)
-	if err = o.From.Liquify(ctx, containerRuntime, &forge.Drains{
-		Out: buf,
-		Err: drains.Err,
-		Tty: drains.Tty,
-	}); err != nil {
-		return
-	}
+	pr, pw := io.Pipe()
 
-	return o.To.Liquify(contaminate.WithInput(ctx, buf.Bytes()), containerRuntime, drains)
+	go func() {
+		defer pw.Close()
+
+		pw.CloseWithError(o.From.Liquify(ctx, containerRuntime, &forge.Drains{
+			Out: pw,
+			Err: drains.Err,
+			Tty: drains.Tty,
+		}))
+	}()
+
+	return o.To.Liquify(contaminate.WithStdin(ctx, pr), containerRuntime, drains)
 }
 
 func (o *Lava) GetFrom() forge.Ore {

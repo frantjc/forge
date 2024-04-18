@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 	"github.com/frantjc/forge"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
@@ -16,7 +16,7 @@ func (d *ContainerRuntime) PullImage(ctx context.Context, reference string) (for
 		return nil, err
 	}
 
-	r, err := d.Client.ImagePull(ctx, ref.Name(), types.ImagePullOptions{})
+	r, err := d.Client.ImagePull(ctx, ref.Name(), image.PullOptions{})
 	if err != nil {
 		return nil, err
 	}

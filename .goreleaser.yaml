@@ -10,6 +10,8 @@ builds:
     goarch:
       - amd64
       - arm64
+release:
+  prerelease: auto
 changelog:
   use: github
   filters:
