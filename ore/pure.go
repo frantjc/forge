@@ -1,0 +1,57 @@
+package ore
+
+import (
+	"bytes"
+	"context"
+
+	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/containerfs"
+	"github.com/frantjc/forge/internal/containerutil"
+	"github.com/frantjc/forge/internal/contaminate"
+	xos "github.com/frantjc/x/os"
+)
+
+// Pure is an Ore for running a "pure" command inside
+// of a container.
+type Pure struct {
+	Image      string   `json:"image,omitempty"`
+	Entrypoint []string `json:"entrypoint,omitempty"`
+	Cmd        []string `json:"cmd,omitempty"`
+	Env        []string `json:"env,omitempty"`
+	Input      []byte   `json:"input,omitempty"`
+}
+
+func (o *Pure) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) error {
+	image, err := containerRuntime.PullImage(ctx, o.Image)
+	if err != nil {
+		return err
+	}
+
+	containerConfig := &forge.ContainerConfig{
+		Entrypoint: o.Entrypoint,
+		Cmd:        o.Cmd,
+		Env:        o.Env,
+		WorkingDir: containerfs.WorkingDir,
+		Mounts:     contaminate.MountsFrom(ctx),
+	}
+
+	container, err := containerutil.CreateSleepingContainer(ctx, containerRuntime, image, containerConfig)
+	if err != nil {
+		return err
+	}
+	defer container.Stop(ctx)   //nolint:errcheck
+	defer container.Remove(ctx) //nolint:errcheck
+
+	stdin := contaminate.StdinFrom(ctx)
+	if stdin == nil {
+		stdin = bytes.NewReader(o.Input)
+	}
+
+	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(stdin)); err != nil {
+		return err
+	} else if exitCode > 0 {
+		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
+	}
+
+	return nil
+}

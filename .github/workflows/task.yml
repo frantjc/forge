@@ -1,0 +1,27 @@
+name: Azure DevOps Task
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Task from Tasks/ directory in https://github.com/microsoft/azure-pipelines-tasks.
+        required: true
+      execution:
+        description: Task execution.
+        required: true
+        default: node16
+jobs:
+  task:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/azure-pipelines-tasks
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 10
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: node make.js build --task ${{ inputs.task }}
+      - uses: frantjc/forge@main
+      - run: forge task -e ${{ inputs.execution }} ${{ inputs.task }}

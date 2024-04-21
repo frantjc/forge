@@ -1,0 +1,27 @@
+name: Release
+on:
+  push:
+    tags:
+      # Rough semantic version regexp to only create releases
+      # on complete semantic versions e.g. v1.0.0, but not v1.
+      - v[0-9]+.[0-9]+.[0-9]+*
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: true
+      - uses: crazy-max/ghaction-upx@v3
+        with:
+          install-only: true
+      - uses: goreleaser/goreleaser-action@v5
+        with:
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      - uses: ./

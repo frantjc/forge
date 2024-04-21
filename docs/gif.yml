@@ -1,0 +1,93 @@
+config:
+  command: /bin/bash -l
+  cwd: $GOPATH/src/github.com/frantjc
+  env: {}
+  cols: 80
+  rows: 24
+  repeat: 0
+  quality: 100
+  frameDelay: auto
+  maxIdleTime: 2000
+  frameBox:
+    type: window
+    title: null
+    style:
+      backgroundColor: null
+      boxShadow: none
+      margin: 0px
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  cursorStyle: block
+  fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
+  fontSize: 12
+  lineHeight: 1
+  letterSpacing: 0
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+records:
+  - delay: 5
+    content: &prompt "\e[32m$\e[0m "
+  - delay: 1000
+    content: forge use actions/setup-go@v3 -w go-version=1.19
+  - delay: 1000
+    content: &nl "\r\n"
+  - delay: 3000
+    content: "Setup go version spec 1.19\r\n"
+  - delay: 5
+    content: "Attempting to download 1.19...\r\n"
+  - delay: 500
+    content: "matching 1.19...\r\n"
+  - delay: 5
+    content: "Acquiring 1.19.3 from https://github.com/actions/go-versions/releases/download/1.19.3-3375666673/go-1.19.3-linux-x64.tar.gz\r\n"
+  - delay: 5000
+    content: "Extracting Go...\r\n"
+  - delay: 5
+    content: "[command]/bin/tar xz --warning=no-unknown-keyword --overwrite -C /a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/tmp/625018bc-7601-4524-aa67-73db877e8bec -f /a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/tmp/f7fffb71-9208-49cf-9a31-51126012826b\r\n"
+  - delay: 10000
+    content: "Successfully extracted go to /a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/tmp/625018bc-7601-4524-aa67-73db877e8bec\r\nAdding to the cache ...\r\n"
+  - delay: 10000
+    content: "Successfully cached go to /a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64\r\nAdded go to the path\r\n"
+  - delay: 100
+    content: "Successfully set up Go version 1.19\r\n"
+  - delay: 20
+    content: "go version go1.19.3 linux/amd64\r\n"
+  - delay: 100
+    content: "GO111MODULE=\"\"\r\nGOARCH=\"amd64\"\r\nGOBIN=\"\"\r\nGOCACHE=\"/root/.cache/go-build\"\r\nGOENV=\"/root/.config/go/env\"\r\nGOEXE=\"\"\r\nGOEXPERIMENT=\"\"\r\nGOFLAGS=\"\"\r\nGOHOSTARCH=\"amd64\"\r\nGOHOSTOS=\"linux\"\r\nGOINSECURE=\"\"\r\nGOMODCACHE=\"/root/go/pkg/mod\"\r\nGONOPROXY=\"\"\r\nGONOSUMDB=\"\"\r\nGOOS=\"linux\"\r\nGOPATH=\"/root/go\"\r\nGOPRIVATE=\"\"\r\nGOPROXY=\"https://proxy.golang.org,direct\"\r\nGOROOT=\"/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64\"\r\nGOSUMDB=\"sum.golang.org\"\r\nGOTMPDIR=\"\"\r\nGOTOOLDIR=\"/a34ec3b0-ff4c-4468-9991-f19436edd9b8/runner/toolcache/go/1.19.3/x64/pkg/tool/linux_amd64\"\r\nGOVCS=\"\"\r\nGOVERSION=\"go1.19.3\"\r\nGCCGO=\"gccgo\"\r\nGOAMD64=\"v1\"\r\nAR=\"ar\"\r\nCC=\"gcc\"\r\nCXX=\"g++\"\r\nCGO_ENABLED=\"1\"\r\nGOMOD=\"/dev/null\"\r\nGOWORK=\"\"\r\nCGO_CFLAGS=\"-g -O2\"\r\nCGO_CPPFLAGS=\"\"\r\nCGO_CXXFLAGS=\"-g -O2\"\r\nCGO_FFLAGS=\"-g -O2\"\r\nCGO_LDFLAGS=\"-g -O2\"\r\nPKG_CONFIG=\"pkg-config\"\r\nGOGCCFLAGS=\"-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build56040408=/tmp/go-build -gno-record-gcc-switches\"\r\n"
+  - delay: 5
+    content: *prompt
+  - delay: 1000
+    content: forge use ./testdata/actions/docker
+  - delay: 1000
+    content: *nl
+  - delay: 6000
+    content: "   =/shim\r\nPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/12a9c12f-25de-4c1c-b7c2-50e902759255/runner/toolcache\r\nHOSTNAME=d09992cc62d3\r\nGITHUB_REPOSITORY_OWNER=frantjc\r\nGITHUB_RUN_NUMBER=1\r\nGITHUB_REF_PROTECTED=false\r\nGITHUB_REF_TYPE=branch\r\nGITHUB_HEAD_REF=\r\nGITHUB_SERVER_URL=https://github.com/\r\nRUNNER_ARCH=X86\r\nRUNNER_TEMP=/12a9c12f-25de-4c1c-b7c2-50e902759255/runner/tmp\r\nRUNNER_TOOL_CACHE=/12a9c12f-25de-4c1c-b7c2-50e902759255/runner/toolcache\r\nGITHUB_ACTION_PATH=/12a9c12f-25de-4c1c-b7c2-50e902759255/action\r\nGITHUB_REPOSITORY=frantjc\r\nGITHUB_EVENT_PATH=\r\nGITHUB_SHA=5230788dbfa9f45503bf8e2b26cd734ac7e4aab9\r\nGITHUB_REF_NAME=main\r\nRUNNER_OS=Linux\r\nGITHUB_EVENT_NAME=\r\nGITHUB_REF=refs/heads/main\r\nGITHUB_API_URL=https://api.github.com/\r\nGITHUB_ACTION=\r\nGITHUB_ACTIONS=true\r\nGITHUB_GRAPHQL_URL=https://api.github.com/graphql\r\nGITHUB_RUN_ID=\r\nGITHUB_RUN_ATTEMPT=1\r\nGITHUB_ACTOR=\r\nGITHUB_WORKSPACE=/12a9c12f-25de-4c1c-b7c2-50e902759255/workspace\r\nRUNNER_NAME=\r\nCI=true\r\nGITHUB_WORKFLOW=\r\nGITHUB_JOB=\r\nGITHUB_BASE_REF=\r\nGITHUB_TOKEN=\r\nGITHUB_PATH=/12a9c12f-25de-4c1c-b7c2-50e902759255/github/path.txt\r\nGITHUB_ENV=/12a9c12f-25de-4c1c-b7c2-50e902759255/github/env.txt\r\nDOCKER_HOST=/var/run/docker.sock\r\nHOME=/root\r\n"
+  - delay: 5
+    content: *prompt
+  - delay: 1000
+    content: clear
+  - delay: 1000
+    content: *nl

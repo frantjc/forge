@@ -1,0 +1,10 @@
+name: Test
+description: |
+  Test action
+author: frantjc
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - -sI
+    - https://github.com/frantjc/forge
