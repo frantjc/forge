@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"io"
+	"strings"
 
 	"github.com/docker/cli/cli/command/image/build"
 	"github.com/docker/docker/api/types"
@@ -15,7 +16,7 @@ import (
 )
 
 func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dir, reference string) (forge.Image, error) {
-	ref, err := name.ParseReference(reference)
+	ref, err := name.ParseReference(strings.NewReplacer(".", "").Replace(reference))
 	if err != nil {
 		return nil, err
 	}

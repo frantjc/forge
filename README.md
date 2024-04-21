@@ -94,7 +94,7 @@ forge get -a mock -v version=v0.0.0
 
 > The Resource's image must have `bash` or `sh` on its `PATH` for the attach to work.
 
-### Google Cloudbuild steps
+### Google Cloudbuild Steps
 
 For Google Cloudbuild, Forge will try to source the default substitutions from the working directory's Git configuration as well as `~/.config/gcloud`.
 
