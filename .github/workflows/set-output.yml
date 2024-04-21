@@ -1,7 +1,0 @@
-name: Set Output
-on: [workflow_dispatch]
-jobs:
-  save-state:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: frantjc/forge/testdata/actions/set-output@main

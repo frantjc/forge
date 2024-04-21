@@ -1,8 +1,0 @@
-name: Test
-description: |
-  Test action
-author: frantjc
-runs:
-  using: docker
-  image: docker://alpine:3.19
-  entrypoint: false
