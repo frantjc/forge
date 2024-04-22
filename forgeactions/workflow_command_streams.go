@@ -11,7 +11,7 @@ import (
 // directly to the underlying writers.
 func NewWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, drains *forge.Drains) *forge.Streams {
 	globalContext = ConfigureGlobalContext(globalContext)
-	debug := globalContext.SecretsContext[githubactions.SecretActionsStepDebug] == githubactions.SecretActionsStepDebugValue
+	debug := globalContext.DebugEnabled()
 
 	return &forge.Streams{
 		Drains: &forge.Drains{

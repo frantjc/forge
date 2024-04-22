@@ -24,7 +24,7 @@ brews:
   - repository:
       owner: frantjc
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     skip_upload: auto
     homepage:  https://github.com/frantjc/forge
     description: Easily run reusable steps from proprietary CI systems.

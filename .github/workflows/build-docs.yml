@@ -1,0 +1,17 @@
+name: Build Docs
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/mkdocs
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

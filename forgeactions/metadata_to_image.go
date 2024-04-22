@@ -3,6 +3,7 @@ package forgeactions
 import (
 	"context"
 	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/frantjc/forge"
@@ -66,8 +67,13 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 
 		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
 		if uses.IsLocal() {
+			filepathCharsNotAllowedInImageRefPath := regexp.MustCompile(`[^a-z0-9\.\-:]`)
+
 			// dir will always be an absolute path here
-			reference = "forge.dev" + strings.ToLower(dir)
+			reference = "forge.dev" + filepathCharsNotAllowedInImageRefPath.ReplaceAllString(
+				strings.ToLower(dir),
+				"",
+			)
 		}
 
 		if imageBuilder, ok := containerRuntime.(ImageBuilder); ok {

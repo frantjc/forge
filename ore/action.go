@@ -12,7 +12,7 @@ import (
 )
 
 // Action is an Ore representing a GitHub Action.
-// That is--a step in a GitHub Actions Workflow that
+// That is--a step in a GitHub Actions workflow that
 // uses the `uses` key.
 type Action struct {
 	ID            string                       `json:"id,omitempty"`

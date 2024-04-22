@@ -9,3 +9,7 @@ resources:
     source:
       force_version: "true"
       log: ok
+  - name: git
+    type: git
+    source:
+      uri: https://github.com/frantjc/forge

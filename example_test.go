@@ -12,8 +12,9 @@ import (
 	"github.com/frantjc/forge/runtime/docker"
 )
 
-// ExampleFoundry_Process checks out https://github.com/frantjc/forge using
-// https://github.com/actions/checkout, grepping to print only the debug logs.
+// Checkout https://github.com/frantjc/forge
+// using https://github.com/actions/checkout,
+// grepping to only print debug logs.
 func ExampleFoundry_Process() {
 	ctx := context.Background()
 
@@ -24,9 +25,7 @@ func ExampleFoundry_Process() {
 	}
 
 	globalContext := githubactions.NewGlobalContextFromEnv()
-	globalContext.SecretsContext[githubactions.SecretActionsStepDebug] = githubactions.SecretActionsStepDebugValue
-	globalContext.SecretsContext[githubactions.SecretRunnerDebug] = githubactions.SecretRunnerDebugValue
-	globalContext.SecretsContext[githubactions.SecretActionsRunnerDebug] = githubactions.SecretActionsRunnerDebugValue
+	globalContext.EnableDebug()
 	globalContext.GitHubContext.Repository = "frantjc/forge"
 
 	if err = forge.NewFoundry(docker.New(cli)).Process(

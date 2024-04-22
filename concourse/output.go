@@ -1,7 +1,7 @@
 package concourse
 
 // Output has the JSON encoding which
-// a Resource outputs on stdout.
+// a resource outputs on stdout.
 type Output struct {
 	Version  map[string]string `json:"version,omitempty"`
 	Metadata []struct {

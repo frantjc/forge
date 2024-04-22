@@ -11,7 +11,7 @@ import (
 	xos "github.com/frantjc/x/os"
 )
 
-// Resource is an Ore representing a Concourse Resource--
+// Resource is an Ore representing a Concourse resource--
 // any of get, put or check.
 type Resource struct {
 	Method       string                  `json:"method,omitempty"`
