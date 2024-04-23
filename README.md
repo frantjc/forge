@@ -6,4 +6,4 @@ Forge is here to help.
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using a pluggable container runtime. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-[**Learn more**][https://frantjc.github.io/forge].
+[**Learn more**](https://frantjc.github.io/forge).
