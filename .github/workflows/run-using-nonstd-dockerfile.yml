@@ -1,0 +1,7 @@
+name: Runs Using Nonstandard Dockerfile
+on: workflow_dispatch
+jobs:
+  uses-nonstd-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: frantjc/forge/testdata/actions/dockerfile/nonstd@main

@@ -1,5 +1,4 @@
 # IDE
-.idea/
 .vscode/
 
 # macOS
@@ -10,7 +9,6 @@ vendor/
 
 # dev
 __debug_bin
-.env
 
 # concourse/mock-resource
 rootfs/
@@ -22,3 +20,7 @@ dist/
 
 # nodejs
 node_modules/
+
+# mkdocs
+site/
+gh-pages/

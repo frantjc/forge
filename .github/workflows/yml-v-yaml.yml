@@ -1,0 +1,7 @@
+name: Runs Using action.yml or action.yaml
+on: workflow_dispatch
+jobs:
+  uses-action-yml-or-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: frantjc/forge/testdata/actions/yml-v-yaml@main

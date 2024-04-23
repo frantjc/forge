@@ -532,7 +532,7 @@ func (c *GlobalContext) Env() []string {
 //
 //	${{ like.this }}
 //
-// ...in Workflow files.
+// ...in workflow files.
 type GlobalContext struct {
 	GitHubContext  *GitHubContext
 	EnvContext     map[string]string
@@ -544,12 +544,24 @@ type GlobalContext struct {
 	NeedsContext   map[string]NeedContext
 }
 
+func (c *GlobalContext) EnableDebug() *GlobalContext {
+	c.SecretsContext[SecretActionsStepDebug] = "true"
+	c.SecretsContext[SecretRunnerDebug] = "1"
+	c.SecretsContext[SecretActionsRunnerDebug] = "true"
+	return c
+}
+
+func (c *GlobalContext) DebugEnabled() bool {
+	enabled, _ := strconv.ParseBool(c.SecretsContext[SecretActionsStepDebug])
+	return enabled
+}
+
 // GitHubContext stores all the values accessible
 // through the...
 //
 //	${{ github }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type GitHubContext struct {
 	Action          string
 	ActionPath      string
@@ -581,7 +593,7 @@ type GitHubContext struct {
 //
 //	${{ job }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type JobContext struct {
 	Container *JobContextContainer
 	Services  map[string]JobContextService
@@ -593,7 +605,7 @@ type JobContext struct {
 //
 //	${{ step }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type StepContext struct {
 	Outputs    map[string]string
 	Conclusion string
@@ -605,7 +617,7 @@ type StepContext struct {
 //
 //	${{ runner }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type RunnerContext struct {
 	Name      string
 	OS        string
@@ -620,7 +632,7 @@ type RunnerContext struct {
 //	TODO: needs?
 //	${{ need }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type NeedContext struct {
 	Outputs map[string]string
 }
@@ -630,7 +642,7 @@ type NeedContext struct {
 //
 //	${{ job.container }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type JobContextContainer struct {
 	ID      string
 	Network string
@@ -641,7 +653,7 @@ type JobContextContainer struct {
 //
 //	${{ job.service }}
 //
-// ...context in Workflow files.
+// ...context in workflow files.
 type JobContextService struct {
 	ID      string
 	Network string

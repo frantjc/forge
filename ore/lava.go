@@ -30,11 +30,3 @@ func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 
 	return o.To.Liquify(contaminate.WithStdin(ctx, pr), containerRuntime, drains)
 }
-
-func (o *Lava) GetFrom() forge.Ore {
-	return o.From
-}
-
-func (o *Lava) GetTo() forge.Ore {
-	return o.To
-}

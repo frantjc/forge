@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 0.15.0
+SEMVER ?= 0.15.1
 
 .DEFAULT: install
 
@@ -81,4 +81,4 @@ shim_$(GOARCH): internal/bin/shim_$(GOARCH) internal/bin/fs_$(GOARCH).go
 
 .PHONY: .github/actions/setup-forge .github/actions/setup-forge/ action i install build fmt generate test download vendor verify lint shim shim_$(GOARCH) internal/bin/fs_$(GOARCH).go internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
--include docs/gif.mk
+-include docs/gifs.mk

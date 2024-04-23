@@ -19,8 +19,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
-          cache-dependency-path: .github/actions/setup-forge/yarn.lock
       - name: Run make action
         run: |
           cd .github/actions/setup-forge

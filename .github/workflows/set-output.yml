@@ -1,5 +1,5 @@
 name: Set Output
-on: [workflow_dispatch]
+on: workflow_dispatch
 jobs:
   save-state:
     runs-on: ubuntu-latest
