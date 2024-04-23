@@ -4,4 +4,9 @@ Forge is here to help.
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using Docker. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running [GitHub Actions](github-actions.md) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go)), [Concourse resources](concourse.md) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource)) and [Google Cloudbuild steps](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers)) _and more_ in its [Go module](module.md).
+Forge currently exposes running:
+
+- [GitHub Actions](github-actions.md) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go))
+- [Concourse resources](concourse.md) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource))
+- [Google Cloudbuild steps](google-cloudbuild.md) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers))
+- _and more_ in its [Go module](module.md).
