@@ -4,8 +4,8 @@ go 1.22.1
 
 require (
 	github.com/adrg/xdg v0.4.0
-	github.com/docker/cli v26.0.1+incompatible
-	github.com/docker/docker v26.0.2+incompatible
+	github.com/docker/cli v26.1.0+incompatible
+	github.com/docker/docker v26.1.0+incompatible
 	github.com/frantjc/x v0.0.0-20240409062121-4f11680e2399
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-containerregistry v0.19.1
@@ -23,7 +23,7 @@ require (
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
-	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/containerd/containerd v1.7.15 // indirect
@@ -67,13 +67,11 @@ require (
 	go.opentelemetry.io/otel/sdk v1.25.0 // indirect
 	go.opentelemetry.io/otel/trace v1.25.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	golang.org/x/tools v0.20.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
