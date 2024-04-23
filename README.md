@@ -1,6 +1,6 @@
 # forge [![CI](https://github.com/frantjc/forge/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/forge/actions) [![godoc](https://pkg.go.dev/badge/github.com/frantjc/forge.svg)](https://pkg.go.dev/github.com/frantjc/forge) [![goreportcard](https://goreportcard.com/badge/github.com/frantjc/forge)](https://goreportcard.com/report/github.com/frantjc/forge)
 
-Have you ever had to swap to using a new CI system? Twice? Three times? Done with searching for a replacement for each Action, CloudBuilder or resource that you were using in your old one? Tired of waiting minutes for feedback on each iteration of dealing with the quirks of your new one?
+Have you ever had to swap to using a new CI system? Twice? Three times? Done with searching for a replacement for each Action, CloudBuilder or resource that you were using in your old one? Tired of waiting minutes for feedback on each iteration of figuring out the quirks of your new one?
 
 Forge is here to help.
 
