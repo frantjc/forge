@@ -1,9 +1,11 @@
-name: Build Docs
+name: Mkdocs
 on:
   push:
     branches:
       - main
     paths:
+      - .github/actions/mkdocs/**
+      - .github/workflows/mkdocs.yml
       - docs/**
 permissions:
   contents: write
