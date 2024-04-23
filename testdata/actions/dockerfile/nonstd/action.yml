@@ -1,0 +1,9 @@
+name: Test
+description: |
+  Test action
+author: frantjc
+runs:
+  using: docker
+  image: nonstd.Dockerfile
+  args:
+    - HELLO THERE

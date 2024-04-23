@@ -1,6 +1,6 @@
 config:
   command: /bin/bash -l
-  cwd: $GOPATH/src/github.com/frantjc
+  cwd: $GOPATH/src/github.com/frantjc/forge
   env: {}
   cols: 80
   rows: 24

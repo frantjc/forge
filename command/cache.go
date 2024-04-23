@@ -12,7 +12,7 @@ import (
 
 var (
 	runnerTmpArgs           = []string{"runner_temp", "runnertemp", "runner_tmp", "runnertmp", "temp", "tmp"}
-	runnerToolCacheArgs     = []string{"runner_tool_cache", "runner_toolcache", "runnertoolcache", "toolcache"}
+	runnerToolCacheArgs     = []string{"runner_tool_cache", "runner_toolcache", "runnertoolcache", "toolcache", "tc"}
 	actionsArgs             = []string{"github", "github_actions", "githubactions", "gha", "action", "actions"}
 	cloudbuildWorkspaceArgs = []string{"cloudbuild", "cb", "workspace"}
 )
