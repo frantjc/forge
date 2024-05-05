@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -243,7 +242,7 @@ func ServeDockerdProxy(ctx context.Context, mounts map[string]string, lis net.Li
 							}()
 						}()
 
-						if err = r.Write(io.MultiWriter(daemon, os.Stdout)); err != nil {
+						if err = r.Write(daemon); err != nil {
 							return err
 						}
 
