@@ -17,7 +17,7 @@ steps:
 Rather, it is intended to run an individual step from within a build config file, like so:
 
 ```sh
-forge cloudbuild forge-git gcr.io/cloud-builders/docker -- build -t 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-docker-repo/my-image' .
+forge cloudbuild gcr.io/cloud-builders/docker -- build -t 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-docker-repo/my-image' .
 ```
 
 > In the previous example, the `--` is important to signify to Forge that the rest of the arguments are meant to be passed to the underlying step, not parsed by Forge itself. Additionally, the `''` are important to keep your shell from doing the substitution before Forge can get ahold of it.
