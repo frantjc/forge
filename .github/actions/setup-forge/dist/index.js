@@ -3820,7 +3820,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports._readLinuxVersionFile = exports._getOsVersion = exports._findMatch = void 0;
-const semver = __importStar(__nccwpck_require__(562));
+const semver = __importStar(__nccwpck_require__(5911));
 const core_1 = __nccwpck_require__(2186);
 // needs to be require for core node modules to be mocked
 /* eslint @typescript-eslint/no-require-imports: 0 */
@@ -4055,7 +4055,7 @@ const mm = __importStar(__nccwpck_require__(2473));
 const os = __importStar(__nccwpck_require__(2037));
 const path = __importStar(__nccwpck_require__(1017));
 const httpm = __importStar(__nccwpck_require__(6255));
-const semver = __importStar(__nccwpck_require__(562));
+const semver = __importStar(__nccwpck_require__(5911));
 const stream = __importStar(__nccwpck_require__(2781));
 const util = __importStar(__nccwpck_require__(3837));
 const assert_1 = __nccwpck_require__(9491);
@@ -4682,7 +4682,7 @@ function _unique(values) {
 
 /***/ }),
 
-/***/ 562:
+/***/ 5911:
 /***/ ((module, exports) => {
 
 exports = module.exports = SemVer
@@ -13303,7 +13303,7 @@ const falseTag = {
     identify: value => value === false,
     default: true,
     tag: 'tag:yaml.org,2002:bool',
-    test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
+    test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/,
     resolve: () => new Scalar.Scalar(false),
     stringify: boolStringify
 };
