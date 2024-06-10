@@ -21,7 +21,7 @@ jobs:
       - uses: golangci/golangci-lint-action@v6.0.1
       - run: make download
       - run: make test
-      - uses: goreleaser/goreleaser-action@v5
+      - uses: goreleaser/goreleaser-action@v6
         with:
           install-only: true
       - uses: crazy-max/ghaction-upx@v3
