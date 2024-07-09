@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/changroup"
@@ -29,7 +29,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		detachKeys = streams.DetachKeys
 	}
 
-	idr, err := c.Client.ContainerExecCreate(ctx, c.ID, types.ExecConfig{
+	idr, err := c.Client.ContainerExecCreate(ctx, c.ID, container.ExecOptions{
 		User:         containerConfig.User,
 		Privileged:   containerConfig.Privileged,
 		Env:          containerConfig.Env,
@@ -45,7 +45,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		return -1, err
 	}
 
-	hjr, err := c.Client.ContainerExecAttach(ctx, idr.ID, types.ExecStartCheck{
+	hjr, err := c.Client.ContainerExecAttach(ctx, idr.ID, container.ExecStartOptions{
 		Tty: tty,
 	})
 	if err != nil {
