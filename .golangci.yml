@@ -9,7 +9,9 @@ linters:
     - gocritic
     - goconst
     - importas
-    - megacheck
+    - gosimple
+    - staticcheck
+    - unused
     - nakedret
     - nolintlint
     - prealloc
