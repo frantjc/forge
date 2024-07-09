@@ -5,7 +5,7 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 )
 
 func (c *Container) CopyTo(ctx context.Context, destination string, content io.Reader) error {
@@ -13,5 +13,5 @@ func (c *Container) CopyTo(ctx context.Context, destination string, content io.R
 		defer rc.Close()
 	}
 
-	return c.CopyToContainer(ctx, c.ID, filepath.Clean(destination), content, types.CopyToContainerOptions{})
+	return c.CopyToContainer(ctx, c.ID, filepath.Clean(destination), content, container.CopyToContainerOptions{})
 }
