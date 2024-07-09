@@ -4,11 +4,11 @@ go 1.22.1
 
 require (
 	github.com/adrg/xdg v0.4.0
-	github.com/docker/cli v26.1.4+incompatible
-	github.com/docker/docker v26.1.4+incompatible
+	github.com/docker/cli v27.0.3+incompatible
+	github.com/docker/docker v27.0.3+incompatible
 	github.com/frantjc/x v0.0.0-20240409062121-4f11680e2399
 	github.com/go-git/go-git/v5 v5.12.0
-	github.com/google/go-containerregistry v0.19.1
+	github.com/google/go-containerregistry v0.19.2
 	github.com/google/go-github/v50 v50.2.0
 	github.com/google/uuid v1.6.0
 	github.com/moby/term v0.5.0
