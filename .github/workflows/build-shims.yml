@@ -18,7 +18,7 @@ jobs:
         run: |
           make shim GOARCH=amd64
           make shim GOARCH=arm64
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
             internal/bin/shim_amd64
