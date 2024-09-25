@@ -25,7 +25,7 @@ jobs:
           yarn
           cd ../../..
           make action
-      - uses: peter-evans/create-pull-request@v6
+      - uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
             .github/actions/setup-forge

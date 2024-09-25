@@ -86,7 +86,7 @@ func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error
 	select {
 	case cwokb := <-cwokbC:
 		if cwokb.Error != nil {
-			err = fmt.Errorf(cwokb.Error.Message)
+			err = fmt.Errorf("%s", cwokb.Error.Message)
 		}
 
 		return int(cwokb.StatusCode), err
