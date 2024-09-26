@@ -4,5 +4,5 @@ description: |
 author: frantjc
 runs:
   using: docker
-  image: docker://alpine:3.19
+  image: docker://alpine:3.20
   entrypoint: false

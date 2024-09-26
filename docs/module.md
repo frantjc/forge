@@ -38,7 +38,7 @@ func main() {
 				GlobalContext: globalContext,
 			},
 			To: &ore.Pure{
-				Image:      "alpine:3.19",
+				Image:      "alpine:3.20",
 				Entrypoint: []string{"grep", "debug"},
 			},
 		},
