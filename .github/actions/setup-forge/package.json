@@ -1,6 +1,6 @@
 {
   "name": "setup-forge",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "private": true,
   "scripts": {
     "all": "npm-run-all fmt build",
@@ -26,8 +26,8 @@
     "yaml": "^2.5.1"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@typescript-eslint/parser": "^8.6.0",
+    "@types/node": "^22.7.4",
+    "@typescript-eslint/parser": "^8.7.0",
     "@vercel/ncc": "^0.38.2",
     "eslint": "^8.57.1",
     "eslint-plugin-github": "^5.0.2",

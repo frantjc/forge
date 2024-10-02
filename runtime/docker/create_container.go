@@ -17,6 +17,10 @@ import (
 	xslice "github.com/frantjc/x/slice"
 )
 
+var (
+	NoDockerInDocker bool
+)
+
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
 	// If the Docker daemon already has the image,
 	// don't bother loading it in again.
@@ -51,7 +55,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 
 	// Because this is the Docker runtime...
 	// Mount the Docker daemon into the container for use by the process inside the container.
-	if strings.HasPrefix(addr, "unix://") {
+	if!NoDockerInDocker && strings.HasPrefix(addr, "unix://") {
 		sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
 		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 			Source: strings.TrimPrefix(addr, "unix://"),
@@ -64,7 +68,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	// Also because this is the Docker runtime...
 	// If we're on linux, mount the Docker CLI into the container since then executables
 	// on the host can also be used by the container because they have a common OS.
-	if runtime.GOOS == "linux" {
+	if!NoDockerInDocker && runtime.GOOS == "linux" {
 		docker, err := exec.LookPath("docker")
 		if errors.Is(err, exec.ErrDot) {
 			docker, err = filepath.Abs(docker)

@@ -4,7 +4,7 @@ description: |
 author: frantjc
 runs:
   using: docker
-  image: Dockerfile
+  image: docker://docker:cli
   entrypoint: sh
   args:
     - -c
