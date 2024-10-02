@@ -5,10 +5,6 @@ author: frantjc
 branding:
   color: yellow
   icon: box
-inputs:
-  version:
-    description: |
-      Version of Forge to install.
 runs:
   using: node20
   main: .github/actions/setup-forge/dist/index.js

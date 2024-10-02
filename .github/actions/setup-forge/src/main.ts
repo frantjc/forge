@@ -19,7 +19,7 @@ const goreleaserYML = yaml.parse(
 async function run(): Promise<void> {
   try {
     const tool = "forge";
-    const version = core.getInput("version") || packageJSON.version;
+    const version = packageJSON.version;
 
     // Turn RUNNER_ARCH into GOARCH.
     let arch;
@@ -32,13 +32,6 @@ async function run(): Promise<void> {
 
     // Before we even attempt the download, check if goreleaser was configured
     // to build the GOARCH that we are trying to download.
-    //
-    // Note that this would become non-backwards-compatible if we remove support for
-    // a GOARCH and it acts funny if we add support for one and someone uses it like so:
-    //
-    //  - uses: frantjc/forge@v0.6.0
-    //    with:
-    //      version: 0.7.0
     if (!goreleaserYML.builds[0].goarch.includes(arch)) {
       throw new Error(`unsupported architecture ${process.env.RUNNER_ARCH}`);
     }
@@ -60,14 +53,7 @@ async function run(): Promise<void> {
     const versionOs = `${version}_${os}`;
 
     // Before we even attempt the download, check if goreleaser was configured
-    // to build the GOOS that we are trying to download
-    //
-    // Note that this would become non-backwards-compatible if we remove support for
-    // a GOOS and it acts funny if we add support for one and someone uses it like so:
-    //
-    //  - uses: frantjc/forge@v0.6.0
-    //    with:
-    //      version: 0.7.0
+    // to build the GOOS that we are trying to download.
     if (!goreleaserYML.builds[0].goos.includes(os)) {
       throw new Error(`unsupported OS ${process.env.RUNNER_OS}`);
     }
