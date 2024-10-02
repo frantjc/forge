@@ -17,9 +17,7 @@ import (
 	xslice "github.com/frantjc/x/slice"
 )
 
-var (
-	NoDockerInDocker bool
-)
+var NoDockerInDocker bool
 
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
 	// If the Docker daemon already has the image,
