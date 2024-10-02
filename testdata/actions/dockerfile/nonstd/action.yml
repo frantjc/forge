@@ -5,5 +5,3 @@ author: frantjc
 runs:
   using: docker
   image: nonstd.Dockerfile
-  args:
-    - HELLO THERE

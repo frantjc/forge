@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	RunsUsingDockerfileImage   = "Dockerfile"
 	RunsUsingDockerImagePrefix = "docker://"
 	RunsUsingDocker            = "docker"
 	RunsUsingComposite         = "composite"
@@ -26,7 +26,12 @@ func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
 }
 
 func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, error) {
-	inputs := make(map[string]string, len(m.Inputs))
+	inputs := map[string]string{}
+	for name := range with {
+		if _, ok := m.Inputs[name]; !ok {
+			return nil, fmt.Errorf("unknown input %s given with action %s", name, m.Name)
+		}
+	}
 	for name, input := range m.Inputs {
 		w, ok := with[name]
 		switch {
@@ -46,7 +51,7 @@ func (m *Metadata) IsComposite() bool {
 }
 
 func (m *Metadata) IsDockerfile() bool {
-	return m.Runs.Using == RunsUsingDocker && m.Runs.Image == RunsUsingDockerfileImage
+	return m.Runs.Using == RunsUsingDocker && !strings.HasPrefix(m.Runs.Image, RunsUsingDockerImagePrefix)
 }
 
 type Metadata struct {

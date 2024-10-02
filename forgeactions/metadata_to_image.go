@@ -3,6 +3,8 @@ package forgeactions
 import (
 	"context"
 	"errors"
+	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -65,19 +67,24 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 			return nil, err
 		}
 
-		reference := "ghcr.io/" + uses.GetRepository() + ":" + uses.Version
+		dockerfile := filepath.Join(dir, actionMetadata.Runs.Image)
+
+		reference := fmt.Sprintf("ghcr.io/%s:%s", uses.GetRepository(), uses.Version)
 		if uses.IsLocal() {
 			filepathCharsNotAllowedInImageRefPath := regexp.MustCompile(`[^a-z0-9\.\-:]`)
 
 			// dir will always be an absolute path here
-			reference = "forge.dev" + filepathCharsNotAllowedInImageRefPath.ReplaceAllString(
-				strings.ToLower(dir),
-				"",
+			reference = filepath.Join(
+				"forge.frantj.cc",
+				filepathCharsNotAllowedInImageRefPath.ReplaceAllString(
+					strings.ToLower(dockerfile),
+					"",
+				),
 			)
 		}
 
 		if imageBuilder, ok := containerRuntime.(ImageBuilder); ok {
-			return imageBuilder.BuildDockerfile(ctx, dir, reference)
+			return imageBuilder.BuildDockerfile(ctx, dockerfile, reference)
 		}
 
 		return nil, ErrCannotBuildDockerfile
@@ -105,7 +112,7 @@ func MetadataToImageReference(actionMetadata *githubactions.Metadata) string {
 	case githubactions.RunsUsingNode20:
 		return Node20ImageReference
 	case githubactions.RunsUsingDocker:
-		if strings.HasPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix) {
+		if !actionMetadata.IsDockerfile() {
 			return strings.TrimPrefix(actionMetadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix)
 		}
 	}
