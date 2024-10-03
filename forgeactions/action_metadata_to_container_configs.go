@@ -3,13 +3,10 @@ package forgeactions
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
-	"github.com/frantjc/forge/internal/bin"
-	"github.com/frantjc/forge/internal/containerfs"
 )
 
 func ActionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image forge.Image) ([]forge.ContainerConfig, error) {
@@ -28,7 +25,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 			}
 
 			var (
-				entrypoint = []string{bin.ShimPath, "exec", "--sock", containerfs.ForgeSock, "--"}
+				entrypoint = []string{}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
 				cmd        = actionMetadata.Runs.Args
 				mounts     = []forge.Mount{
@@ -46,33 +43,34 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 						Destination: m.RunnerTemp,
 					},
 				}
-				entrypoints []string
+				entrypoints [][]string
 			)
 
 			switch actionMetadata.Runs.Using {
 			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16, githubactions.RunsUsingNode20:
-				entrypoint = append(entrypoint, "node")
+				entrypoint = []string{"node"}
+
 				if pre := actionMetadata.Runs.Pre; pre != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, pre))
+					entrypoints = append(entrypoints, []string{filepath.Join(m.ActionPath, pre)})
 				}
 
 				if main := actionMetadata.Runs.Main; main != "" {
-					entrypoints = append(entrypoints, filepath.Join(m.ActionPath, main))
+					entrypoints = append(entrypoints, []string{filepath.Join(m.ActionPath, main)})
 				}
 			case githubactions.RunsUsingDocker:
 				if pre := actionMetadata.Runs.PreEntrypoint; pre != "" {
-					entrypoints = append(entrypoints, pre)
+					entrypoints = append(entrypoints, []string{pre})
 				}
 
 				if main := actionMetadata.Runs.Entrypoint; main != "" {
-					entrypoints = append(entrypoints, main)
+					entrypoints = append(entrypoints, []string{main})
 				} else {
 					config, err := image.Config()
 					if err != nil {
 						return nil, err
 					}
 
-					entrypoints = append(entrypoints, strings.Join(config.Entrypoint, " "))
+					entrypoints = append(entrypoints, config.Entrypoint)
 				}
 			default:
 				return nil, fmt.Errorf("unsupported runs using: %s", actionMetadata.Runs.Using)
@@ -94,21 +92,31 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 			globalContext.InputsContext = inputs
 			env = append(env, globalContext.Env()...)
 			env = append(env,
-				githubactions.EnvVarPath+"="+m.GitHubPathPath,
-				githubactions.EnvVarEnv+"="+m.GitHubEnvPath,
-				githubactions.EnvVarOutput+"="+m.GitHubOutputPath,
-				githubactions.EnvVarState+"="+m.GitHubStatePath,
+				fmt.Sprintf("%s=%s", githubactions.EnvVarPath, m.GitHubPathPath),
+				fmt.Sprintf("%s=%s", githubactions.EnvVarEnv, m.GitHubEnvPath),
+				fmt.Sprintf("%s=%s", githubactions.EnvVarOutput, m.GitHubOutputPath),
+				fmt.Sprintf("%s=%s", githubactions.EnvVarState, m.GitHubStatePath),
 			)
 
-			for _, s := range entrypoints {
-				if s != "" {
-					containerConfigs = append(containerConfigs, forge.ContainerConfig{
-						Entrypoint: entrypoint,
-						Cmd:        append([]string{s}, cmd...),
-						Env:        env,
-						Mounts:     mounts,
-						WorkingDir: m.Workspace,
-					})
+			for _, ep := range entrypoints {
+				if len(ep) > 0 {
+					if len(entrypoint) > 0 {
+						containerConfigs = append(containerConfigs, forge.ContainerConfig{
+							Entrypoint: entrypoint,
+							Cmd:        append(ep, cmd...),
+							Env:        env,
+							Mounts:     mounts,
+							WorkingDir: m.Workspace,
+						})
+					} else {
+						containerConfigs = append(containerConfigs, forge.ContainerConfig{
+							Entrypoint: ep,
+							Cmd:        cmd,
+							Env:        env,
+							Mounts:     mounts,
+							WorkingDir: m.Workspace,
+						})
+					}
 				}
 			}
 		}
