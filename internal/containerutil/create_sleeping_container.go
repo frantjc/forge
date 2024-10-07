@@ -13,11 +13,11 @@ import (
 
 var NoForgeSock bool
 
-type sockContainerWrapper struct {
+type SleepingShimContainer struct {
 	forge.Container
 }
 
-func (c *sockContainerWrapper) Exec(ctx context.Context, cc *forge.ContainerConfig, s *forge.Streams) (int, error) {
+func (c *SleepingShimContainer) Exec(ctx context.Context, cc *forge.ContainerConfig, s *forge.Streams) (int, error) {
 	ccc := new(forge.ContainerConfig)
 	*ccc = *cc
 
@@ -50,6 +50,7 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 	ccc := new(forge.ContainerConfig)
 	*ccc = *containerConfig
 	ccc.Entrypoint = entrypoint
+	ccc.Cmd = nil
 
 	container, err := containerRuntime.CreateContainer(ctx, image, ccc)
 	if err != nil {
@@ -68,5 +69,5 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 
 	hooks.ContainerStarted.Dispatch(ctx, container)
 
-	return &sockContainerWrapper{container}, nil
+	return &SleepingShimContainer{container}, nil
 }

@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/githubactions"
+	"github.com/opencontainers/go-digest"
 )
 
 const (
@@ -67,24 +69,37 @@ func (m *Mapping) GetImageForMetadata(ctx context.Context, containerRuntime forg
 			return nil, err
 		}
 
-		dockerfile := filepath.Join(dir, actionMetadata.Runs.Image)
-
-		reference := fmt.Sprintf("ghcr.io/%s:%s", uses.GetRepository(), uses.Version)
+		var (
+			dockerfilePath = filepath.Join(dir, actionMetadata.Runs.Image)
+			reference      = fmt.Sprintf("ghcr.io/%s:%s", uses.GetRepository(), uses.Version)
+		)
 		if uses.IsLocal() {
-			filepathCharsNotAllowedInImageRefPath := regexp.MustCompile(`[^a-z0-9\.\-:]`)
+			dockerfile, err := os.Open(dockerfilePath)
+			if err != nil {
+				return nil, err
+			}
+			defer dockerfile.Close()
 
-			// dir will always be an absolute path here
-			reference = filepath.Join(
-				"forge.frantj.cc",
-				filepathCharsNotAllowedInImageRefPath.ReplaceAllString(
-					strings.ToLower(dockerfile),
-					"",
+			digest, err := digest.FromReader(dockerfile)
+			if err != nil {
+				return nil, err
+			}
+
+			reference = fmt.Sprintf(
+				"%s:%s",
+				filepath.Join(
+					"forge.frantj.cc",
+					regexp.MustCompile(`[^a-z0-9._/-]`).ReplaceAllString(
+						strings.ToLower(dockerfilePath),
+						"",
+					),
 				),
+				digest.Hex(),
 			)
 		}
 
 		if imageBuilder, ok := containerRuntime.(ImageBuilder); ok {
-			return imageBuilder.BuildDockerfile(ctx, dockerfile, reference)
+			return imageBuilder.BuildDockerfile(ctx, dockerfilePath, reference)
 		}
 
 		return nil, ErrCannotBuildDockerfile
