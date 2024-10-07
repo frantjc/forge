@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 
@@ -22,7 +23,7 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 
 	rc, err := container.CopyFrom(ctx, m.GitHubPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("copying GitHub path from container: %w", err)
 	}
 	defer rc.Close()
 

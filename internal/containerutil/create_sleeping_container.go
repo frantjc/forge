@@ -24,7 +24,7 @@ func (c *sockContainerWrapper) Exec(ctx context.Context, cc *forge.ContainerConf
 	if NoForgeSock {
 		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--"}, ccc.Entrypoint...)
 	} else {
-		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--sock", containerfs.ForgeSock, "--"}, ccc.Entrypoint...)
+		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", fmt.Sprintf("--sock=%s", containerfs.ForgeSock), "--"}, ccc.Entrypoint...)
 	}
 
 	return c.Container.Exec(ctx, ccc, s)
@@ -47,11 +47,11 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 		}
 	}
 
-	container, err := containerRuntime.CreateContainer(ctx, image, &forge.ContainerConfig{
-		Entrypoint: entrypoint,
-		Mounts:     containerConfig.Mounts,
-		Env:        containerConfig.Env,
-	})
+	ccc := new(forge.ContainerConfig)
+	*ccc = *containerConfig
+	ccc.Entrypoint = entrypoint
+
+	container, err := containerRuntime.CreateContainer(ctx, image, ccc)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +68,5 @@ func CreateSleepingContainer(ctx context.Context, containerRuntime forge.Contain
 
 	hooks.ContainerStarted.Dispatch(ctx, container)
 
-	if !NoForgeSock {
-		container = &sockContainerWrapper{container}
-	}
-
-	return container, nil
+	return &sockContainerWrapper{container}, nil
 }
