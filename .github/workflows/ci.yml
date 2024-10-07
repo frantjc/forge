@@ -60,7 +60,7 @@ jobs:
       - name: Run forge use .
         run: |
           cd ./testdata/actions/node
-          forge use . --no-dind
+          forge use .
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge use dind
@@ -68,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge check resource
-        run: forge check mock -v version=v0.0.0
+        run: forge --no-dind check mock -v version=v0.0.0
       - name: Run forge get resource
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
