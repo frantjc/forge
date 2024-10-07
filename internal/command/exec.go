@@ -2,7 +2,6 @@ package command
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -113,13 +112,17 @@ func NewExec() *cobra.Command {
 				// Wait on forge.sock to be ready (it probably is, but want to avoid race condition).
 				if useForgeSock {
 					if err = func() error {
+						c, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(fmt.Sprintf("unix://%s", forgeSock)), client.WithAPIVersionNegotiation())
+						if err != nil {
+							return err
+						}
+
 						for {
 							select {
 							case <-ctx.Done():
 								return ctx.Err()
 							default:
-								if conn, err := net.Dial("unix", forgeSock); err == nil {
-									defer conn.Close()
+								if _, err := c.Ping(ctx); err == nil {
 									return nil
 								}
 							}
