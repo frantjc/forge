@@ -79,7 +79,7 @@ func NewUse() *cobra.Command {
 					}()
 				}
 
-				return forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
 					contaminate.WithMounts(ctx, []forge.Mount{
 						{
 							Source:      workdir,

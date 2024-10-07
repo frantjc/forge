@@ -49,7 +49,7 @@ func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime forge.Contain
 		return err
 	}
 
-	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(nil)); err != nil {
+	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(contaminate.StdinFrom(ctx))); err != nil {
 		return err
 	} else if exitCode > 0 {
 		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)

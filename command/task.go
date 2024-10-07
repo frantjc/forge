@@ -45,7 +45,7 @@ func NewTask() *cobra.Command {
 					Execution: execution,
 				}
 
-				return forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
 					ctx,
 					t,
 					commandDrains(cmd),

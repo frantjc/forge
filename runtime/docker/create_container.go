@@ -17,8 +17,6 @@ import (
 	xslice "github.com/frantjc/x/slice"
 )
 
-var NoDockerInDocker bool
-
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
 	// If the Docker daemon already has the image,
 	// don't bother loading it in again.
@@ -51,94 +49,96 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	)
 
-	// Because this is the Docker runtime...
-	// Mount the Docker daemon into the container for use by the process inside the container.
-	if !NoDockerInDocker && strings.HasPrefix(addr, "unix://") {
-		sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
-		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
-			Source: strings.TrimPrefix(addr, "unix://"),
-			Target: sock,
-			Type:   mount.TypeBind,
-		})
-		containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s=unix://%s", client.EnvOverrideHost, sock))
-	}
-
-	// Also because this is the Docker runtime...
-	// If we're on linux, mount the Docker CLI into the container since then executables
-	// on the host can also be used by the container because they have a common OS.
-	if !NoDockerInDocker && runtime.GOOS == "linux" {
-		docker, err := exec.LookPath("docker")
-		if errors.Is(err, exec.ErrDot) {
-			docker, err = filepath.Abs(docker)
-		}
-
-		if err == nil {
-			var (
-				bin       = filepath.Join(containerfs.WorkingDir, "/bin")
-				addedPath = false
-			)
-
+	if d.DockerInDocker {
+		// Because this is the Docker runtime...
+		// Mount the Docker daemon into the container for use by the process inside the container.
+		if strings.HasPrefix(addr, "unix://") {
+			sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
 			hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
-				Source: docker,
-				Target: filepath.Join(bin, "docker"),
+				Source: strings.TrimPrefix(addr, "unix://"),
+				Target: sock,
 				Type:   mount.TypeBind,
 			})
+			containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s=unix://%s", client.EnvOverrideHost, sock))
+		}
 
-			// If there already is a PATH, add to it.
-			for i, e := range containerConfig.Env {
-				if strings.HasPrefix(e, "PATH=") {
-					containerConfig.Env[i] = fmt.Sprintf("%s:%s", e, bin)
-					addedPath = true
-					break
-				}
+		// Also because this is the Docker runtime...
+		// If we're on linux, mount the Docker CLI into the container since then executables
+		// on the host can also be used by the container because they have a common OS.
+		if runtime.GOOS == "linux" {
+			docker, err := exec.LookPath("docker")
+			if errors.Is(err, exec.ErrDot) {
+				docker, err = filepath.Abs(docker)
 			}
 
-			// findPATHAppendBinFn iterates an env array searching for PATH.
-			// If it finds it, it appends it to containerConfig.Env with bin
-			// appended to the end and marks addedPath as true so we know to
-			// stop this absurd PATH hunt.
-			//
-			// Note that we append to the very end so that we don't override
-			// a Docker CLI that already exists on the PATH and cause unexpected
-			// behavior with our arguably over the top helpfulness here.
-			findPATHAppendBinFn := func(env []string) {
-				for _, e := range env {
+			if err == nil {
+				var (
+					bin       = filepath.Join(containerfs.WorkingDir, "/bin")
+					addedPath = false
+				)
+
+				hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
+					Source: docker,
+					Target: filepath.Join(bin, "docker"),
+					Type:   mount.TypeBind,
+				})
+
+				// If there already is a PATH, add to it.
+				for i, e := range containerConfig.Env {
 					if strings.HasPrefix(e, "PATH=") {
-						containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s:%s", e, bin))
+						containerConfig.Env[i] = fmt.Sprintf("%s:%s", e, bin)
 						addedPath = true
 						break
 					}
 				}
-			}
 
-			// If we didn't find the PATH on the containerConfig to modify,
-			// then we want to modify it as it appears on the image config.
-			//
-			// Unfortunately, image.Config() is unbearably slow, so we use this
-			// workaround to try and get the image config from elsewhere first.
-			if !addedPath {
-				// We may already have successfully called ImageInspectWithRaw
-				// previously to check if we needed to call ImageLoad. If we didn't,
-				// retry and it should work now that we've definitely loaded the image.
-				if ii.Config == nil || len(ii.Config.Env) == 0 {
-					ii, _, _ = d.ImageInspectWithRaw(ctx, image.Name())
-				}
-
-				if ii.Config != nil {
-					findPATHAppendBinFn(ii.Config.Env)
-				}
-
-				if !addedPath {
-					if imageConfig, err := image.Config(); err == nil {
-						findPATHAppendBinFn(imageConfig.Env)
+				// findPATHAppendBinFn iterates an env array searching for PATH.
+				// If it finds it, it appends it to containerConfig.Env with bin
+				// appended to the end and marks addedPath as true so we know to
+				// stop this absurd PATH hunt.
+				//
+				// Note that we append to the very end so that we don't override
+				// a Docker CLI that already exists on the PATH and cause unexpected
+				// behavior with our arguably over the top helpfulness here.
+				findPATHAppendBinFn := func(env []string) {
+					for _, e := range env {
+						if strings.HasPrefix(e, "PATH=") {
+							containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("%s:%s", e, bin))
+							addedPath = true
+							break
+						}
 					}
 				}
-			}
 
-			// If we still didn't find the PATH on the imageConfig to modify,
-			// we just add PATH ourselves.
-			if !addedPath {
-				containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("PATH=%s", bin))
+				// If we didn't find the PATH on the containerConfig to modify,
+				// then we want to modify it as it appears on the image config.
+				//
+				// Unfortunately, image.Config() is unbearably slow, so we use this
+				// workaround to try and get the image config from elsewhere first.
+				if !addedPath {
+					// We may already have successfully called ImageInspectWithRaw
+					// previously to check if we needed to call ImageLoad. If we didn't,
+					// retry and it should work now that we've definitely loaded the image.
+					if ii.Config == nil || len(ii.Config.Env) == 0 {
+						ii, _, _ = d.ImageInspectWithRaw(ctx, image.Name())
+					}
+
+					if ii.Config != nil {
+						findPATHAppendBinFn(ii.Config.Env)
+					}
+
+					if !addedPath {
+						if imageConfig, err := image.Config(); err == nil {
+							findPATHAppendBinFn(imageConfig.Env)
+						}
+					}
+				}
+
+				// If we still didn't find the PATH on the imageConfig to modify,
+				// we just add PATH ourselves.
+				if !addedPath {
+					containerConfig.Env = append(containerConfig.Env, fmt.Sprintf("PATH=%s", bin))
+				}
 			}
 		}
 	}

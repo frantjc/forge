@@ -95,7 +95,7 @@ func NewCloudBuild() *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd, forgecloudbuild.DefaultCloudBuildPath))
 				}
 
-				return forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
 					contaminate.WithMounts(ctx,
 						[]forge.Mount{
 							{

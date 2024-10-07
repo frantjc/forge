@@ -49,7 +49,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime forge.ContainerRu
 		return err
 	}
 
-	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(o.GlobalContext, o.ID, drains)
+	workflowCommandStreams := forgeactions.NewWorkflowCommandStreams(ctx, o.GlobalContext, o.ID, drains)
 	for _, containerConfig := range containerConfigs {
 		cc := containerConfig
 		cc.Mounts = contaminate.OverrideWithMountsFrom(ctx, containerConfig.Mounts...)

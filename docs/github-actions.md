@@ -49,9 +49,9 @@ Authentication to GitHub is provided to Forge in a similar way--through the `GIT
 export GITHUB_TOKEN=yourtokenhere
 ```
 
-Forge can also execute local GitHub Actions. This helps custom action developers more quickly and easily test out their actions while developing them locally.
+Forge can also execute local GitHub Actions. This helps custom Action developers more quickly and easily test out their actions while developing them locally.
 
-To signify to Forge that a GitHub Action can be found on the filesystem as opposed to in a GitHub repository, start the reference with `"/"` or `"."` for absolute or relative filepaths, respectively. For example:
+To signify to Forge that a GitHub Action can be found on the filesystem as opposed to in a remote GitHub repository, start the reference with `"/"` or `"."` for absolute or relative filepaths, respectively. For [example](https://github.com/frantjc/forge/blob/main/testdata/actions/docker/action.yml):
 
 ```sh
 forge use ./testdata/actions/docker
@@ -59,7 +59,7 @@ forge use ./testdata/actions/docker
 
 > Local Actions cannot refer to files outside of the `action.yml`'s directory.
 
-For additional assistance with debugging, you can attach to the container running the Action to snoop around:
+For additional assistance with debugging, you can attach to the container running the Action to snoop around as in this [example](https://github.com/frantjc/forge/blob/main/testdata/actions/dockerfile/action.yml):
 
 ```sh
 forge use --attach ./testdata/actions/dockerfile

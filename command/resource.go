@@ -90,7 +90,7 @@ func newResource(method string) *cobra.Command {
 					hooks.ContainerStarted.Listen(hookAttach(cmd, destination))
 				}
 
-				return forge.NewFoundry(docker.New(c)).Process(
+				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
 					contaminate.WithMounts(ctx, forge.Mount{
 						Source:      workdir,
 						Destination: destination,

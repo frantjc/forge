@@ -60,7 +60,7 @@ jobs:
       - name: Run forge use .
         run: |
           cd ./testdata/actions/node
-          forge use .
+          forge use . --no-dind
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge use dind

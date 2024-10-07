@@ -20,7 +20,13 @@ type sockContainerWrapper struct {
 func (c *sockContainerWrapper) Exec(ctx context.Context, cc *forge.ContainerConfig, s *forge.Streams) (int, error) {
 	ccc := new(forge.ContainerConfig)
 	*ccc = *cc
-	ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--sock", containerfs.ForgeSock, "--"}, ccc.Entrypoint...)
+
+	if NoForgeSock {
+		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--"}, ccc.Entrypoint...)
+	} else {
+		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--sock", containerfs.ForgeSock, "--"}, ccc.Entrypoint...)
+	}
+
 	return c.Container.Exec(ctx, ccc, s)
 }
 

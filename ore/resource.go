@@ -37,7 +37,7 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime forge.Container
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
-	if exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(drains, &concourse.Input{
+	if exitCode, err := container.Exec(ctx, containerConfig, forgeconcourse.NewStreams(ctx, drains, &concourse.Input{
 		Params: func() map[string]any {
 			if o.Method == forgeconcourse.MethodCheck {
 				return nil

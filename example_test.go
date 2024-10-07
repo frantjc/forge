@@ -28,7 +28,7 @@ func ExampleFoundry_Process() {
 	globalContext.EnableDebug()
 	globalContext.GitHubContext.Repository = "frantjc/forge"
 
-	if err = forge.NewFoundry(docker.New(cli)).Process(
+	if err = forge.NewFoundry(docker.New(cli, false)).Process(
 		ctx,
 		&ore.Lava{
 			From: &ore.Action{

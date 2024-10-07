@@ -1,10 +1,10 @@
 # Import as a Go module
 
-Forge can be used as a library as well. Each type of step from a proprietary CI system is represented as an [`Ore`](../ore.go) and live in the package [`ore`](../ore). For example: a GitHub [`Action`](../ore/action.go).
+Forge can be used as a library as well. Each type of step from a proprietary CI system is represented as an [`Ore`](https://github.com/frantjc/forge/blob/main/ore.go) and live in the package [`ore`](https://github.com/frantjc/forge/blob/main/ore). For example: a GitHub [`Action`](https://github.com/frantjc/forge/blob/main/ore/action.go).
 
-There are a few additional helper `Ore`s: [`Lava`](../ore/lava.go), which pipes the stdout of one ore to the stdin of another; [`Alloy`](../ore/alloy.go), which runs other Ores sequentially that will share a working directory; and [`Pure`](../ore/pure.go), which simply runs one containerized command.
+There are a few additional helper `Ore`s: [`Lava`](https://github.com/frantjc/forge/blob/main/ore/lava.go), which pipes the stdout of one ore to the stdin of another; [`Alloy`](https://github.com/frantjc/forge/blob/main/ore/alloy.go), which runs other Ores sequentially that will share a working directory; and [`Pure`](https://github.com/frantjc/forge/blob/main/ore/pure.go), which simply runs one containerized command.
 
-In this example, a `Lava` is used to pipe the stdout of a GitHub Action, which is using `actions/checkout` to check out https://github.com/frantjc/forge, to a `Pure` running `grep`, only printing lines that contain the string `"debug"`:
+In this example, a `Lava` is used to pipe the stdout of a GitHub Action, which is using `actions/checkout` to check out [github.com/frantjc/forge](https://github.com/frantjc/forge), to a `Pure` running `grep` to only printing lines that contain the string `"debug"`:
 
 ```go
 import (
@@ -30,7 +30,7 @@ func main() {
 	// Checkout https://github.com/frantjc/forge
 	// using https://github.com/actions/checkout,
 	// grepping to only print debug logs.
-	if err = forge.NewFoundry(docker.New(cli)).Process(
+	if err = forge.NewFoundry(docker.New(cli, false)).Process(
 		ctx,
 		&ore.Lava{
 			From: &ore.Action{

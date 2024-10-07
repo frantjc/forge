@@ -12,7 +12,7 @@ import (
 // stdout of the first is piped to the stdin of the second.
 type Lava struct {
 	From forge.Ore `json:"from,omitempty"`
-	To   *Pure     `json:"to,omitempty"`
+	To   forge.Ore `json:"to,omitempty"`
 }
 
 func (o *Lava) Liquify(ctx context.Context, containerRuntime forge.ContainerRuntime, drains *forge.Drains) (err error) {

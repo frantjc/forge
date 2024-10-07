@@ -51,7 +51,7 @@ func (o *Task) Liquify(ctx context.Context, containerRuntime forge.ContainerRunt
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
-	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(nil)); err != nil {
+	if exitCode, err := container.Exec(ctx, containerConfig, drains.ToStreams(contaminate.StdinFrom(ctx))); err != nil {
 		return err
 	} else if exitCode > 0 {
 		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
