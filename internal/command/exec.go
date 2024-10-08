@@ -125,7 +125,7 @@ func NewExec() *cobra.Command {
 								}
 							}
 
-							// Backoff
+							// Backoff.
 							time.Sleep(time.Second * time.Duration(i))
 						}
 
