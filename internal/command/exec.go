@@ -1,11 +1,13 @@
 package command
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge/envconv"
@@ -112,13 +114,16 @@ func NewExec() *cobra.Command {
 				// Wait on forge.sock to be ready (it probably is, but want to avoid race condition).
 				if useForgeSock {
 					if err = func() error {
+						cCtx, cancel := context.WithTimeout(ctx, time.Second*9)
+						defer cancel()
+
 						for {
 							select {
-							case <-ctx.Done():
-								return ctx.Err()
+							case <-cCtx.Done():
+								return cCtx.Err()
 							default:
 								if c, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(fmt.Sprintf("unix://%s", forgeSock)), client.WithAPIVersionNegotiation()); err != nil {
-									_, err = c.Ping(ctx)
+									_, err = c.Ping(cCtx)
 									return err
 								}
 							}
