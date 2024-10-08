@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge/envconv"
@@ -113,7 +114,7 @@ func NewExec() *cobra.Command {
 				// Wait on forge.sock to be ready (it probably is, but want to avoid race condition).
 				if useForgeSock {
 					if err = func() error {
-						for {
+						for i := 0; true; i++ {
 							select {
 							case <-ctx.Done():
 								return ctx.Err()
@@ -123,7 +124,12 @@ func NewExec() *cobra.Command {
 									return nil
 								}
 							}
+
+							// Backoff
+							time.Sleep(time.Second * time.Duration(i))
 						}
+
+						return nil
 					}(); err != nil {
 						return err
 					}
