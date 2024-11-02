@@ -1,7 +1,6 @@
 package githubactions
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -17,8 +16,6 @@ const (
 	RunsUsingNode16            = "node16"
 	RunsUsingNode20            = "node20"
 )
-
-var ErrMissingRequiredInput = errors.New("required input missing")
 
 func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
 	m := &Metadata{}
@@ -40,7 +37,7 @@ func (m *Metadata) InputsFromWith(with map[string]string) (map[string]string, er
 		case input.Default != "":
 			inputs[name] = fmt.Sprint(input.Default)
 		case input.Required:
-			return nil, ErrMissingRequiredInput
+			return nil, fmt.Errorf("required input %s is missing", name)
 		}
 	}
 	return inputs, nil

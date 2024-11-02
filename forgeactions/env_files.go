@@ -62,7 +62,7 @@ func (m *Mapping) SetGlobalContextFromEnvFiles(ctx context.Context, globalContex
 				}
 
 				for k, v := range outputs {
-					globalContext.EnvContext["STATE_"+k] = v
+					globalContext.EnvContext[fmt.Sprintf("STATE_%s", k)] = v
 				}
 			case strings.HasSuffix(m.GitHubEnvPath, header.Name):
 				env, err := githubactions.ParseEnvFile(r)

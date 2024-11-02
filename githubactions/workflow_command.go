@@ -34,6 +34,9 @@ func (c *WorkflowCommand) GoString() string {
 	return "&WorkflowCommand{" + c.String() + "}"
 }
 
+// GetName returns the value of the name parameter from the workflow command.
+// Useful for set-env workflow commands as they require it to specify the name
+// of the environment variable.
 func (c *WorkflowCommand) GetName() string {
 	if c.Parameters != nil {
 		if name, ok := c.Parameters["name"]; ok {

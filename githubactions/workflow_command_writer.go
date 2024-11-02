@@ -63,7 +63,7 @@ func (w *WorkflowCommandWriter) handleCommand(wc *WorkflowCommand) []byte {
 	case CommandStopCommands:
 		w.StopCommandsTokens[wc.Value] = true
 	case CommandSaveState:
-		w.GlobalContext.EnvContext["STATE_"+wc.GetName()] = wc.Value
+		w.GlobalContext.EnvContext[fmt.Sprintf("STATE_%s", wc.GetName())] = wc.Value
 
 		if !w.saveStateDeprecationWarned {
 			return []byte("[" + CommandWarning + "] The `" + wc.Command + "` command is deprecated and will be disabled soon. Please upgrade to using Environment Files. For more information see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/")

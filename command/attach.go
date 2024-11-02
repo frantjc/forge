@@ -12,7 +12,7 @@ func hookAttach(cmd *cobra.Command, workingDir string, stdoutUsed ...bool) func(
 	return func(ctx context.Context, c forge.Container) {
 		var (
 			streams = commandStreams(cmd, stdoutUsed...)
-			_, _    = fmt.Fprintln(streams.Out, "detach with "+forge.DefaultDetachKeys)
+			_, _    = fmt.Fprintln(streams.Out, "detach with", forge.DefaultDetachKeys)
 		)
 
 		streams, restore, err := forge.TerminalStreams(streams.In, streams.Out, streams.Err)
