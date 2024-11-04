@@ -3,7 +3,7 @@ module github.com/frantjc/forge
 go 1.22.1
 
 require (
-	github.com/adrg/xdg v0.5.1
+	github.com/adrg/xdg v0.5.3
 	github.com/docker/cli v27.3.1+incompatible
 	github.com/docker/docker v27.3.1+incompatible
 	github.com/frantjc/x v0.0.0-20240409062121-4f11680e2399
