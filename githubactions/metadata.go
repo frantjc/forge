@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/frantjc/forge/internal/yaml"
 )
 
 const (

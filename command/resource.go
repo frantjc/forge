@@ -12,12 +12,12 @@ import (
 	"github.com/frantjc/forge/forgeconcourse"
 	"github.com/frantjc/forge/internal/contaminate"
 	"github.com/frantjc/forge/internal/hooks"
+	"github.com/frantjc/forge/internal/yaml"
 	"github.com/frantjc/forge/ore"
 	"github.com/frantjc/forge/runtime/docker"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v3"
 )
 
 func newResource(method string) *cobra.Command {
