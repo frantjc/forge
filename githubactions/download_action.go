@@ -47,10 +47,10 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	go func() {
 		defer close(shaC)
 
-		if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "tags/"+u.Version); err == nil {
+		if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), fmt.Sprintf("tags/%s", u.Version)); err == nil {
 			shaC <- ref.GetObject().GetSHA()
 		} else {
-			if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), "heads/"+u.Version); err == nil {
+			if ref, _, err := client.Git.GetRef(ctx, u.GetOwner(), u.GetRepository(), fmt.Sprintf("heads/%s", u.Version)); err == nil {
 				shaC <- ref.GetObject().GetSHA()
 			} else {
 				shaC <- u.Version
@@ -59,7 +59,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}()
 
 	for _, filename := range ActionYAMLFilenames {
-		rc, _, err := client.Repositories.DownloadContents(ctx, u.GetOwner(), u.GetRepository(), u.GetActionPath()+"/"+filename, &github.RepositoryContentGetOptions{
+		rc, _, err := client.Repositories.DownloadContents(ctx, u.GetOwner(), u.GetRepository(), fmt.Sprintf("%s/%s", u.GetActionPath(), filename), &github.RepositoryContentGetOptions{
 			Ref: u.Version,
 		})
 		if err != nil {
@@ -78,7 +78,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	if metadata == nil {
-		return nil, nil, ErrNotAnAction
+		return nil, nil, fmt.Errorf("action.yaml/action.yml not found at %s", u)
 	}
 
 	link, _, err := client.Repositories.GetArchiveLink(
@@ -108,7 +108,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	if matched, err := regexp.MatchString("[0-9a-f]{40}", sha); err != nil {
 		return nil, nil, err
 	} else if !matched {
-		return nil, nil, fmt.Errorf("get action sha")
+		return nil, nil, fmt.Errorf("get action sha returned something that does not look like a sha: %s", sha)
 	}
 
 	r, err := gzip.NewReader(res.Body)
@@ -117,5 +117,5 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 	}
 
 	// sha is guaranteed to be a 40 character string by the above regexp.
-	return metadata, xtar.Subdir(tar.NewReader(r), u.GetOwner()+"-"+u.GetRepository()+"-"+sha[0:7]+"/"), nil
+	return metadata, xtar.Subdir(tar.NewReader(r), fmt.Sprintf("%s-%s-%s/", u.GetOwner(), u.GetRepository(), sha[0:7])), nil
 }

@@ -1,7 +1,6 @@
 package githubactions
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -16,21 +15,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"
 )
-
-type globalContextKey struct{}
-
-// WithGlobalContext stores the given *GlobalContext in the given context.Context.
-// Retrievable via GlobalContextFrom.
-func WithGlobalContext(ctx context.Context, globalContext *GlobalContext) context.Context {
-	return context.WithValue(ctx, globalContextKey{}, globalContext)
-}
-
-// WithGlobalContext gets the *GlobalContext from the given context.Context.
-// Settable via WithGlobalContext.
-func GlobalContextFrom(ctx context.Context) (globalContext *GlobalContext, ok bool) {
-	globalContext, ok = ctx.Value(globalContextKey{}).(*GlobalContext)
-	return
-}
 
 // GetString allows *GlobalContext to be accessed "like a map", e.g.
 // *GlobalContext.GetString("env.EXAMPLE") returns *GlobalContext.EnvContext["EXAMPLE"].

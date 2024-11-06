@@ -28,7 +28,7 @@ func (u *Uses) IsRemote() bool {
 func (u *Uses) String() string {
 	uses := u.Path
 	if v := u.Version; v != "" {
-		uses = uses + "@" + v
+		uses = fmt.Sprintf("%s@%s", uses, v)
 	}
 	return uses
 }
@@ -64,7 +64,15 @@ func (u *Uses) GoString() string {
 	return "&Uses{" + u.String() + "}"
 }
 
-// TODO regexp.
+// Parse parses a reference to a GitHub Action that would appear as the value
+// of `uses` in a GitHub Actions Workflow Step, such as:
+//
+// steps:
+//   - uses: frantjc/forge@v0
+//   - uses: ./
+//   - uses: ./my/local/action
+//
+// Also supports the special case ".".
 func Parse(uses string) (*Uses, error) {
 	r := &Uses{}
 

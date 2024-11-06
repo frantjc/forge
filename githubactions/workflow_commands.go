@@ -1,6 +1,9 @@
 package githubactions
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 const (
 	CommandDebug        = "debug"
@@ -17,21 +20,26 @@ const (
 	CommandStopCommands = "stop-commands"
 )
 
-// TODO regexp.
+// ParseWorkflowCommandString parses a workflow command from a string such as:
+//
+// ::set-env name=HELLO::there
+//
+// This supports a deprecated GitHub Actions function that used such strings written
+// to stdout to send commands from a GitHub Action up to GitHub Actions.
 func ParseWorkflowCommandString(workflowCommand string) (*WorkflowCommand, error) {
 	if !strings.HasPrefix(workflowCommand, "::") {
-		return nil, ErrNotAWorkflowCommand
+		return nil, fmt.Errorf("not a workflow command: %s", workflowCommand)
 	}
 
 	a := strings.Split(workflowCommand, "::")
 	if len(a) < 2 {
-		return nil, ErrNotAWorkflowCommand
+		return nil, fmt.Errorf("not a workflow command: %s", workflowCommand)
 	}
 
 	cmdAndParams := a[1]
 	b := strings.Split(cmdAndParams, " ")
 	if len(b) < 1 {
-		return nil, ErrNotAWorkflowCommand
+		return nil, fmt.Errorf("not a workflow command: %s", workflowCommand)
 	}
 
 	cmd := b[0]
@@ -57,6 +65,8 @@ func ParseWorkflowCommandString(workflowCommand string) (*WorkflowCommand, error
 	}, nil
 }
 
+// ParseWorkflowCommand parses a workflow command from bytes.
+// See ParseWorkflowCommandString for more details.
 func ParseWorkflowCommand(b []byte) (*WorkflowCommand, error) {
 	return ParseWorkflowCommandString(string(b))
 }

@@ -24,12 +24,12 @@ func (r *TaskReference) IsRemote() bool {
 func (r *TaskReference) String() string {
 	ref := r.Path
 	if v := r.Version; v != "" {
-		ref = ref + "@" + v
+		ref = fmt.Sprintf("%s@%s", ref, v)
 	}
 	return ref
 }
 
-// TODO regexp.
+// Parse parses a reference to a Azure DevOps Task.
 func Parse(ref string) (*TaskReference, error) {
 	r := &TaskReference{}
 
