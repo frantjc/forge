@@ -21,22 +21,17 @@ func hookAttach(cmd *cobra.Command, workingDir string, stdoutUsed ...bool) func(
 			return
 		}
 
-		if _, err = c.Exec(
-			ctx,
-			&forge.ContainerConfig{
-				Entrypoint: []string{"bash"},
-				WorkingDir: workingDir,
-			},
-			streams,
-		); err != nil {
-			_, _ = c.Exec(
+		for _, shell := range []string{"bash", "sh"} {
+			if _, err = c.Exec(
 				ctx,
 				&forge.ContainerConfig{
-					Entrypoint: []string{"sh"},
+					Entrypoint: []string{shell},
 					WorkingDir: workingDir,
 				},
 				streams,
-			)
+			); err == nil {
+				break
+			}
 		}
 
 		_, _ = fmt.Fprintln(streams.Out)
