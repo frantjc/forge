@@ -17,10 +17,13 @@ type Uses struct {
 	Version string
 }
 
+// IsLocal returns if the Uses refers to an Action on the local filesystem.
 func (u *Uses) IsLocal() bool {
+	// A GitHub org cannot start with ".", so this correctly identifies if the path is "." or "./path/to/action".
 	return strings.HasPrefix(u.Path, ".") || filepath.IsAbs(u.Path) || len(strings.Split(u.Path, "/")) < 2
 }
 
+// IsRemote returns if the Uses refers to an Action in a GitHub repository.
 func (u *Uses) IsRemote() bool {
 	return !u.IsLocal()
 }

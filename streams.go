@@ -10,7 +10,7 @@ import (
 // DefaultDetachKeys are the default key combinations
 // to use when detaching from a Container that has
 // been attached to.
-var DefaultDetachKeys = "ctrl-d"
+const DefaultDetachKeys = "ctrl-d"
 
 // Streams represents streams to and from a process
 // inside of a Container.
