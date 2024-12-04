@@ -14,15 +14,11 @@ jobs:
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
-      - name: Run make shim
-        run: |
-          make shim GOARCH=amd64
-          make shim GOARCH=arm64
+      - run: make shims
       - uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |
-            internal/bin/shim_amd64
-            internal/bin/shim_arm64
+            internal/bin/shim_*
           reviewers: |
             ${{ github.actor }}
           title: |
