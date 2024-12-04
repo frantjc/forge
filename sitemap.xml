@@ -26,6 +26,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://frantjc.github.io/forge/gotchas/</loc>
+         <lastmod>2024-12-04</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://frantjc.github.io/forge/install/</loc>
          <lastmod>2024-12-04</lastmod>
          <changefreq>daily</changefreq>
