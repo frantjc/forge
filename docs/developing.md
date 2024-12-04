@@ -7,4 +7,4 @@
 - [`upx`](https://github.com/upx/upx) is _required_ for compressing [`shim`](https://github.com/frantjc/forge/blob/main/internal/cmd/shim/main.go)
 - `node` >=20 is _required_ for developing the [`action`](https://github.com/frantjc/forge/blob/main/.github/action)
 
-![Diagram](diag.dark.png)
+![Diagram](diag.png)
