@@ -44,7 +44,7 @@ jobs:
       # See https://cloud.google.com/build/docs/building/build-containers.
       - name: Run forge cloudbuild docker
         run: |
-          forge --no-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
+          forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - name: Run forge use remote
         run: forge use frantjc/forge/testdata/actions/docker@${{ github.sha }}
         env:
@@ -75,5 +75,5 @@ jobs:
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
       - name: Test forge.sock
         run: |
-          forge cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
+          forge --use-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - run: forge cache --clean

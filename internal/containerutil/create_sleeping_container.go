@@ -11,7 +11,7 @@ import (
 	"github.com/frantjc/forge/internal/hooks"
 )
 
-var NoForgeSock bool
+var UseForgeSock bool
 
 type SleepingShimContainer struct {
 	forge.Container
@@ -21,10 +21,10 @@ func (c *SleepingShimContainer) Exec(ctx context.Context, cc *forge.ContainerCon
 	ccc := new(forge.ContainerConfig)
 	*ccc = *cc
 
-	if NoForgeSock {
-		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--"}, ccc.Entrypoint...)
-	} else {
+	if UseForgeSock {
 		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", fmt.Sprintf("--sock=%s", containerfs.ForgeSock), "--"}, ccc.Entrypoint...)
+	} else {
+		ccc.Entrypoint = append([]string{bin.ShimPath, "exec", "--"}, ccc.Entrypoint...)
 	}
 
 	return c.Container.Exec(ctx, ccc, s)
@@ -33,7 +33,7 @@ func (c *SleepingShimContainer) Exec(ctx context.Context, cc *forge.ContainerCon
 func CreateSleepingContainer(ctx context.Context, containerRuntime forge.ContainerRuntime, image forge.Image, containerConfig *forge.ContainerConfig) (forge.Container, error) {
 	entrypoint := []string{bin.ShimPath, "sleep"}
 
-	if !NoForgeSock {
+	if UseForgeSock {
 		entrypoint = append(entrypoint,
 			fmt.Sprintf("--sock=%s", containerfs.ForgeSock),
 		)
