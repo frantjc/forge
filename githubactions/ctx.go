@@ -372,15 +372,17 @@ func NewGlobalContextFromPath(path string) (*GlobalContext, error) {
 		r             *git.Repository
 	)
 
+loop:
 	for {
 		var err error
 		r, err = git.PlainOpen(path)
-		if errors.Is(err, git.ErrRepositoryNotExists) && path != "/" {
+		switch {
+		case errors.Is(err, git.ErrRepositoryNotExists) && path != "/":
 			path = filepath.Dir(path)
-		} else if err != nil {
+		case err != nil:
 			return nil, err
-		} else {
-			break
+		default:
+			break loop
 		}
 	}
 
