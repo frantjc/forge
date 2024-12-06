@@ -31,6 +31,9 @@ jobs:
         run: make INSTALL=install BIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
+      - name: Test forge.sock
+        run: |
+          forge --use-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       # See https://cloud.google.com/build/docs/configuring-builds/run-bash-scripts.
       - name: Run forge cloudbuild --script noshebang
         run: |
@@ -73,7 +76,4 @@ jobs:
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
-      - name: Test forge.sock
-        run: |
-          forge --use-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       - run: forge cache --clean
