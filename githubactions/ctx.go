@@ -1,6 +1,7 @@
 package githubactions
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -368,14 +369,19 @@ func NewGlobalContextFromPath(path string) (*GlobalContext, error) {
 		c             = NewGlobalContextFromEnv()
 		currentBranch = DefaultBranch
 		currentRemote = DefaultRemote
+		r             *git.Repository
 	)
 
-	r, err := git.PlainOpen(path)
-	for ; err != nil && path != "/"; r, err = git.PlainOpen(path) {
-		path = filepath.Dir(path)
-	}
-	if err != nil {
-		return nil, err
+	for {
+		var err error
+		r, err = git.PlainOpen(path)
+		if errors.Is(err, git.ErrRepositoryNotExists) && path != "/" {
+			path = filepath.Dir(path)
+		} else if err != nil {
+			return nil, err
+		} else {
+			break
+		}
 	}
 
 	if ref, err := r.Head(); err == nil {
