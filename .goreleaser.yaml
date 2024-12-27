@@ -24,6 +24,10 @@ brews:
   - repository:
       owner: frantjc
       name: homebrew-tap
+    alternative_names:
+      - forge@{{ .RawVersion }}
+      - forge@{{ .Major }}.{{ .Minor }}
+      - forge@{{ .Major }}
     directory: Formula
     skip_upload: auto
     homepage:  https://github.com/frantjc/forge
