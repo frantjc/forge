@@ -16,13 +16,13 @@ jobs:
     steps:
       - uses: actions/setup-go@v5
         with:
-          go-version: 1.22
+          go-version: 1.23
 ```
 
 Rather, it is intended to run an Action from within a workflow, like so:
 
 ```sh
-forge use actions/setup-go@v5 --with go-version=1.22
+forge use actions/setup-go@v5 --with go-version=1.23
 ```
 
 When running an Action, Forge mounts the current working directory to the Action's `GITHUB_WORKSPACE` as well as directories respecting the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) to the Action's `RUNNER_TOOLCACHE` and `RUNNER_TEMP`. So, after the above command is ran, if it succeeds, `go` should be installed somewhere in `XDG_CACHE_HOME/forge/runner/toolcache`. This can be found more easily by running:
