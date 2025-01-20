@@ -20,7 +20,7 @@ require (
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/text v0.21.0
 	k8s.io/apimachinery v0.32.1
-	k8s.io/cli-runtime v0.32.0
+	k8s.io/cli-runtime v0.32.1
 	k8s.io/client-go v0.32.1
 	sigs.k8s.io/yaml v1.4.0
 )
