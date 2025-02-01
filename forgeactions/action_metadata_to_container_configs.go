@@ -19,7 +19,7 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 
 	if actionMetadata != nil {
 		if actionMetadata.Runs != nil {
-			actionDir, err := m.UsesToActionDirectory(uses)
+			dir, err := m.UsesToRootDirectory(uses)
 			if err != nil {
 				return nil, err
 			}
@@ -28,9 +28,10 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 				entrypoint = []string{}
 				env        = append(envconv.MapToArr(environment), envconv.MapToArr(actionMetadata.Runs.Env)...)
 				cmd        = actionMetadata.Runs.Args
+				actionPath = filepath.Join(m.ActionPath, uses.GetActionPath())
 				mounts     = []forge.Mount{
 					{
-						Source:      actionDir,
+						Source:      dir,
 						Destination: m.ActionPath,
 					},
 					{
@@ -51,11 +52,11 @@ func (m *Mapping) ActionToConfigs(globalContext *githubactions.GlobalContext, us
 				entrypoint = []string{"node"}
 
 				if pre := actionMetadata.Runs.Pre; pre != "" {
-					entrypoints = append(entrypoints, []string{filepath.Join(m.ActionPath, pre)})
+					entrypoints = append(entrypoints, []string{filepath.Join(actionPath, pre)})
 				}
 
 				if main := actionMetadata.Runs.Main; main != "" {
-					entrypoints = append(entrypoints, []string{filepath.Join(m.ActionPath, main)})
+					entrypoints = append(entrypoints, []string{filepath.Join(actionPath, main)})
 				}
 			case githubactions.RunsUsingDocker:
 				if pre := actionMetadata.Runs.PreEntrypoint; pre != "" {
