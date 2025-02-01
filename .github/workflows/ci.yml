@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: 1.23
-      - uses: golangci/golangci-lint-action@v6.1.1
+      - uses: golangci/golangci-lint-action@v6.2.0
       - run: make download
       - run: make test
       - uses: goreleaser/goreleaser-action@v6
