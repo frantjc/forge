@@ -78,7 +78,8 @@ format: fmt
 i: install
 shims: shim_amd64 shim_arm64
 shim: shim_$(GOARCH)
-shim_$(GOARCH): internal/bin/shim_$(GOARCH) internal/bin/fs_$(GOARCH).go
+shim_amd64: internal/bin/shim_amd64 internal/bin/fs_amd64.go
+shim_arm64: internal/bin/shim_arm64 internal/bin/fs_arm64.go
 
 .PHONY: .github/actions/setup-forge .github/actions/setup-forge/ action i install build fmt generate test download vendor verify lint shims shim shim_$(GOARCH) internal/bin/fs_$(GOARCH).go internal/bin/shim_$(GOARCH) clean gen dl ven ver format release
 
