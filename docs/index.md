@@ -8,5 +8,5 @@ Forge currently exposes running:
 
 - [GitHub Actions](github-actions.md) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go))
 - [Concourse resources](concourse.md) (e.g. [`concourse/git-resource`](https://github.com/concourse/git-resource))
-- [Google Cloudbuild steps](google-cloudbuild.md) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers))
+- [Google CloudBuild steps](google-cloudbuild.md) (e.g. [`gcr.io/cloud-builders/docker`](https://cloud.google.com/build/docs/building/build-containers))
 - _and more_ in its [Go module](module.md).
