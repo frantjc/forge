@@ -1,0 +1,7 @@
+name: Test
+description: |
+  Test action
+author: frantjc
+runs:
+  using: node20
+  main: ../node/main.js

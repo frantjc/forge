@@ -56,6 +56,9 @@ jobs:
         run: forge --no-dind use ./testdata/actions/node
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Run forge use dotdot
+        run: |
+          forge use frantjc/forge/testdata/actions/dotdot@${{ github.sha }}
       - name: Run forge use dockerfile
         run: forge use ./testdata/actions/dockerfile
         env:
