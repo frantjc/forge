@@ -1,8 +1,6 @@
 version: 2
 builds:
   - main: ./cmd/forge
-    ldflags:
-      - -s -w -X github.com/frantjc/forge.VersionCore={{ .RawVersion }}
     env:
       - CGO_ENABLED=0
     goos:

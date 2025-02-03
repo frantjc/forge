@@ -3,7 +3,6 @@ package command
 import (
 	"runtime"
 
-	"github.com/frantjc/forge"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +13,6 @@ func NewShim() *cobra.Command {
 		verbosity int
 		cmd       = &cobra.Command{
 			Use:           "shim",
-			Version:       forge.SemVer(),
 			SilenceErrors: true,
 			SilenceUsage:  true,
 		}

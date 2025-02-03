@@ -3,7 +3,6 @@ package command
 import (
 	"runtime"
 
-	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +14,6 @@ func NewForge() *cobra.Command {
 		verbosity int
 		cmd       = &cobra.Command{
 			Use:           "forge",
-			Version:       forge.SemVer(),
 			SilenceErrors: true,
 			SilenceUsage:  true,
 		}
