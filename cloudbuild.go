@@ -1,28 +1,86 @@
-package forgecloudbuild
+package forge
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
-	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/internal/bin"
+	xos "github.com/frantjc/x/os"
 	xslice "github.com/frantjc/x/slice"
 )
 
-func StepToContainerConfigAndScript(step *cloudbuild.Step, home string, image forge.Image) (*forge.ContainerConfig, string, error) {
-	return DefaultMapping.StepToContainerConfigAndScript(step, home, image)
+type CloudBuild struct {
+	cloudbuild.Step
 }
 
-func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home string, image forge.Image) (*forge.ContainerConfig, string, error) {
+func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
+	opt := oreOptsWithDefaults(opts...)
+
+	image, err := containerRuntime.PullImage(ctx, o.Step.Name)
+	if err != nil {
+		return err
+	}
+
+	home := "/root"
+	if config, err := image.Config(); err == nil {
+		for _, env := range config.Env {
+			if strings.HasPrefix(env, "HOME=") {
+				home = strings.TrimPrefix(env, "HOME=")
+				break
+			}
+		}
+	}
+
+	containerConfig, script, err := stepToContainerConfigAndScript(&o.Step, home, image, opt)
+	if err != nil {
+		return err
+	}
+	containerConfig.Mounts = append(containerConfig.Mounts, opt.Mounts...)
+
+	container, err := createSleepingContainer(ctx, containerRuntime, image, containerConfig, opt)
+	if err != nil {
+		return err
+	}
+	defer container.Stop(ctx) //nolint:errcheck
+	// defer container.Remove(ctx) //nolint:errcheck
+
+	if err = copyScriptToContainer(ctx, container, script, opt); err != nil {
+		return err
+	}
+
+	if exitCode, err := container.Exec(ctx, containerConfig, opt.Streams); err != nil {
+		return err
+	} else if exitCode > 0 {
+		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
+	}
+
+	return nil
+}
+
+func copyScriptToContainer(ctx context.Context, container Container, script string, opt *OreOpts) error {
+	if !bin.HasShebang(script) {
+		script = fmt.Sprintf("#!/bin/sh\n%s", script)
+	}
+
+	if err := container.CopyTo(ctx, opt.WorkingDir, bin.NewScriptTarArchive(script, ScriptName)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Image, opt *OreOpts) (*ContainerConfig, string, error) {
 	var (
-		containerConfig = &forge.ContainerConfig{
+		containerConfig = &ContainerConfig{
 			Entrypoint: []string{},
 			Env:        step.Env,
-			WorkingDir: m.CloudBuildPath,
+			WorkingDir: CloudBuildWorkingDir(opt.WorkingDir),
 		}
 		substitutions = step.Substitutions
 		mapping       = func(s string) string {
@@ -41,8 +99,8 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 	}
 
 	source := filepath.Join(_home, ".config/gcloud")
-	if _, err := os.Stat(source); err == nil {
-		containerConfig.Mounts = []forge.Mount{
+	if fi, err := os.Stat(source); err == nil && fi.IsDir() {
+		containerConfig.Mounts = []Mount{
 			{
 				Source:      source,
 				Destination: filepath.Join(home, ".config/gcloud"),
@@ -55,7 +113,7 @@ func (m *Mapping) StepToContainerConfigAndScript(step *cloudbuild.Step, home str
 			return nil, "", fmt.Errorf("cannot specify args or entrypoint with script")
 		}
 
-		containerConfig.Entrypoint = bin.ScriptEntrypoint
+		containerConfig.Entrypoint = []string{filepath.Join(opt.WorkingDir, ScriptName)}
 	} else {
 		if lenArgs := len(step.Args); step.Entrypoint == "" || lenArgs == 0 {
 			config, err := image.Config()

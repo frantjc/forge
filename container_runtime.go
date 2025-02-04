@@ -8,6 +8,13 @@ type ContainerRuntime interface {
 	GetContainer(context.Context, string) (Container, error)
 	CreateContainer(context.Context, Image, *ContainerConfig) (Container, error)
 	PullImage(context.Context, string) (Image, error)
-	CreateVolume(context.Context, string) (Volume, error)
 	Close() error
+}
+
+// ImageBuilder is for a ContainerRuntime to implement building a Dockerfile.
+// Because building an OCI image is not ubiquitous, forge.ContainerRuntimes are
+// not required to implement this, but they may. The default runtime (Docker)
+// happens to so as to support GitHub Actions that run using "docker".
+type ImageBuilder interface {
+	BuildDockerfile(context.Context, string, string) (Image, error)
 }

@@ -5,6 +5,14 @@ import (
 	"io"
 )
 
+const (
+	ExecutionNode        = "node"
+	ExecutionNode16      = "node16"
+	ExecutionNode10      = "node10"
+	ExecutionPowershell  = "powershell"
+	ExecutionPowershell3 = "powershell3"
+)
+
 // NewTaskFromReader ...
 func NewTaskFromReader(r io.Reader) (*Task, error) {
 	t := &Task{}

@@ -3,7 +3,6 @@ package command
 import (
 	"runtime"
 
-	"github.com/frantjc/forge/internal/containerutil"
 	"github.com/spf13/cobra"
 )
 
@@ -21,9 +20,9 @@ func NewForge() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
-	cmd.PersistentFlags().BoolVar(&containerutil.UseForgeSock, "use-sock", false, "enable use of forge.sock")
+	cmd.PersistentFlags().Bool("fix-dind", false, "intercept and fix traffic to docker.sock")
 	cmd.PersistentFlags().Bool("no-dind", false, "disable Docker in Docker")
-	cmd.MarkFlagsMutuallyExclusive("no-dind", "use-sock")
+	cmd.MarkFlagsMutuallyExclusive("no-dind", "intercept-sock")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
 
 	return cmd

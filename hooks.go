@@ -1,9 +1,11 @@
-package hooks
+package forge
 
 import (
 	"context"
 	"sync"
 )
+
+var HookContainerStarted = new(Hook[Container])
 
 type Hook[T any] struct {
 	Listeners []func(context.Context, T)

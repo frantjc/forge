@@ -13,7 +13,6 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/containerfs"
 	xslice "github.com/frantjc/x/slice"
 )
 
@@ -49,11 +48,11 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	)
 
-	if d.DockerInDocker {
+	if d.DockerInDockerPath != "" {
 		// Because this is the Docker runtime...
 		// Mount the Docker daemon into the container for use by the process inside the container.
 		if strings.HasPrefix(addr, "unix://") {
-			sock := filepath.Join(containerfs.WorkingDir, "/docker.sock")
+			sock := filepath.Join(d.DockerInDockerPath, "/docker.sock")
 			hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 				Source: strings.TrimPrefix(addr, "unix://"),
 				Target: sock,
@@ -73,7 +72,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 
 			if err == nil {
 				var (
-					bin       = filepath.Join(containerfs.WorkingDir, "/bin")
+					bin       = filepath.Join(d.DockerInDockerPath, "bin")
 					addedPath = false
 				)
 

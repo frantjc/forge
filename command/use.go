@@ -5,15 +5,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/forgeactions"
 	"github.com/frantjc/forge/githubactions"
-	"github.com/frantjc/forge/internal/contaminate"
-	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/internal/hostfs"
-	"github.com/frantjc/forge/ore"
-	"github.com/frantjc/forge/runtime/docker"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +17,7 @@ import (
 func NewUse() *cobra.Command {
 	var (
 		attach, outputs, envVars bool
-		workdir                  string
+		workDir                  string
 		env, with                map[string]string
 		cmd                      = &cobra.Command{
 			Use:           "use [flags] (action)",
@@ -33,9 +27,7 @@ func NewUse() *cobra.Command {
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := cmd.Context()
-
-				globalContext, err := githubactions.NewGlobalContextFromPath(workdir)
+				globalContext, err := githubactions.NewGlobalContextFromPath(workDir)
 				if err != nil {
 					globalContext = githubactions.NewGlobalContextFromEnv()
 				}
@@ -50,27 +42,28 @@ func NewUse() *cobra.Command {
 					}
 				}
 
-				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+				cr, opts, err := oreOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
 
+				opts.Mounts = []forge.Mount{
+					{
+						Source:      workDir,
+						Destination: forge.GitHubWorkspace(opts.WorkingDir),
+					},
+					{
+						Source:      hostfs.RunnerTmp,
+						Destination: forge.GitHubRunnerTmp(opts.WorkingDir),
+					},
+					{
+						Source:      hostfs.RunnerToolCache,
+						Destination: forge.GitHubRunnerToolCache(opts.WorkingDir),
+					},
+				}
+
 				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd, forgeactions.DefaultMapping.Workspace))
-				}
-
-				a := &ore.Action{
-					ID:            uuid.NewString(),
-					Uses:          args[0],
-					With:          with,
-					Env:           env,
-					GlobalContext: globalContext,
-				}
-
-				if outputs {
-					defer func() {
-						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[a.ID].Outputs)
-					}()
+					forge.HookContainerStarted.Listen(hookAttach(cmd, opts.WorkingDir, envVars, outputs))
 				}
 
 				if envVars {
@@ -79,24 +72,24 @@ func NewUse() *cobra.Command {
 					}()
 				}
 
-				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
-					contaminate.WithMounts(ctx, []forge.Mount{
-						{
-							Source:      workdir,
-							Destination: forgeactions.DefaultWorkspace,
-						},
-						{
-							Source:      hostfs.RunnerTmp,
-							Destination: forgeactions.DefaultRunnerTemp,
-						},
-						{
-							Source:      hostfs.RunnerToolCache,
-							Destination: forgeactions.DefaultRunnerToolCache,
-						},
-					}...),
-					a,
-					commandDrains(cmd, outputs, envVars),
+				var (
+					ctx = cmd.Context()
+					a   = &forge.Action{
+						ID:            uuid.NewString(),
+						Uses:          args[0],
+						With:          with,
+						Env:           env,
+						GlobalContext: globalContext,
+					}
 				)
+
+				if outputs {
+					defer func() {
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(globalContext.StepsContext[a.ID].Outputs)
+					}()
+				}
+
+				return a.Liquify(ctx, cr, opts)
 			},
 		}
 	)
@@ -111,10 +104,10 @@ func NewUse() *cobra.Command {
 	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
 	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
-	cmd.Flags().StringVar(&forgeactions.Node12ImageReference, "node12-image", forgeactions.DefaultNode12ImageReference, "node12 image")
-	cmd.Flags().StringVar(&forgeactions.Node16ImageReference, "node16-image", forgeactions.DefaultNode16ImageReference, "node16 image")
-	cmd.Flags().StringVar(&forgeactions.Node20ImageReference, "node20-image", forgeactions.DefaultNode20ImageReference, "node20 image")
-	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
+	cmd.Flags().StringVar(&forge.Node12ImageReference, "node12-image", forge.DefaultNode12ImageReference, "node12 image")
+	cmd.Flags().StringVar(&forge.Node16ImageReference, "node16-image", forge.DefaultNode16ImageReference, "node16 image")
+	cmd.Flags().StringVar(&forge.Node20ImageReference, "node20-image", forge.DefaultNode20ImageReference, "node20 image")
+	cmd.Flags().StringVar(&workDir, "workdir", wd, "working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
