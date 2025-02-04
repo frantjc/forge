@@ -85,6 +85,9 @@ func (o *OreOpts) Apply(opts *OreOpts) {
 	if o.InterceptDockerSock {
 		opts.InterceptDockerSock = true
 	}
+	if o.WorkingDir != "" {
+		opts.WorkingDir = o.WorkingDir
+	}
 }
 
 type OreOpt interface {

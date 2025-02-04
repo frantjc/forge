@@ -41,7 +41,6 @@ func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime ContainerRunt
 	if err != nil {
 		return err
 	}
-	containerConfig.Mounts = append(containerConfig.Mounts, opt.Mounts...)
 
 	container, err := createSleepingContainer(ctx, containerRuntime, image, containerConfig, opt)
 	if err != nil {
@@ -79,6 +78,7 @@ func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Im
 	var (
 		containerConfig = &ContainerConfig{
 			Entrypoint: []string{},
+			Mounts:     opt.Mounts,
 			Env:        step.Env,
 			WorkingDir: CloudBuildWorkingDir(opt.WorkingDir),
 		}
