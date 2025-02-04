@@ -33,7 +33,7 @@ jobs:
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       - name: Test forge.sock
         run: |
-          forge --use-sock cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
+          forge --fix-dind cloudbuild gcr.io/cloud-builders/docker build testdata/actions/dockerfile
       # See https://cloud.google.com/build/docs/configuring-builds/run-bash-scripts.
       - name: Run forge cloudbuild --script noshebang
         run: |

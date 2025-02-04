@@ -22,7 +22,7 @@ func NewForge() *cobra.Command {
 	cmd.PersistentFlags().CountVarP(&verbosity, "verbose", "V", "verbosity for forge")
 	cmd.PersistentFlags().Bool("fix-dind", false, "intercept and fix traffic to docker.sock")
 	cmd.PersistentFlags().Bool("no-dind", false, "disable Docker in Docker")
-	cmd.MarkFlagsMutuallyExclusive("no-dind", "intercept-sock")
+	cmd.MarkFlagsMutuallyExclusive("no-dind", "fix-dind")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
 
 	return cmd
