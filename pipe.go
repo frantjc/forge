@@ -5,23 +5,21 @@ import (
 	"io"
 )
 
-// Lava is an Ore representing two Ores of which the
-// stdout of the first is piped to the stdin of the second.
-type Lava struct {
-	From Ore
-	To   Ore
+type Pipe struct {
+	From Runnable
+	To   Runnable
 }
 
-func (o *Lava) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) (err error) {
+func (o *Pipe) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) (err error) {
 	var (
-		opt    = oreOptsWithDefaults(opts...)
+		opt    = runOptsWithDefaults(opts...)
 		pr, pw = io.Pipe()
 	)
 
 	go func() {
 		defer pw.Close()
 
-		_ = pw.CloseWithError(o.From.Liquify(ctx, containerRuntime, &OreOpts{
+		_ = pw.CloseWithError(o.From.Run(ctx, containerRuntime, &RunOpts{
 			Mounts: opt.Mounts,
 			Streams: &Streams{
 				Out:        pw,
@@ -33,7 +31,7 @@ func (o *Lava) Liquify(ctx context.Context, containerRuntime ContainerRuntime, o
 		}))
 	}()
 
-	return o.To.Liquify(ctx, containerRuntime, &OreOpts{
+	return o.To.Run(ctx, containerRuntime, &RunOpts{
 		Mounts: opt.Mounts,
 		Streams: &Streams{
 			Out:        opt.Streams.Out,

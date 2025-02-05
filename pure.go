@@ -6,8 +6,6 @@ import (
 	xos "github.com/frantjc/x/os"
 )
 
-// Pure is an Ore for running a "pure" command inside
-// of a container.
 type Pure struct {
 	Image      string
 	Entrypoint []string
@@ -15,8 +13,8 @@ type Pure struct {
 	Env        []string
 }
 
-func (o *Pure) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
-	opt := oreOptsWithDefaults(opts...)
+func (o *Pure) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
+	opt := runOptsWithDefaults(opts...)
 
 	image, err := containerRuntime.PullImage(ctx, o.Image)
 	if err != nil {

@@ -72,7 +72,7 @@ func newResource(method string) *cobra.Command {
 					return fmt.Errorf("resource type not found: %s", r.Resource.Type)
 				}
 
-				cr, opts, err := oreOptsAndContainerRuntime(cmd)
+				cr, opts, err := runOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
@@ -88,7 +88,7 @@ func newResource(method string) *cobra.Command {
 					forge.HookContainerStarted.Listen(hookAttach(cmd, opts.WorkingDir))
 				}
 
-				return r.Liquify(ctx, cr, opts)
+				return r.Run(ctx, cr, opts)
 			},
 		}
 	)

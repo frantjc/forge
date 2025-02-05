@@ -58,7 +58,7 @@ func hookAttach(cmd *cobra.Command, workingDir string, stdoutUsed ...bool) func(
 	}
 }
 
-func oreOptsAndContainerRuntime(cmd *cobra.Command) (forge.ContainerRuntime, *forge.OreOpts, error) {
+func runOptsAndContainerRuntime(cmd *cobra.Command) (forge.ContainerRuntime, *forge.RunOpts, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, nil, err
@@ -72,7 +72,7 @@ func oreOptsAndContainerRuntime(cmd *cobra.Command) (forge.ContainerRuntime, *fo
 		dindPath = ""
 	}
 
-	return docker.New(cli, dindPath), &forge.OreOpts{
+	return docker.New(cli, dindPath), &forge.RunOpts{
 		Streams:             commandStreams(cmd),
 		InterceptDockerSock: cmd.Flag("fix-dind").Changed,
 		WorkingDir:          ctrWorkDir,

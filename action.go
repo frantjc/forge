@@ -19,9 +19,6 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
-// Action is an Ore representing a GitHub Action.
-// That is--a step in a GitHub Actions workflow that
-// uses the `uses` key.
 type Action struct {
 	ID            string
 	Uses          string
@@ -30,8 +27,8 @@ type Action struct {
 	GlobalContext *githubactions.GlobalContext
 }
 
-func (o *Action) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
-	opt := oreOptsWithDefaults(opts...)
+func (o *Action) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
+	opt := runOptsWithDefaults(opts...)
 
 	uses, err := githubactions.Parse(o.Uses)
 	if err != nil {
@@ -108,7 +105,7 @@ func getUsesMetadata(ctx context.Context, uses *githubactions.Uses) (*githubacti
 	return githubactions.GetUsesMetadata(ctx, uses, dir)
 }
 
-func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubactions.GlobalContext, step string, container Container, opt *OreOpts) error {
+func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubactions.GlobalContext, step string, container Container, opt *RunOpts) error {
 	var errs []error
 	globalContext = configureGlobalContext(globalContext, opt)
 
@@ -172,7 +169,7 @@ func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 	return errors.Join(errs...)
 }
 
-func newWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, opt *OreOpts) *Streams {
+func newWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, opt *RunOpts) *Streams {
 	globalContext = configureGlobalContext(globalContext, opt)
 	debug := globalContext.DebugEnabled()
 
@@ -197,7 +194,7 @@ func newWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id st
 	}
 }
 
-func configureGlobalContext(globalContext *githubactions.GlobalContext, opt *OreOpts) *githubactions.GlobalContext {
+func configureGlobalContext(globalContext *githubactions.GlobalContext, opt *RunOpts) *githubactions.GlobalContext {
 	if globalContext == nil {
 		globalContext = githubactions.NewGlobalContextFromEnv()
 	}
@@ -219,7 +216,7 @@ func configureGlobalContext(globalContext *githubactions.GlobalContext, opt *Ore
 	return globalContext
 }
 
-func actionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image Image, opt *OreOpts) ([]ContainerConfig, error) {
+func actionToConfigs(globalContext *githubactions.GlobalContext, uses *githubactions.Uses, with, environment map[string]string, actionMetadata *githubactions.Metadata, image Image, opt *RunOpts) ([]ContainerConfig, error) {
 	containerConfigs := []ContainerConfig{}
 	globalContext = configureGlobalContext(globalContext, opt)
 

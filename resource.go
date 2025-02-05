@@ -11,8 +11,6 @@ import (
 	xos "github.com/frantjc/x/os"
 )
 
-// Resource is an Ore representing a Concourse resource--
-// any of get, put or check.
 type Resource struct {
 	Method       string
 	Version      map[string]any
@@ -21,8 +19,8 @@ type Resource struct {
 	ResourceType *concourse.ResourceType
 }
 
-func (o *Resource) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
-	opt := oreOptsWithDefaults(opts...)
+func (o *Resource) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
+	opt := runOptsWithDefaults(opts...)
 
 	image, err := containerRuntime.PullImage(ctx, resourceTypeToImageReference(o.ResourceType))
 	if err != nil {
@@ -89,7 +87,7 @@ func resourceStreams(streams *Streams, input *concourse.Input) (*Streams, error)
 	}, nil
 }
 
-func resourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string, opt *OreOpts) *ContainerConfig {
+func resourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string, opt *RunOpts) *ContainerConfig {
 	return &ContainerConfig{
 		Entrypoint: concourse.GetEntrypoint(method),
 		Cmd:        []string{filepath.Join(ConcourseResourceWorkingDir(opt.WorkingDir), resource.Name)},

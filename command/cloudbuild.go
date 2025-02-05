@@ -80,7 +80,7 @@ func NewCloudBuild() *cobra.Command {
 
 				cb.Substitutions = envconv.ArrToMap(subs.Env())
 
-				cr, opts, err := oreOptsAndContainerRuntime(cmd)
+				cr, opts, err := runOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
@@ -100,7 +100,7 @@ func NewCloudBuild() *cobra.Command {
 					forge.HookContainerStarted.Listen(hookAttach(cmd, forge.CloudBuildWorkingDir(opts.WorkingDir)))
 				}
 
-				return cb.Liquify(ctx, cr, opts)
+				return cb.Run(ctx, cr, opts)
 			},
 		}
 	)

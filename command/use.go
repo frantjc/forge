@@ -42,7 +42,7 @@ func NewUse() *cobra.Command {
 					}
 				}
 
-				cr, opts, err := oreOptsAndContainerRuntime(cmd)
+				cr, opts, err := runOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
@@ -89,7 +89,7 @@ func NewUse() *cobra.Command {
 					}()
 				}
 
-				return a.Liquify(ctx, cr, opts)
+				return a.Run(ctx, cr, opts)
 			},
 		}
 	)

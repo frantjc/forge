@@ -19,8 +19,8 @@ type CloudBuild struct {
 	cloudbuild.Step
 }
 
-func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
-	opt := oreOptsWithDefaults(opts...)
+func (o *CloudBuild) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
+	opt := runOptsWithDefaults(opts...)
 
 	image, err := containerRuntime.PullImage(ctx, o.Step.Name)
 	if err != nil {
@@ -63,7 +63,7 @@ func (o *CloudBuild) Liquify(ctx context.Context, containerRuntime ContainerRunt
 	return nil
 }
 
-func copyScriptToContainer(ctx context.Context, container Container, script string, opt *OreOpts) error {
+func copyScriptToContainer(ctx context.Context, container Container, script string, opt *RunOpts) error {
 	if !bin.HasShebang(script) {
 		script = fmt.Sprintf("#!/bin/sh\n%s", script)
 	}
@@ -75,7 +75,7 @@ func copyScriptToContainer(ctx context.Context, container Container, script stri
 	return nil
 }
 
-func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Image, opt *OreOpts) (*ContainerConfig, string, error) {
+func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Image, opt *RunOpts) (*ContainerConfig, string, error) {
 	var (
 		containerConfig = &ContainerConfig{
 			Entrypoint: []string{},

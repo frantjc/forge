@@ -2,7 +2,7 @@ package forge
 
 import "context"
 
-// ContainerRuntime represents the functionality needed by Ores
+// ContainerRuntime represents the functionality needed by Runnables
 // to pull OCI images and run containers when being processed.
 type ContainerRuntime interface {
 	GetContainer(context.Context, string) (Container, error)

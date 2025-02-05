@@ -32,7 +32,7 @@ func NewTask() *cobra.Command {
 					}
 				)
 
-				cr, opts, err := oreOptsAndContainerRuntime(cmd)
+				cr, opts, err := runOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
@@ -41,7 +41,7 @@ func NewTask() *cobra.Command {
 					forge.HookContainerStarted.Listen(hookAttach(cmd, forge.AzureDevOpsTaskWorkingDir(opts.WorkingDir)))
 				}
 
-				return t.Liquify(ctx, cr, opts)
+				return t.Run(ctx, cr, opts)
 			},
 		}
 	)

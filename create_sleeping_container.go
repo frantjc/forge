@@ -32,7 +32,7 @@ func (c *SleepingShimContainer) Exec(ctx context.Context, cc *ContainerConfig, s
 	return c.Container.Exec(ctx, ccc, s)
 }
 
-func createSleepingContainer(ctx context.Context, containerRuntime ContainerRuntime, image Image, containerConfig *ContainerConfig, opt *OreOpts) (Container, error) {
+func createSleepingContainer(ctx context.Context, containerRuntime ContainerRuntime, image Image, containerConfig *ContainerConfig, opt *RunOpts) (Container, error) {
 	entrypoint := []string{filepath.Join(opt.WorkingDir, ShimName), "sleep"}
 
 	if opt.InterceptDockerSock {

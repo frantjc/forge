@@ -16,8 +16,8 @@ type Task struct {
 	Execution string
 }
 
-func (o *Task) Liquify(ctx context.Context, containerRuntime ContainerRuntime, opts ...OreOpt) error {
-	opt := oreOptsWithDefaults(opts...)
+func (o *Task) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
+	opt := runOptsWithDefaults(opts...)
 
 	ref, err := azuredevops.Parse(o.Task)
 	if err != nil {
@@ -64,7 +64,7 @@ func taskReferenceToDirectory(ref *azuredevops.TaskReference) (string, error) {
 	return "", fmt.Errorf("remote Azure DevOps tasks are not implemented")
 }
 
-func taskToContainerConfig(ref *azuredevops.TaskReference, task *azuredevops.Task, execution string, inputs map[string]string, opt *OreOpts) (*ContainerConfig, error) {
+func taskToContainerConfig(ref *azuredevops.TaskReference, task *azuredevops.Task, execution string, inputs map[string]string, opt *RunOpts) (*ContainerConfig, error) {
 	taskDir, err := taskReferenceToDirectory(ref)
 	if err != nil {
 		return nil, err

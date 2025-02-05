@@ -1,10 +1,7 @@
 package forge
 
 import (
-	"context"
 	"path/filepath"
-
-	"github.com/google/uuid"
 )
 
 func CloudBuildWorkingDir(workingDir string) string {
@@ -53,48 +50,4 @@ func ConcourseResourceWorkingDir(workingDir string) string {
 
 func AzureDevOpsTaskWorkingDir(workingDir string) string {
 	return filepath.Join(workingDir, "task")
-}
-
-func oreOptsWithDefaults(opts ...OreOpt) *OreOpts {
-	o := &OreOpts{
-		WorkingDir: "/" + uuid.NewString(),
-	}
-
-	for _, opt := range opts {
-		opt.Apply(o)
-	}
-
-	return o
-}
-
-type OreOpts struct {
-	Streams             *Streams
-	Mounts              []Mount
-	InterceptDockerSock bool
-	WorkingDir          string
-}
-
-func (o *OreOpts) Apply(opts *OreOpts) {
-	if opts == nil {
-		opts = &OreOpts{}
-	}
-	if o.Streams != nil {
-		opts.Streams = o.Streams
-	}
-	opts.Mounts = overrideMounts(opts.Mounts, o.Mounts...)
-	if o.InterceptDockerSock {
-		opts.InterceptDockerSock = true
-	}
-	if o.WorkingDir != "" {
-		opts.WorkingDir = o.WorkingDir
-	}
-}
-
-type OreOpt interface {
-	Apply(*OreOpts)
-}
-
-// Ore represents one or more sequential containerized commands.
-type Ore interface {
-	Liquify(context.Context, ContainerRuntime, ...OreOpt) error
 }
