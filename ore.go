@@ -81,7 +81,7 @@ func (o *OreOpts) Apply(opts *OreOpts) {
 	if o.Streams != nil {
 		opts.Streams = o.Streams
 	}
-	opts.Mounts = append(opts.Mounts, o.Mounts...)
+	opts.Mounts = overrideMounts(opts.Mounts, o.Mounts...)
 	if o.InterceptDockerSock {
 		opts.InterceptDockerSock = true
 	}

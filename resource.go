@@ -30,7 +30,7 @@ func (o *Resource) Liquify(ctx context.Context, containerRuntime ContainerRuntim
 	}
 
 	containerConfig := resourceToConfig(o.Resource, o.ResourceType, o.Method, opt)
-	containerConfig.Mounts = append(containerConfig.Mounts, opt.Mounts...)
+	containerConfig.Mounts = overrideMounts(containerConfig.Mounts, opt.Mounts...)
 
 	container, err := createSleepingContainer(ctx, containerRuntime, image, containerConfig, opt)
 	if err != nil {

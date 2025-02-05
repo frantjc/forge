@@ -15,7 +15,6 @@ import (
 
 func commandStreams(cmd *cobra.Command, stdoutUsed ...bool) *forge.Streams {
 	return &forge.Streams{
-		In: cmd.InOrStdin(),
 		Out: func() io.Writer {
 			if xslice.Some(stdoutUsed, func(b bool, _ int) bool {
 				return b

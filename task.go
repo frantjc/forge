@@ -33,7 +33,7 @@ func (o *Task) Liquify(ctx context.Context, containerRuntime ContainerRuntime, o
 	if err != nil {
 		return err
 	}
-	containerConfig.Mounts = append(containerConfig.Mounts, opt.Mounts...)
+	containerConfig.Mounts = overrideMounts(containerConfig.Mounts, opt.Mounts...)
 
 	image, err := pullImageForExecution(ctx, containerRuntime, o.Execution)
 	if err != nil {

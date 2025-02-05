@@ -59,7 +59,7 @@ func (o *Action) Liquify(ctx context.Context, containerRuntime ContainerRuntime,
 	workflowCommandStreams := newWorkflowCommandStreams(o.GlobalContext, o.ID, opt)
 	for _, containerConfig := range containerConfigs {
 		cc := containerConfig
-		cc.Mounts = append(cc.Mounts, opt.Mounts...)
+		cc.Mounts = overrideMounts(cc.Mounts, opt.Mounts...)
 		cc.Env = append(cc.Env, o.GlobalContext.Env()...)
 
 		container, err := createSleepingContainer(ctx, containerRuntime, image, &cc, opt)
