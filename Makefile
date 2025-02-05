@@ -11,7 +11,7 @@ BIN = /usr/local/bin
 GOOS = $(shell $(GO) env GOOS)
 GOARCH = $(shell $(GO) env GOARCH)
 
-SEMVER ?= 1.0.0-alpha.0
+SEMVER ?= 1.0.0
 
 .DEFAULT: install
 
@@ -40,12 +40,19 @@ vendor verify:
 lint:
 	@$(GOLANGCI-LINT) run --fix
 
-internal/bin/shim_$(GOARCH):
-	@GOOS=linux GOARCH=$(GOARCH) CGO_ENABLED=0 $(GO) build -ldflags "-s -w -X github.com/frantjc/forge.VersionCore=$(SEMVER)" -o $@ ./internal/cmd/shim
+internal/bin/shim_amd64:
+	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
 	@$(UPX) --ultra-brute $@
 
-internal/bin/fs_$(GOARCH).go:
-	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|$(GOARCH)|g" > $@
+internal/bin/fs_amd64.go:
+	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|amd64|g" > $@
+
+internal/bin/shim_arm64:
+	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
+	@$(UPX) --ultra-brute $@
+
+internal/bin/fs_arm64.go:
+	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|arm64|g" > $@
 
 clean:
 	@rm -rf dist/ rootfs/ vendor/ privileged version internal/bin/shim*.*
