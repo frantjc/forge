@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/command"
-	"github.com/frantjc/forge/ore"
 	xos "github.com/frantjc/x/os"
 )
 
@@ -22,7 +22,7 @@ func main() {
 	cmd.Version = SemVer()
 
 	err := cmd.ExecuteContext(ctx)
-	if err != nil && !errors.Is(err, ore.ErrContainerExitedWithNonzeroExitCode) {
+	if err != nil && !errors.Is(err, forge.ErrContainerExitedWithNonzeroExitCode) {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 

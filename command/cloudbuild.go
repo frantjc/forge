@@ -4,16 +4,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/envconv"
-	"github.com/frantjc/forge/forgecloudbuild"
-	"github.com/frantjc/forge/internal/contaminate"
-	"github.com/frantjc/forge/internal/hooks"
 	"github.com/frantjc/forge/internal/hostfs"
-	"github.com/frantjc/forge/ore"
-	"github.com/frantjc/forge/runtime/docker"
 	"github.com/spf13/cobra"
 )
 
@@ -22,10 +16,10 @@ import (
 func NewCloudBuild() *cobra.Command {
 	var (
 		attach        bool
-		workdir       string
+		workDir       string
 		script        string
 		substitutions map[string]string
-		cb            = &ore.CloudBuild{}
+		cb            = &forge.CloudBuild{}
 		cmd           = &cobra.Command{
 			Use:           "cloudbuild [flags] (builder) [--] [args]",
 			Aliases:       []string{"cb"},
@@ -77,7 +71,7 @@ func NewCloudBuild() *cobra.Command {
 					}
 				}
 
-				subs, err := cloudbuild.NewSubstituionsFromPath(workdir, substitutions)
+				subs, err := cloudbuild.NewSubstituionsFromPath(workDir, substitutions)
 				if err != nil {
 					if subs, err = cloudbuild.NewSubstitutionsFromEnv(substitutions); err != nil {
 						return err
@@ -86,30 +80,27 @@ func NewCloudBuild() *cobra.Command {
 
 				cb.Substitutions = envconv.ArrToMap(subs.Env())
 
-				c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+				cr, opts, err := runOptsAndContainerRuntime(cmd)
 				if err != nil {
 					return err
 				}
 
-				if attach {
-					hooks.ContainerStarted.Listen(hookAttach(cmd, forgecloudbuild.DefaultCloudBuildPath))
+				opts.Mounts = []forge.Mount{
+					{
+						Source:      workDir,
+						Destination: forge.CloudBuildWorkingDir(opts.WorkingDir),
+					},
+					{
+						Source:      hostfs.CloudBuildWorkspace,
+						Destination: cloudbuild.WorkspacePath,
+					},
 				}
 
-				return forge.NewFoundry(docker.New(c, !cmd.Flag("no-dind").Changed)).Process(
-					contaminate.WithMounts(ctx,
-						[]forge.Mount{
-							{
-								Source:      workdir,
-								Destination: forgecloudbuild.DefaultCloudBuildPath,
-							},
-							{
-								Source:      hostfs.CloudBuildWorkspace,
-								Destination: cloudbuild.WorkspacePath,
-							},
-						}...),
-					cb,
-					commandDrains(cmd),
-				)
+				if attach {
+					forge.HookContainerStarted.Listen(hookAttach(cmd, forge.CloudBuildWorkingDir(opts.WorkingDir)))
+				}
+
+				return cb.Run(ctx, cr, opts)
 			},
 		}
 	)
@@ -120,7 +111,7 @@ func NewCloudBuild() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for cloudbuild")
+	cmd.Flags().StringVar(&workDir, "workdir", wd, "working directory for cloudbuild")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	cmd.Flags().StringVar(&cb.Entrypoint, "entrypoint", "", "entrypoint for cloudbuild")

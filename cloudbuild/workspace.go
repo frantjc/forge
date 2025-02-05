@@ -1,3 +1,5 @@
 package cloudbuild
 
-const WorkspacePath = "/workspace"
+const (
+	WorkspacePath = "/workspace"
+)

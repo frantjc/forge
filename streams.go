@@ -15,8 +15,10 @@ const DefaultDetachKeys = "ctrl-d"
 // Streams represents streams to and from a process
 // inside of a Container.
 type Streams struct {
-	*Drains
 	In         io.Reader
+	Out        io.Writer
+	Err        io.Writer
+	Tty        bool
 	DetachKeys string
 }
 
@@ -25,7 +27,9 @@ type Streams struct {
 func StdStreams() *Streams {
 	return &Streams{
 		In:         os.Stdin,
-		Drains:     StdDrains(),
+		Out:        os.Stdout,
+		Err:        os.Stderr,
+		Tty:        true,
 		DetachKeys: DefaultDetachKeys,
 	}
 }
@@ -83,12 +87,10 @@ func TerminalStreams(stdin io.Reader, stdout, stderr io.Writer) (*Streams, func(
 	}
 
 	return &Streams{
-		In: stdin,
-		Drains: &Drains{
-			Out: stdout,
-			Err: stderr,
-			Tty: true,
-		},
+		In:         stdin,
+		Out:        stdout,
+		Err:        stderr,
+		Tty:        true,
 		DetachKeys: DefaultDetachKeys,
 	}, restore, nil
 }
