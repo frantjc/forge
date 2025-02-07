@@ -26,9 +26,9 @@ func TestParse(t *testing.T) {
 			expectedLocal:   true,
 		},
 		{
-			uses:            "frantjc/forge@v0",
+			uses:            "frantjc/forge@v1",
 			expectedPath:    "frantjc/forge",
-			expectedVersion: "v0",
+			expectedVersion: "v1",
 		},
 	} {
 		if actual, err := githubactions.Parse(s.uses); err != nil {

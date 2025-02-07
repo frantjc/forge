@@ -71,7 +71,7 @@ func (u *Uses) GoString() string {
 // of `uses` in a GitHub Actions Workflow Step, such as:
 //
 // steps:
-//   - uses: frantjc/forge@v0
+//   - uses: frantjc/forge@v1
 //   - uses: ./
 //   - uses: ./my/local/action
 //
