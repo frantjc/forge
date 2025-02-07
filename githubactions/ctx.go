@@ -194,7 +194,7 @@ func (c *StepContext) GetString(key string) string {
 }
 
 // GetString allows *RunnerContext to be accessed "like a map", e.g.
-// *RunnerContext.GetString("os") returns *StepContext.OS.
+// *RunnerContext.GetString("os") returns *RunnerContext.OS.
 func (c *RunnerContext) GetString(key string) string {
 	keys := strings.Split(key, ".")
 	if len(keys) > 0 {
@@ -361,7 +361,7 @@ const (
 	DefaultRemote = "origin"
 )
 
-// NewGlobalContextFromEnv returns a *GlobalContext whose values
+// NewGlobalContextFromPath returns a *GlobalContext whose values
 // are sourced from the git repository at the given path, the environment
 // and some sensible defaults.
 func NewGlobalContextFromPath(path string) (*GlobalContext, error) {

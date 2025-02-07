@@ -11,7 +11,7 @@ import (
 	"regexp"
 
 	xtar "github.com/frantjc/x/archive/tar"
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v69/github"
 )
 
 // ActionYAMLFilenames holds the possible names of
@@ -86,7 +86,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		u.GetOwner(), u.GetRepository(),
 		github.Tarball,
 		&github.RepositoryContentGetOptions{Ref: u.Version},
-		true,
+		9,
 	)
 	if err != nil {
 		return nil, nil, err
