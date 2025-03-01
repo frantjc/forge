@@ -18,9 +18,9 @@ linters:
     - revive
     - unconvert
     # test
-    - tenv
     - testpackage
     - thelper
+    - usetesting
     # auto-fix
     - godot
     - gofmt

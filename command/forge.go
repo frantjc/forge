@@ -9,13 +9,11 @@ import (
 // New returns the "root" command for `forge`
 // which acts as Forge's CLI entrypoint.
 func NewForge() *cobra.Command {
-	var (
-		cmd = &cobra.Command{
-			Use:           "forge",
-			SilenceErrors: true,
-			SilenceUsage:  true,
-		}
-	)
+	cmd := &cobra.Command{
+		Use:           "forge",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+	}
 
 	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 	cmd.PersistentFlags().CountP("verbose", "V", "Verbosity for forge")
