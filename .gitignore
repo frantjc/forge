@@ -16,9 +16,6 @@ rootfs/
 privileged
 version
 
-# nodejs
-node_modules/
-
 # mkdocs
 site/
 gh-pages/

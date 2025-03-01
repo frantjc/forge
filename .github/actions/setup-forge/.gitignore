@@ -3,3 +3,6 @@
 
 # tsc
 lib/
+
+# nodejs
+node_modules/
