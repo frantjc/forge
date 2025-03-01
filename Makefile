@@ -12,8 +12,7 @@ GIT ?= git
 UPX ?= upx
 YARN ?= yarn
 
-GOOS = $(shell $(GO) env GOOS)
-GOARCH = $(shell $(GO) env GOARCH)
+GOARCH ?= $(shell $(GO) env GOARCH)
 
 .PHONY: .github/actions/setup-forge .github/actions/setup-forge/
 .github/actions/setup-forge .github/actions/setup-forge/:
@@ -116,7 +115,7 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 	@$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint,$(GOLANGCI_LINT_VERSION))
 
 define go-install-tool
-@[ -f "$(1)-$(3)" ] || { \
+@[ -f "$(1)" ] || { \
 set -e; \
 package=$(2)@$(3) ;\
 echo "Downloading $${package}" ;\
