@@ -51,13 +51,13 @@ func NewTask() *cobra.Command {
 		wd = "."
 	}
 
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to containers")
 	cmd.Flags().StringToStringVarP(&inputs, "input", "i", nil, "inputs")
-	cmd.Flags().StringVar(&forge.NodeImageReference, "node-image", forge.DefaultNodeImageReference, "Node image")
-	cmd.Flags().StringVar(&forge.Node10ImageReference, "node10-image", forge.DefaultNode10ImageReference, "Node10 image")
-	cmd.Flags().StringVar(&forge.Node16ImageReference, "node16-image", forge.DefaultNode16ImageReference, "Node16 image")
-	cmd.Flags().StringVarP(&execution, "exec", "e", "Node", "task execution")
-	cmd.Flags().StringVar(&workdir, "workdir", wd, "working directory for use")
+	cmd.Flags().StringVar(&forge.NodeImageReference, "node-image", forge.DefaultNodeImageReference, "Node image for task")
+	cmd.Flags().StringVar(&forge.Node10ImageReference, "node10-image", forge.DefaultNode10ImageReference, "Node10 image for task")
+	cmd.Flags().StringVar(&forge.Node16ImageReference, "node16-image", forge.DefaultNode16ImageReference, "Node16 image for task")
+	cmd.Flags().StringVarP(&execution, "exec", "e", "Node", "Task execution")
+	cmd.Flags().StringVar(&workdir, "workdir", wd, "Working directory for task")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd

@@ -99,15 +99,15 @@ func NewUse() *cobra.Command {
 		wd = "."
 	}
 
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().BoolVar(&outputs, "outputs", false, "print step outputs")
-	cmd.Flags().BoolVar(&envVars, "env-vars", false, "print step environment variables")
-	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "env values")
-	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "with values")
-	cmd.Flags().StringVar(&forge.Node12ImageReference, "node12-image", forge.DefaultNode12ImageReference, "node12 image")
-	cmd.Flags().StringVar(&forge.Node16ImageReference, "node16-image", forge.DefaultNode16ImageReference, "node16 image")
-	cmd.Flags().StringVar(&forge.Node20ImageReference, "node20-image", forge.DefaultNode20ImageReference, "node20 image")
-	cmd.Flags().StringVar(&workDir, "workdir", wd, "working directory for use")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to containers")
+	cmd.Flags().BoolVar(&outputs, "outputs", false, "Print step outputs")
+	cmd.Flags().BoolVar(&envVars, "env-vars", false, "Print step environment variables")
+	cmd.Flags().StringToStringVarP(&env, "env", "e", nil, "Env values for use")
+	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "With values for use")
+	cmd.Flags().StringVar(&forge.Node12ImageReference, "node12-image", forge.DefaultNode12ImageReference, "node12 image for use")
+	cmd.Flags().StringVar(&forge.Node16ImageReference, "node16-image", forge.DefaultNode16ImageReference, "node16 image for use")
+	cmd.Flags().StringVar(&forge.Node20ImageReference, "node20-image", forge.DefaultNode20ImageReference, "node20 image for use")
+	cmd.Flags().StringVar(&workDir, "workdir", wd, "Working directory for use")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd

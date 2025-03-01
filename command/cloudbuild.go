@@ -110,16 +110,16 @@ func NewCloudBuild() *cobra.Command {
 		wd = "."
 	}
 
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().StringVar(&workDir, "workdir", wd, "working directory for cloudbuild")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to container")
+	cmd.Flags().StringVar(&workDir, "workdir", wd, "Working directory for cloudbuild")
 	_ = cmd.MarkFlagDirname("workdir")
 
-	cmd.Flags().StringVar(&cb.Entrypoint, "entrypoint", "", "entrypoint for cloudbuild")
-	cmd.Flags().StringVar(&script, "script", "", "script for cloudbuild")
+	cmd.Flags().StringVar(&cb.Entrypoint, "entrypoint", "", "Entrypoint for cloudbuild")
+	cmd.Flags().StringVar(&script, "script", "", "Script for cloudbuild")
 	_ = cmd.MarkFlagFilename("script")
-	cmd.Flags().StringArrayVarP(&cb.Env, "env", "e", nil, "env for cloudbuild")
-	cmd.Flags().StringToStringVarP(&substitutions, "sub", "s", nil, "substitutions for cloudbuild")
-	cmd.Flags().BoolVar(&cb.AutomapSubstitutions, "automap-substitutions", false, "automap substitutions for cloudbuild")
+	cmd.Flags().StringArrayVarP(&cb.Env, "env", "e", nil, "Env for cloudbuild")
+	cmd.Flags().StringToStringVarP(&substitutions, "sub", "s", nil, "Substitutions for cloudbuild")
+	cmd.Flags().BoolVar(&cb.AutomapSubstitutions, "automap-substitutions", false, "Automap substitutions for cloudbuild")
 
 	return cmd
 }

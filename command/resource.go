@@ -98,14 +98,14 @@ func newResource(method string) *cobra.Command {
 		wd = "."
 	}
 
-	if method != "check" {
-		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", "params for resource")
+	if method != concourse.MethodCheck {
+		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", "Params for resource")
 	}
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "attach to containers")
-	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "version for resource")
-	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "config file for resource")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to container")
+	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "Version for resource")
+	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "Config file for resource")
 	_ = cmd.MarkFlagFilename("conf", ".yaml", ".yml", ".json")
-	cmd.Flags().StringVar(&workDir, "workdir", wd, "working directory for resource")
+	cmd.Flags().StringVar(&workDir, "workdir", wd, "Working directory for resource")
 	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
