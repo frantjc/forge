@@ -65,7 +65,7 @@ func NewCache() *cobra.Command {
 		}
 	)
 
-	cmd.PersistentFlags().BoolVar(&clean, "clean", false, "If set, clean the cache and exit")
+	cmd.PersistentFlags().BoolVar(&clean, "clean", false, "Clean the cache and exit")
 
 	return cmd
 }
