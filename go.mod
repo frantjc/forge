@@ -10,7 +10,7 @@ require (
 	github.com/docker/docker v28.0.1+incompatible
 	github.com/frantjc/x v0.0.0-20240409062121-4f11680e2399
 	github.com/go-git/go-git/v5 v5.14.0
-	github.com/google/go-containerregistry v0.20.3
+	github.com/google/go-containerregistry v0.20.4-0.20250225234217-098045d5e61f
 	github.com/google/go-github/v69 v69.2.0
 	github.com/google/uuid v1.6.0
 	github.com/moby/term v0.5.2

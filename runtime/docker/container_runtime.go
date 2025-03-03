@@ -136,7 +136,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	// don't bother loading it in again.
 	ii, _, err := d.ImageInspectWithRaw(ctx, image.Name())
 	if err != nil {
-		if ilr, err := d.ImageLoad(ctx, image.Blob(), true); err != nil {
+		if ilr, err := d.ImageLoad(ctx, image.Blob(), client.ImageLoadWithQuiet(true)); err != nil {
 			return nil, err
 		} else if err = ilr.Body.Close(); err != nil {
 			return nil, err
