@@ -134,9 +134,9 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dockerfile, refe
 func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Image, config *forge.ContainerConfig) (forge.Container, error) {
 	// If the Docker daemon already has the image,
 	// don't bother loading it in again.
-	ii, _, err := d.ImageInspectWithRaw(ctx, image.Name())
+	ir, err := d.ImageInspect(ctx, image.Name())
 	if err != nil {
-		if ilr, err := d.ImageLoad(ctx, image.Blob(), true); err != nil {
+		if ilr, err := d.ImageLoad(ctx, image.Blob(), client.ImageLoadWithQuiet(true)); err != nil {
 			return nil, err
 		} else if err = ilr.Body.Close(); err != nil {
 			return nil, err
@@ -233,12 +233,12 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 					// We may already have successfully called ImageInspectWithRaw
 					// previously to check if we needed to call ImageLoad. If we didn't,
 					// retry and it should work now that we've definitely loaded the image.
-					if ii.Config == nil || len(ii.Config.Env) == 0 {
-						ii, _, _ = d.ImageInspectWithRaw(ctx, image.Name())
+					if ir.Config == nil || len(ir.Config.Env) == 0 {
+						ir, _ = d.ImageInspect(ctx, image.Name())
 					}
 
-					if ii.Config != nil {
-						findPATHAppendBinFn(ii.Config.Env)
+					if ir.Config != nil {
+						findPATHAppendBinFn(ir.Config.Env)
 					}
 
 					if !addedPath {
