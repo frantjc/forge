@@ -16,11 +16,11 @@ Next, get an understanding for how `forge` works. Each `forge` command follows r
 Finally, get an understanding for some useful `make` commands.
 
 ```sh
-# Run forge's tests.
+# Run Forge's tests.
 make test
-# Install forge.
-make install
-# Regenerate all of forge's generated code.
+# Install forge to ./bin.
+make forge
+# Regenerate all of Forge's generated code.
 make generate
 ```
 
