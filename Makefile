@@ -14,8 +14,12 @@ YARN ?= yarn
 
 GOARCH ?= $(shell $(GO) env GOARCH)
 
+.PHONY: .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/
+.github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/:
+	@cd .github/actions/setup-forge && $(YARN)
+
 .PHONY: .github/actions/setup-forge .github/actions/setup-forge/
-.github/actions/setup-forge .github/actions/setup-forge/:
+.github/actions/setup-forge .github/actions/setup-forge/: .github/actions/setup-forge/node_modules
 	@cd $@ && $(YARN) all
 
 .PHONY: fmt test generate
