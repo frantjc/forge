@@ -65,7 +65,7 @@ func (o *CloudBuild) Run(ctx context.Context, containerRuntime ContainerRuntime,
 
 func copyScriptToContainer(ctx context.Context, container Container, script string, opt *RunOpts) error {
 	if !bin.HasShebang(script) {
-		script = fmt.Sprintf("#!/bin/sh\n%s", script)
+		script = fmt.Sprintf("#!/usr/bin/env sh\nset -eo pipefail\n%s", script)
 	}
 
 	if err := container.CopyTo(ctx, opt.WorkingDir, bin.NewScriptTarArchive(script, ScriptName)); err != nil {
