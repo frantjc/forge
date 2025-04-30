@@ -16,13 +16,12 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
-	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/frantjc/forge"
 	xslice "github.com/frantjc/x/slice"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
+	"github.com/moby/go-archive"
 )
 
 func New(c *client.Client, dindPath string) *ContainerRuntime {
@@ -49,7 +48,7 @@ func (d *ContainerRuntime) PullImage(ctx context.Context, reference string) (for
 		return nil, err
 	}
 
-	r, err := d.Client.ImagePull(ctx, ref.Name(), image.PullOptions{})
+	r, err := d.ImagePull(ctx, ref.Name(), image.PullOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +83,7 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dockerfile, refe
 
 	buildCtx, err := archive.TarWithOptions(dir, &archive.TarOptions{
 		ExcludePatterns: excludes,
-		ChownOpts:       &idtools.Identity{UID: 0, GID: 0},
+		ChownOpts:       &archive.ChownOpts{UID: 0, GID: 0},
 	})
 	if err != nil {
 		return nil, err
@@ -94,7 +93,7 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dockerfile, refe
 		buildCtx = bc
 	}
 
-	ibr, err := d.Client.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
+	ibr, err := d.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
 		Tags:       []string{ref.Name()},
 		Dockerfile: filepath.Base(dockerfile),
 		PullParent: true,
@@ -144,7 +143,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 	}
 
 	var (
-		addr            = d.Client.DaemonHost()
+		addr            = d.DaemonHost()
 		containerConfig = &container.Config{
 			User:         config.User,
 			Env:          config.Env,

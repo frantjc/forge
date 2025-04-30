@@ -49,8 +49,8 @@ func (w *WorkflowCommandWriter) handleCommand(wc *WorkflowCommand) []byte {
 
 	switch wc.Command {
 	case CommandSetOutput:
-		if _, ok := w.GlobalContext.StepsContext[w.ID]; !ok {
-			w.GlobalContext.StepsContext[w.ID] = StepContext{
+		if _, ok := w.StepsContext[w.ID]; !ok {
+			w.StepsContext[w.ID] = StepContext{
 				Outputs: make(map[string]string),
 			}
 		}
@@ -63,7 +63,7 @@ func (w *WorkflowCommandWriter) handleCommand(wc *WorkflowCommand) []byte {
 	case CommandStopCommands:
 		w.StopCommandsTokens[wc.Value] = true
 	case CommandSaveState:
-		w.GlobalContext.EnvContext[fmt.Sprintf("STATE_%s", wc.GetName())] = wc.Value
+		w.EnvContext[fmt.Sprintf("STATE_%s", wc.GetName())] = wc.Value
 
 		if !w.saveStateDeprecationWarned {
 			return []byte("[" + CommandWarning + "] The `" + wc.Command + "` command is deprecated and will be disabled soon. Please upgrade to using Environment Files. For more information see: https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/")
@@ -82,7 +82,7 @@ func (w *WorkflowCommandWriter) handleCommand(wc *WorkflowCommand) []byte {
 	case CommandAddMask:
 		w.Masks = append(w.Masks, wc.Value)
 	case CommandAddPath:
-		w.GlobalContext.EnvContext["PATH"] = xos.JoinPath(wc.Value, w.GlobalContext.EnvContext["PATH"])
+		w.EnvContext["PATH"] = xos.JoinPath(wc.Value, w.EnvContext["PATH"])
 	case CommandEndGroup:
 		return []byte("[" + CommandEndGroup + "]")
 	case CommandDebug:

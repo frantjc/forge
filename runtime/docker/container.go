@@ -43,7 +43,7 @@ func (c *Container) CopyFrom(ctx context.Context, source string) (io.ReadCloser,
 }
 
 func (c *Container) Start(ctx context.Context) error {
-	return c.Client.ContainerStart(ctx, c.ID, container.StartOptions{})
+	return c.ContainerStart(ctx, c.ID, container.StartOptions{})
 }
 
 func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error) {
@@ -152,7 +152,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		detachKeys = streams.DetachKeys
 	}
 
-	idr, err := c.Client.ContainerExecCreate(ctx, c.ID, container.ExecOptions{
+	idr, err := c.ContainerExecCreate(ctx, c.ID, container.ExecOptions{
 		User:         containerConfig.User,
 		Privileged:   containerConfig.Privileged,
 		Env:          containerConfig.Env,
@@ -168,7 +168,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		return -1, err
 	}
 
-	hjr, err := c.Client.ContainerExecAttach(ctx, idr.ID, container.ExecStartOptions{
+	hjr, err := c.ContainerExecAttach(ctx, idr.ID, container.ExecStartOptions{
 		Tty: tty,
 	})
 	if err != nil {
@@ -249,7 +249,7 @@ func (c *Container) Restart(ctx context.Context) error {
 		seconds = int(time.Until(deadline).Seconds())
 	}
 
-	return c.Client.ContainerRestart(ctx, c.ID, container.StopOptions{
+	return c.ContainerRestart(ctx, c.ID, container.StopOptions{
 		Timeout: &seconds,
 	})
 }
@@ -260,17 +260,17 @@ func (c *Container) Stop(ctx context.Context) error {
 		seconds = int(time.Until(deadline).Seconds())
 	}
 
-	return c.Client.ContainerStop(ctx, c.ID, container.StopOptions{
+	return c.ContainerStop(ctx, c.ID, container.StopOptions{
 		Timeout: &seconds,
 	})
 }
 
 func (c *Container) Remove(ctx context.Context) error {
-	return c.Client.ContainerRemove(ctx, c.ID, container.RemoveOptions{
+	return c.ContainerRemove(ctx, c.ID, container.RemoveOptions{
 		Force: true,
 	})
 }
 
 func (c *Container) Kill(ctx context.Context) error {
-	return c.Client.ContainerKill(ctx, c.ID, os.Kill.String())
+	return c.ContainerKill(ctx, c.ID, os.Kill.String())
 }

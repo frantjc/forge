@@ -22,7 +22,7 @@ type CloudBuild struct {
 func (o *CloudBuild) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
 	opt := runOptsWithDefaults(opts...)
 
-	image, err := containerRuntime.PullImage(ctx, o.Step.Name)
+	image, err := containerRuntime.PullImage(ctx, o.Name)
 	if err != nil {
 		return err
 	}

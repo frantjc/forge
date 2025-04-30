@@ -1,7 +1,8 @@
 module github.com/frantjc/forge
 
-go 1.23.0
-toolchain go1.24.1
+go 1.24.0
+
+toolchain go1.24.2
 
 require (
 	github.com/adrg/xdg v0.5.3
