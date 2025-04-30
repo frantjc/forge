@@ -13,6 +13,7 @@ require (
 	github.com/google/go-containerregistry v0.20.4-0.20250225234217-098045d5e61f
 	github.com/google/go-github/v69 v69.2.0
 	github.com/google/uuid v1.6.0
+	github.com/moby/go-archive v0.1.0
 	github.com/moby/term v0.5.2
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
@@ -20,7 +21,7 @@ require (
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/text v0.24.0
 	k8s.io/apimachinery v0.33.0
-	k8s.io/cli-runtime v0.32.3
+	k8s.io/cli-runtime v0.33.0
 	k8s.io/client-go v0.33.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -55,7 +56,6 @@ require (
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/moby/go-archive v0.1.0 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
 	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
