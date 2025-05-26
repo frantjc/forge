@@ -93,7 +93,7 @@ func newResource(method string) *cobra.Command {
 		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", fmt.Sprintf("Params for %s", method))
 	}
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, fmt.Sprintf("Attach to container before executing %s", method))
-	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "V", fmt.Sprintf("Version for %s", method))
+	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", fmt.Sprintf("Version for %s", method))
 	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", fmt.Sprintf("Config file for  %s", method))
 	_ = cmd.MarkFlagFilename("conf", ".yaml", ".yml", ".json")
 
