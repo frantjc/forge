@@ -8,19 +8,21 @@ import (
 	"strings"
 )
 
-type stringToPrimitiveValue struct {
-	value   *map[string]any
+type stringToPrimitive struct {
+	Value *map[string]any
+
 	changed bool
 }
 
-func newStringToPrimitive(val map[string]any, p *map[string]any) *stringToPrimitiveValue {
-	ssv := new(stringToPrimitiveValue)
-	ssv.value = p
-	*ssv.value = val
+func newStringToPrimitive(val map[string]any, p *map[string]any) *stringToPrimitive {
+	ssv := new(stringToPrimitive)
+	ssv.Value = p
+	*ssv.Value = val
 	return ssv
 }
 
-func (s *stringToPrimitiveValue) Set(val string) error {
+// Set implements pflag.Value.
+func (s *stringToPrimitive) Set(val string) error {
 	var ss []string
 	n := strings.Count(val, "=")
 	switch n {
@@ -52,23 +54,25 @@ func (s *stringToPrimitiveValue) Set(val string) error {
 		}
 	}
 	if !s.changed {
-		*s.value = out
+		*s.Value = out
 	} else {
 		for k, v := range out {
-			(*s.value)[k] = v
+			(*s.Value)[k] = v
 		}
 	}
 	s.changed = true
 	return nil
 }
 
-func (s *stringToPrimitiveValue) Type() string {
+// Type implements pflag.Value.
+func (s *stringToPrimitive) Type() string {
 	return "stringToPrimitive"
 }
 
-func (s *stringToPrimitiveValue) String() string {
-	records := make([]string, 0, len(*s.value)>>1)
-	for k, v := range *s.value {
+// String implements pflag.Value.
+func (s *stringToPrimitive) String() string {
+	records := make([]string, 0, len(*s.Value)>>1)
+	for k, v := range *s.Value {
 		records = append(records, fmt.Sprint(k, "=", v))
 	}
 

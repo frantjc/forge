@@ -16,22 +16,24 @@ import (
 func NewCloudBuild() *cobra.Command {
 	var (
 		attach        bool
-		workDir       string
 		script        string
 		substitutions map[string]string
 		cb            = &forge.CloudBuild{}
-		cmd           = &cobra.Command{
-			Use:           "cloudbuild [flags] (builder) [--] [args]",
-			Aliases:       []string{"cb"},
-			Short:         "Run a Google Cloud Build step",
-			Args:          cobra.MinimumNArgs(1),
-			SilenceErrors: true,
-			SilenceUsage:  true,
+		cmd           = setCommon(&cobra.Command{
+			Use:     "cloudbuild [flags] (builder) [--] [args]",
+			Aliases: []string{"cb"},
+			Short:   "Run a Google Cloud Build step",
+			Args:    cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx   = cmd.Context()
 					iArgs = 1
 				)
+
+				wd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
 
 				cb.Name = args[0]
 
@@ -71,7 +73,7 @@ func NewCloudBuild() *cobra.Command {
 					}
 				}
 
-				subs, err := cloudbuild.NewSubstituionsFromPath(workDir, substitutions)
+				subs, err := cloudbuild.NewSubstituionsFromPath(wd, substitutions)
 				if err != nil {
 					if subs, err = cloudbuild.NewSubstitutionsFromEnv(substitutions); err != nil {
 						return err
@@ -87,7 +89,7 @@ func NewCloudBuild() *cobra.Command {
 
 				opts.Mounts = []forge.Mount{
 					{
-						Source:      workDir,
+						Source:      wd,
 						Destination: forge.CloudBuildWorkingDir(opts.WorkingDir),
 					},
 					{
@@ -102,18 +104,10 @@ func NewCloudBuild() *cobra.Command {
 
 				return cb.Run(ctx, cr, opts)
 			},
-		}
+		})
 	)
 
-	wd, err := os.Getwd()
-	if err != nil {
-		wd = "."
-	}
-
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to container")
-	cmd.Flags().StringVar(&workDir, "workdir", wd, "Working directory for cloudbuild")
-	_ = cmd.MarkFlagDirname("workdir")
-
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to container before executing cloudbuild")
 	cmd.Flags().StringVar(&cb.Entrypoint, "entrypoint", "", "Entrypoint for cloudbuild")
 	cmd.Flags().StringVar(&script, "script", "", "Script for cloudbuild")
 	_ = cmd.MarkFlagFilename("script")

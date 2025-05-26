@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/frantjc/forge"
@@ -15,11 +16,9 @@ import (
 
 func main() {
 	var (
-		cmd       = command.NewForge()
+		cmd       = command.NewForge(fmt.Sprintf("forge%s %s", SemVer(), runtime.Version()))
 		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	)
-
-	cmd.Version = SemVer()
 
 	err := cmd.ExecuteContext(ctx)
 	if err != nil && !errors.Is(err, forge.ErrContainerExitedWithNonzeroExitCode) {

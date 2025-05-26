@@ -22,13 +22,11 @@ var (
 func NewCache() *cobra.Command {
 	var (
 		clean bool
-		cmd   = &cobra.Command{
-			Use:           "cache [name] [--clean]",
-			Short:         "Interact with the Forge cache",
-			SilenceErrors: true,
-			SilenceUsage:  true,
-			Args:          cobra.MaximumNArgs(1),
-			ValidArgs:     append(runnerTmpArgs, runnerToolCacheArgs...),
+		cmd   = setCommon(&cobra.Command{
+			Use:       "cache [name] [--clean]",
+			Short:     "Interact with the Forge cache",
+			Args:      cobra.MaximumNArgs(1),
+			ValidArgs: append(runnerTmpArgs, runnerToolCacheArgs...),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					cache = hostfs.CacheHome
@@ -62,7 +60,7 @@ func NewCache() *cobra.Command {
 				_, err := fmt.Fprintln(cmd.OutOrStdout(), cache)
 				return err
 			},
-		}
+		})
 	)
 
 	cmd.PersistentFlags().BoolVar(&clean, "clean", false, "Clean the cache and exit")
