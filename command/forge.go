@@ -11,7 +11,7 @@ import (
 func newVersion(version string) *cobra.Command {
 	return setCommon(&cobra.Command{
 		Use: "version",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			_, err := fmt.Fprintln(cmd.OutOrStdout(), version)
 			return err
 		},
