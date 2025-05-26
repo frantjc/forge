@@ -18,85 +18,83 @@ func NewUse() *cobra.Command {
 		attach, outputs, envVars bool
 		env, with                map[string]string
 		debug                    bool
-		cmd                      = setCommon(
-			&cobra.Command{
-				Use:     "use [flags] (action)",
-				Aliases: []string{"github", "action", "act", "gh"},
-				Short:   "Use a GitHub Action",
-				Args:    cobra.ExactArgs(1),
-				RunE: func(cmd *cobra.Command, args []string) error {
-					var (
-						ctx = cmd.Context()
-						a   = &forge.Action{
-							ID:   uuid.NewString(),
-							Uses: args[0],
-							With: with,
-							Env:  env,
-						}
-					)
+		cmd                      = setCommon(&cobra.Command{
+			Use:     "use [flags] (action)",
+			Aliases: []string{"github", "action", "act", "gh"},
+			Short:   "Use a GitHub Action",
+			Args:    cobra.ExactArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				var (
+					ctx = cmd.Context()
+					a   = &forge.Action{
+						ID:   uuid.NewString(),
+						Uses: args[0],
+						With: with,
+						Env:  env,
+					}
+				)
 
-					wd, err := os.Getwd()
-					if err != nil {
+				wd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+
+				a.GlobalContext, err = githubactions.NewGlobalContextFromPath(wd)
+				if err != nil {
+					a.GlobalContext = githubactions.NewGlobalContextFromEnv()
+				}
+
+				if debug {
+					a.GlobalContext.EnableDebug()
+				}
+
+				for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolCache} {
+					if err = os.MkdirAll(dir, 0o755); err != nil {
 						return err
 					}
+				}
 
-					a.GlobalContext, err = githubactions.NewGlobalContextFromPath(wd)
-					if err != nil {
-						a.GlobalContext = githubactions.NewGlobalContextFromEnv()
-					}
+				cr, opts, err := runOptsAndContainerRuntime(cmd, envVars, outputs)
+				if err != nil {
+					return err
+				}
 
-					if debug {
-						a.GlobalContext.EnableDebug()
-					}
+				opts.Mounts = []forge.Mount{
+					{
+						Source:      wd,
+						Destination: forge.GitHubWorkspace(opts.WorkingDir),
+					},
+					{
+						Source:      hostfs.RunnerTmp,
+						Destination: forge.GitHubRunnerTmp(opts.WorkingDir),
+					},
+					{
+						Source:      hostfs.RunnerToolCache,
+						Destination: forge.GitHubRunnerToolCache(opts.WorkingDir),
+					},
+				}
 
-					for _, dir := range []string{hostfs.RunnerTmp, hostfs.RunnerToolCache} {
-						if err = os.MkdirAll(dir, 0o755); err != nil {
-							return err
-						}
-					}
+				if attach {
+					forge.HookContainerStarted.Listen(hookAttach(cmd, opts.WorkingDir, envVars, outputs))
+				}
 
-					cr, opts, err := runOptsAndContainerRuntime(cmd, envVars, outputs)
-					if err != nil {
-						return err
-					}
+				if envVars {
+					defer func() {
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(a.GlobalContext.EnvContext)
+					}()
+				}
 
-					opts.Mounts = []forge.Mount{
-						{
-							Source:      wd,
-							Destination: forge.GitHubWorkspace(opts.WorkingDir),
-						},
-						{
-							Source:      hostfs.RunnerTmp,
-							Destination: forge.GitHubRunnerTmp(opts.WorkingDir),
-						},
-						{
-							Source:      hostfs.RunnerToolCache,
-							Destination: forge.GitHubRunnerToolCache(opts.WorkingDir),
-						},
-					}
+				var ()
 
-					if attach {
-						forge.HookContainerStarted.Listen(hookAttach(cmd, opts.WorkingDir, envVars, outputs))
-					}
+				if outputs {
+					defer func() {
+						_ = json.NewEncoder(cmd.OutOrStdout()).Encode(a.GlobalContext.StepsContext[a.ID].Outputs)
+					}()
+				}
 
-					if envVars {
-						defer func() {
-							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(a.GlobalContext.EnvContext)
-						}()
-					}
-
-					var ()
-
-					if outputs {
-						defer func() {
-							_ = json.NewEncoder(cmd.OutOrStdout()).Encode(a.GlobalContext.StepsContext[a.ID].Outputs)
-						}()
-					}
-
-					return a.Run(ctx, cr, opts)
-				},
+				return a.Run(ctx, cr, opts)
 			},
-		)
+		})
 	)
 
 	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to containers before executing action")
