@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/concourse"
@@ -17,14 +16,12 @@ import (
 func newResource(method string) *cobra.Command {
 	var (
 		attach          bool
-		conf, workDir   string
+		conf            string
 		version, params map[string]any
-		cmd             = &cobra.Command{
-			Use:           fmt.Sprintf("%s [flags] (resource)", method),
-			Short:         fmt.Sprintf("%s a Concourse resource", cases.Title(language.English).String(method)),
-			Args:          cobra.ExactArgs(1),
-			SilenceErrors: true,
-			SilenceUsage:  true,
+		cmd             = setCommon(&cobra.Command{
+			Use:   fmt.Sprintf("%s [flags] (resource)", method),
+			Short: fmt.Sprintf("%s a Concourse resource", cases.Title(language.English).String(method)),
+			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					ctx      = cmd.Context()
@@ -39,14 +36,13 @@ func newResource(method string) *cobra.Command {
 					}
 				)
 
-				if cmd.Flag("conf").Changed {
-					if file, err = os.Open(conf); err != nil {
-						return err
-					}
-				} else {
-					if file, err = os.Open(filepath.Join(workDir, conf)); err != nil {
-						return err
-					}
+				wd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+
+				if file, err = os.Open(conf); err != nil {
+					return err
 				}
 
 				if err = yaml.NewDecoder(file).Decode(pipeline); err != nil {
@@ -79,7 +75,7 @@ func newResource(method string) *cobra.Command {
 
 				opts.Mounts = []forge.Mount{
 					{
-						Source:      workDir,
+						Source:      wd,
 						Destination: opts.WorkingDir,
 					},
 				}
@@ -90,23 +86,16 @@ func newResource(method string) *cobra.Command {
 
 				return r.Run(ctx, cr, opts)
 			},
-		}
+		})
 	)
 
-	wd, err := os.Getwd()
-	if err != nil {
-		wd = "."
-	}
-
 	if method != concourse.MethodCheck {
-		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", "Params for resource")
+		cmd.Flags().VarP(newStringToPrimitive(nil, &params), "param", "p", fmt.Sprintf("Params for %s", method))
 	}
-	cmd.Flags().BoolVarP(&attach, "attach", "a", false, "Attach to container")
-	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", "Version for resource")
-	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", "Config file for resource")
+	cmd.Flags().BoolVarP(&attach, "attach", "a", false, fmt.Sprintf("Attach to container before executing %s", method))
+	cmd.Flags().VarP(newStringToPrimitive(nil, &version), "version", "v", fmt.Sprintf("Version for %s", method))
+	cmd.Flags().StringVarP(&conf, "conf", "c", ".forge.yml", fmt.Sprintf("Config file for  %s", method))
 	_ = cmd.MarkFlagFilename("conf", ".yaml", ".yml", ".json")
-	cmd.Flags().StringVar(&workDir, "workdir", wd, "Working directory for resource")
-	_ = cmd.MarkFlagDirname("workdir")
 
 	return cmd
 }

@@ -1,26 +1,33 @@
 package command
 
 import (
-	"runtime"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
+// newVersion returns the command which acts as
+// the entrypoint for `forge version`.
+func newVersion(version string) *cobra.Command {
+	return setCommon(&cobra.Command{
+		Use: "version",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			_, err := fmt.Fprintln(cmd.OutOrStdout(), version)
+			return err
+		},
+	})
+}
+
 // New returns the "root" command for `forge`
 // which acts as Forge's CLI entrypoint.
-func NewForge() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:           "forge",
-		SilenceErrors: true,
-		SilenceUsage:  true,
-	}
+func NewForge(version string) *cobra.Command {
+	cmd := setCommon(&cobra.Command{Use: "forge"})
 
-	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
-	cmd.PersistentFlags().CountP("verbose", "V", "Verbosity for forge")
-	cmd.PersistentFlags().Bool("fix-dind", false, "Intercept and fix traffic to docker.sock,")
-	cmd.PersistentFlags().Bool("no-dind", false, "Disable Docker in Docker,")
-	cmd.MarkFlagsMutuallyExclusive("no-dind", "fix-dind")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
+
+	if version != "" {
+		cmd.AddCommand(newVersion(version))
+	}
 
 	return cmd
 }

@@ -29,4 +29,4 @@ brews:
     description: Easily run reusable steps from proprietary CI systems.
     license: MIT
     test: |
-      system "#{bin}/forge --version"
+      system "#{bin}/forge version"

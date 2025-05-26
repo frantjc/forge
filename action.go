@@ -109,7 +109,7 @@ func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 	var errs []error
 	globalContext = configureGlobalContext(globalContext, opt)
 
-	rc, err := container.CopyFrom(ctx, GitHubPath(opt.WorkingDir))
+	rc, err := container.CopyFrom(ctx, filepath.Join(opt.WorkingDir, "github/files"))
 	if err != nil {
 		return fmt.Errorf("copying GitHub path from container: %w", err)
 	}
@@ -128,6 +128,18 @@ func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 		switch header.Typeflag {
 		case tar.TypeReg:
 			switch {
+			case strings.HasSuffix(GitHubPath(opt.WorkingDir), header.Name):
+				addPath, err := githubactions.ParsePathFile(r)
+				if err != nil {
+					errs = append(errs, err)
+					continue
+				}
+
+				if path, ok := globalContext.EnvContext["PATH"]; ok {
+					globalContext.EnvContext["PATH"] = xos.JoinPath(addPath, path)
+				} else {
+					globalContext.EnvContext["PATH"] = addPath
+				}
 			case strings.HasSuffix(GitHubOutput(opt.WorkingDir), header.Name):
 				outputs, err := githubactions.ParseEnvFile(r)
 				if err != nil {
@@ -143,13 +155,13 @@ func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 					maps.Copy(globalContext.StepsContext[step].Outputs, outputs)
 				}
 			case strings.HasSuffix(GitHubState(opt.WorkingDir), header.Name):
-				outputs, err := githubactions.ParseEnvFile(r)
+				state, err := githubactions.ParseEnvFile(r)
 				if err != nil {
 					errs = append(errs, err)
 					continue
 				}
 
-				for k, v := range outputs {
+				for k, v := range state {
 					globalContext.EnvContext[fmt.Sprintf("STATE_%s", k)] = v
 				}
 			case strings.HasSuffix(GitHubEnv(opt.WorkingDir), header.Name):

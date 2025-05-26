@@ -88,7 +88,7 @@ async function run(): Promise<void> {
     core.endGroup();
 
     // Sanity check that forge was installed correctly.
-    await cp.exec(bin, ["-v"]);
+    await cp.exec(bin, ["version"]);
   } catch (err) {
     if (typeof err === "string" || err instanceof Error) {
       core.setFailed(err);

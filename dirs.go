@@ -29,19 +29,19 @@ func GitHubRunnerToolCache(workingDir string) string {
 }
 
 func GitHubPath(workingDir string) string {
-	return filepath.Join(workingDir, "github/add_path")
+	return filepath.Join(workingDir, "github/files/add_path")
 }
 
 func GitHubEnv(workingDir string) string {
-	return filepath.Join(workingDir, "github/set_env")
+	return filepath.Join(workingDir, "github/files/set_env")
 }
 
 func GitHubOutput(workingDir string) string {
-	return filepath.Join(workingDir, "github/set_output")
+	return filepath.Join(workingDir, "github/files/set_output")
 }
 
 func GitHubState(workingDir string) string {
-	return filepath.Join(workingDir, "github/save_state")
+	return filepath.Join(workingDir, "github/files/save_state")
 }
 
 func ConcourseResourceWorkingDir(workingDir string) string {
