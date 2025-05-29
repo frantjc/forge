@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/frantjc/forge/envconv"
+	"github.com/frantjc/forge/internal/envconv"
 	xslice "github.com/frantjc/x/slice"
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"

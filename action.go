@@ -12,8 +12,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
+	"github.com/frantjc/forge/internal/envconv"
 	"github.com/frantjc/forge/internal/hostfs"
 	xos "github.com/frantjc/x/os"
 	"github.com/opencontainers/go-digest"
