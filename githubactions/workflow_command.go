@@ -3,7 +3,7 @@ package githubactions
 import (
 	"fmt"
 
-	"github.com/frantjc/forge/rangemap"
+	"github.com/frantjc/forge/internal/rangemap"
 )
 
 type WorkflowCommand struct {

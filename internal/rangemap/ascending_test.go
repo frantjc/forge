@@ -3,21 +3,21 @@ package rangemap_test
 import (
 	"testing"
 
-	"github.com/frantjc/forge/rangemap"
+	"github.com/frantjc/forge/internal/rangemap"
 )
 
-func TestDescending(t *testing.T) {
+func TestAscending(t *testing.T) {
 	var (
 		m = map[string]int{
-			"b": 3,
-			"d": 1,
-			"c": 2,
-			"a": 4,
+			"b": 2,
+			"d": 4,
+			"c": 3,
+			"a": 1,
 		}
 		i = 1
 	)
 
-	rangemap.Descending(m, func(k string, v int) {
+	rangemap.Ascending(m, func(k string, v int) {
 		if i != v {
 			t.Error(k, "was in position", v, "should have been in position", i)
 			t.FailNow()

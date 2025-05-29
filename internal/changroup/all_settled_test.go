@@ -3,7 +3,7 @@ package changroup_test
 import (
 	"testing"
 
-	"github.com/frantjc/forge/changroup"
+	"github.com/frantjc/forge/internal/changroup"
 )
 
 func TestAllSettled(t *testing.T) {

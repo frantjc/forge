@@ -12,7 +12,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/changroup"
+	"github.com/frantjc/forge/internal/changroup"
 	"github.com/moby/term"
 )
 
