@@ -16,9 +16,11 @@ import (
 
 func main() {
 	var (
-		cmd       = command.NewForge(fmt.Sprintf("forge%s %s", SemVer(), runtime.Version()))
+		cmd       = command.NewForge()
 		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	)
+
+	cmd.AddCommand(command.NewVersion(fmt.Sprintf("forge%s %s", SemVer(), runtime.Version())))
 
 	err := cmd.ExecuteContext(ctx)
 	if err != nil && !errors.Is(err, forge.ErrContainerExitedWithNonzeroExitCode) {

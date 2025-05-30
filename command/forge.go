@@ -6,9 +6,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// newVersion returns the command which acts as
+// NewVersion returns the command which acts as
 // the entrypoint for `forge version`.
-func newVersion(version string) *cobra.Command {
+func NewVersion(version string) *cobra.Command {
 	return setCommon(&cobra.Command{
 		Use: "version",
 		RunE: func(cmd *cobra.Command, _ []string) error {
@@ -20,14 +20,10 @@ func newVersion(version string) *cobra.Command {
 
 // New returns the "root" command for `forge`
 // which acts as Forge's CLI entrypoint.
-func NewForge(version string) *cobra.Command {
+func NewForge() *cobra.Command {
 	cmd := setCommon(&cobra.Command{Use: "forge"})
 
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
-
-	if version != "" {
-		cmd.AddCommand(newVersion(version))
-	}
 
 	return cmd
 }

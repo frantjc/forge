@@ -9,6 +9,8 @@ on:
         description: Task execution.
         required: true
         default: node16
+permissions:
+  contents: read
 jobs:
   task:
     runs-on: ubuntu-latest
@@ -23,5 +25,5 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: node make.js build --task ${{ inputs.task }}
-      - uses: frantjc/forge@main
+      - uses: frantjc/forge@${{ github.sha }}
       - run: forge task -e ${{ inputs.execution }} ${{ inputs.task }}
