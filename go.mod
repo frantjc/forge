@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/adrg/xdg v0.5.3
-	github.com/docker/cli v28.1.1+incompatible
+	github.com/docker/cli v28.2.2+incompatible
 	github.com/docker/docker v28.1.1+incompatible
 	github.com/frantjc/x v0.0.0-20250505021416-42b0ffc4aefa
 	github.com/go-git/go-git/v5 v5.16.0
