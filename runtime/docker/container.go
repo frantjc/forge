@@ -2,9 +2,7 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -44,94 +42,6 @@ func (c *Container) CopyFrom(ctx context.Context, source string) (io.ReadCloser,
 
 func (c *Container) Start(ctx context.Context) error {
 	return c.ContainerStart(ctx, c.ID, container.StartOptions{})
-}
-
-func (c *Container) Run(ctx context.Context, streams *forge.Streams) (int, error) {
-	var (
-		stdin          io.Reader
-		stdout, stderr io.Writer
-		detachKeys     string
-		tty            bool
-	)
-	if streams != nil {
-		stdin = streams.In
-		stdout = streams.Out
-		stderr = streams.Err
-		tty = streams.Tty
-		if tty {
-			stderr = stdout
-		}
-		detachKeys = streams.DetachKeys
-	}
-
-	hjr, err := c.ContainerAttach(ctx, c.ID, container.AttachOptions{
-		Stream:     streams != nil,
-		Stdin:      stdin != nil,
-		Stdout:     stdout != nil,
-		Stderr:     stderr != nil,
-		DetachKeys: detachKeys,
-	})
-	if err != nil {
-		return -1, err
-	}
-
-	errC := make(chan error, 1)
-	go func() {
-		if tty {
-			_, err = io.Copy(stdout, hjr.Reader)
-		} else {
-			_, err = stdcopy.StdCopy(
-				stdout,
-				stderr,
-				hjr.Reader,
-			)
-		}
-		if err != nil {
-			errC <- err
-		}
-	}()
-
-	if stdin != nil {
-		if detachKeys != "" {
-			detachKeysB, err := term.ToBytes(detachKeys)
-			if err != nil {
-				return -1, err
-			}
-
-			stdin = term.NewEscapeProxy(stdin, detachKeysB)
-		}
-
-		go func() {
-			if _, err = io.Copy(hjr.Conn, stdin); err != nil {
-				errC <- err
-			}
-
-			if err = hjr.CloseWrite(); err != nil {
-				errC <- hjr.CloseWrite()
-			}
-		}()
-	}
-
-	if err = c.ContainerStart(ctx, c.ID, container.StartOptions{}); err != nil {
-		return -1, err
-	}
-
-	cwokbC, waitErrC := c.ContainerWait(ctx, c.ID, container.WaitConditionNotRunning)
-
-	select {
-	case cwokb := <-cwokbC:
-		if cwokb.Error != nil {
-			err = fmt.Errorf("%s", cwokb.Error.Message)
-		}
-
-		return int(cwokb.StatusCode), err
-	case err = <-errC:
-		return -1, err
-	case err = <-waitErrC:
-		return -1, err
-	case <-ctx.Done():
-		return -1, ctx.Err()
-	}
 }
 
 func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerConfig, streams *forge.Streams) (int, error) {
@@ -243,17 +153,6 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 	return cei.ExitCode, err
 }
 
-func (c *Container) Restart(ctx context.Context) error {
-	seconds := -1
-	if deadline, ok := ctx.Deadline(); ok {
-		seconds = int(time.Until(deadline).Seconds())
-	}
-
-	return c.ContainerRestart(ctx, c.ID, container.StopOptions{
-		Timeout: &seconds,
-	})
-}
-
 func (c *Container) Stop(ctx context.Context) error {
 	seconds := -1
 	if deadline, ok := ctx.Deadline(); ok {
@@ -269,8 +168,4 @@ func (c *Container) Remove(ctx context.Context) error {
 	return c.ContainerRemove(ctx, c.ID, container.RemoveOptions{
 		Force: true,
 	})
-}
-
-func (c *Container) Kill(ctx context.Context) error {
-	return c.ContainerKill(ctx, c.ID, os.Kill.String())
 }
