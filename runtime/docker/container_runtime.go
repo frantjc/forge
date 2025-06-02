@@ -28,10 +28,6 @@ func New(path string) *ContainerRuntime {
 	return r
 }
 
-func (r *ContainerRuntime) GetContainer(ctx context.Context, id string) (forge.Container, error) {
-	return &DockerContainer{ID: id, Path: r.Path}, nil
-}
-
 func (r *ContainerRuntime) CreateContainer(ctx context.Context, img forge.Image, cfg *forge.ContainerConfig) (forge.Container, error) {
 	args := []string{"create"}
 
