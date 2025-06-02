@@ -1,88 +1,62 @@
 package docker
 
 import (
-	"compress/gzip"
+	"bytes"
 	"encoding/json"
 	"io"
+	"os/exec"
+	"strings"
 
-	"github.com/google/go-containerregistry/pkg/name"
-	v1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/google/go-containerregistry/pkg/v1/tarball"
+	xos "github.com/frantjc/x/os"
 	"github.com/opencontainers/go-digest"
 	imagespecsv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 type Image struct {
-	v1.Image
-	name.Reference
+	Ref  string
+	Path string
+}
+
+func (i *Image) Name() string { return i.Ref }
+
+func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
+	var (
+		configFile = &struct {
+			Config *imagespecsv1.ImageConfig `json:"config"`
+		}{}
+		buf = new(bytes.Buffer)
+		cmd = exec.Command(i.Path, "inspect", i.Ref)
+	)
+	cmd.Stdout = buf
+
+	if err := cmd.Run(); err != nil {
+		return nil, xos.NewExitCodeError(err, cmd.ProcessState.ExitCode())
+	}
+
+	return configFile.Config, json.NewDecoder(buf).Decode(configFile)
 }
 
 func (i *Image) Digest() (digest.Digest, error) {
-	hash, err := i.Image.Digest()
+	cmd := exec.Command(i.Path, "inspect", "--format={{.Id}}", i.Ref)
+	out, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
-
-	d := digest.Digest(hash.String())
-	return d, d.Validate()
-}
-
-func (i *Image) Manifest() (manifest *imagespecsv1.Manifest, _ error) {
-	rawManifest, err := i.RawManifest()
-	if err != nil {
-		return nil, err
-	}
-
-	return manifest, json.Unmarshal(rawManifest, manifest)
-}
-
-func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
-	// RawConfigFile returns JSON that has this structure:
-	//
-	// {
-	// 	...
-	// 	"config": { ... }
-	// }
-	//
-	// We want "config" from the above JSON, so we create
-	// this struct containing our ImageConfig where
-	// the "config" will be unmarshaled to.
-	configFile := &struct {
-		Config *imagespecsv1.ImageConfig `json:"config"`
-	}{}
-
-	rawConfig, err := i.RawConfigFile()
-	if err != nil {
-		return nil, err
-	}
-
-	return configFile.Config, json.Unmarshal(rawConfig, configFile)
-}
-
-func (i *Image) MarshalJSON() ([]byte, error) {
-	d, err := i.Digest()
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte("\"" + d.String() + "\""), nil
+	return digest.FromString(strings.TrimSpace(string(out))), nil
 }
 
 func (i *Image) Blob() io.Reader {
 	pr, pw := io.Pipe()
 
 	go func() {
-		w := gzip.NewWriter(pw)
-		err := tarball.Write(i, i.Image, w)
-		if err == nil {
-			err = w.Close()
+		cmd := exec.Command(i.Path, "save", i.Ref)
+		cmd.Stdout = pw
+		if err := cmd.Run(); err != nil {
+			_ = pw.CloseWithError(xos.NewExitCodeError(err, cmd.ProcessState.ExitCode()))
+		} else {
+			_ = pw.Close()
 		}
-		_ = pw.CloseWithError(err)
 	}()
 
 	return pr
-}
-
-func (i *Image) GoString() string {
-	return "&Image{" + i.String() + "}"
 }

@@ -2,170 +2,92 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"io"
-	"path/filepath"
-	"time"
+	"os/exec"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/changroup"
-	"github.com/moby/term"
+	xos "github.com/frantjc/x/os"
 )
 
-type Container struct {
-	ID string
-	*client.Client
+type DockerContainer struct {
+	ID   string
+	Path string
 }
 
-func (c *Container) GetID() string {
-	return c.ID
-}
+func (c *DockerContainer) GetID() string { return c.ID }
 
-func (c *Container) GoString() string {
-	return "&Container{" + c.GetID() + "}"
-}
+func (c *DockerContainer) CopyTo(ctx context.Context, dst string, r io.Reader) error {
+	cmd := exec.CommandContext(ctx, c.Path, "cp", "-", fmt.Sprintf("%s:%s", c.ID, dst))
+	cmd.Stdin = r
 
-func (c *Container) CopyTo(ctx context.Context, destination string, content io.Reader) error {
-	if rc, ok := content.(io.ReadCloser); ok {
-		defer rc.Close()
+	if err := cmd.Run(); err != nil {
+		return xos.NewExitCodeError(err, cmd.ProcessState.ExitCode())
 	}
 
-	return c.CopyToContainer(ctx, c.ID, filepath.Clean(destination), content, container.CopyToContainerOptions{})
+	return nil
 }
 
-func (c *Container) CopyFrom(ctx context.Context, source string) (io.ReadCloser, error) {
-	rc, _, err := c.CopyFromContainer(ctx, c.ID, filepath.Clean(source))
-	return rc, err
-}
+func (c *DockerContainer) CopyFrom(ctx context.Context, src string) (io.ReadCloser, error) {
+	cmd := exec.CommandContext(ctx, c.Path, "cp", fmt.Sprintf("%s:%s", c.ID, src), "-")
 
-func (c *Container) Start(ctx context.Context) error {
-	return c.ContainerStart(ctx, c.ID, container.StartOptions{})
-}
-
-func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerConfig, streams *forge.Streams) (int, error) {
-	var (
-		stdin          io.Reader
-		stdout, stderr io.Writer
-		tty            bool
-		detachKeys     string
-	)
-	if streams != nil {
-		stdin = streams.In
-		stdout = streams.Out
-		stderr = streams.Err
-		tty = streams.Tty
-		if tty {
-			stderr = stdout
-		}
-		detachKeys = streams.DetachKeys
-	}
-
-	idr, err := c.ContainerExecCreate(ctx, c.ID, container.ExecOptions{
-		User:         containerConfig.User,
-		Privileged:   containerConfig.Privileged,
-		Env:          containerConfig.Env,
-		WorkingDir:   containerConfig.WorkingDir,
-		Cmd:          append(containerConfig.Entrypoint, containerConfig.Cmd...),
-		Tty:          tty,
-		DetachKeys:   detachKeys,
-		AttachStdin:  stdin != nil,
-		AttachStdout: stdout != nil,
-		AttachStderr: stderr != nil,
-	})
+	out, err := cmd.StdoutPipe()
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	hjr, err := c.ContainerExecAttach(ctx, idr.ID, container.ExecStartOptions{
-		Tty: tty,
-	})
-	if err != nil {
-		return -1, err
-	}
-	defer hjr.Close()
-
-	errC := make(chan error, 1)
-	outC := make(chan any, 1)
-	go func() {
-		if tty {
-			_, err = io.Copy(stdout, hjr.Reader)
-		} else {
-			// "exit status 1" comes from here
-			_, err = stdcopy.StdCopy(
-				stdout,
-				stderr,
-				hjr.Reader,
-			)
-		}
-		if err != nil {
-			errC <- err
-		}
-
-		go close(outC)
-	}()
-
-	inC := make(chan any, 1)
-	if stdin != nil {
-		if detachKeys != "" {
-			detachKeysB, err := term.ToBytes(detachKeys)
-			if err != nil {
-				return -1, err
-			}
-
-			stdin = term.NewEscapeProxy(stdin, detachKeysB)
-		}
-
-		go func() {
-			if _, err = io.Copy(hjr.Conn, stdin); err != nil {
-				errC <- err
-			}
-
-			if err = hjr.CloseWrite(); err != nil {
-				errC <- err
-			}
-
-			go close(inC)
-		}()
-	} else {
-		go close(inC)
+	if err := cmd.Start(); err != nil {
+		return nil, err
 	}
 
-	select {
-	case err = <-errC:
-		if _, ok := err.(term.EscapeError); ok {
-			err = nil
-		}
-	case <-ctx.Done():
-		err = ctx.Err()
-	case <-changroup.AllSettled(inC, outC):
-	}
-	if err != nil {
-		return -1, err
-	}
-
-	cei, inspectErr := c.ContainerExecInspect(ctx, idr.ID)
-	if inspectErr != nil {
-		return -1, inspectErr
-	}
-
-	return cei.ExitCode, err
+	return out, nil
 }
 
-func (c *Container) Stop(ctx context.Context) error {
-	seconds := -1
-	if deadline, ok := ctx.Deadline(); ok {
-		seconds = int(time.Until(deadline).Seconds())
+func (c *DockerContainer) Start(ctx context.Context) error {
+	cmd := exec.CommandContext(ctx, c.Path, "start", c.ID)
+
+	if err := cmd.Run(); err != nil {
+		return xos.NewExitCodeError(err, cmd.ProcessState.ExitCode())
 	}
 
-	return c.ContainerStop(ctx, c.ID, container.StopOptions{
-		Timeout: &seconds,
-	})
+	return nil
 }
 
-func (c *Container) Remove(ctx context.Context) error {
-	return c.ContainerRemove(ctx, c.ID, container.RemoveOptions{
-		Force: true,
-	})
+func (c *DockerContainer) Exec(ctx context.Context, cfg *forge.ContainerConfig, streams *forge.Streams) (int, error) {
+	args := []string{"exec"}
+
+	if cfg.User != "" {
+		args = append(args, "-u", cfg.User)
+	}
+
+	if cfg.WorkingDir != "" {
+		args = append(args, "-w", cfg.WorkingDir)
+	}
+
+	for _, env := range cfg.Env {
+		args = append(args, "-e", env)
+	}
+
+	args = append(args, c.ID)
+	args = append(args, cfg.Entrypoint...)
+	args = append(args, cfg.Cmd...)
+
+	cmd := exec.CommandContext(ctx, c.Path, args...)
+	cmd.Stdin = streams.In
+	cmd.Stdout = streams.Out
+	cmd.Stderr = streams.Err
+
+	if err := cmd.Run(); err != nil {
+		return -1, xos.NewExitCodeError(err, cmd.ProcessState.ExitCode())
+	}
+
+	return cmd.ProcessState.ExitCode(), nil
+}
+
+func (c *DockerContainer) Stop(ctx context.Context) error {
+	return exec.CommandContext(ctx, c.Path, "stop", c.ID).Run()
+}
+
+func (c *DockerContainer) Remove(ctx context.Context) error {
+	return exec.CommandContext(ctx, c.Path, "rm", "-f", c.ID).Run()
 }

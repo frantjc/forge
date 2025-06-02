@@ -7,7 +7,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/runtime/docker"
+	"github.com/frantjc/forge/runtime/dockerd"
 	xslice "github.com/frantjc/x/slice"
 	"github.com/spf13/cobra"
 )
@@ -72,11 +72,12 @@ func runOptsAndContainerRuntime(cmd *cobra.Command, stdoutUsed ...bool) (forge.C
 		dindPath = ""
 	}
 
-	return docker.New(cli, dindPath), &forge.RunOpts{
-		Streams:             commandStreams(cmd, stdoutUsed...),
-		InterceptDockerSock: cmd.Flag("fix-dind").Changed,
-		WorkingDir:          ctrWorkDir,
-	}, nil
+	return dockerd.New(cli, dindPath),
+		&forge.RunOpts{
+			Streams:             commandStreams(cmd, stdoutUsed...),
+			InterceptDockerSock: cmd.Flag("fix-dind").Changed,
+			WorkingDir:          ctrWorkDir,
+		}, nil
 }
 
 func setCommon(cmd *cobra.Command) *cobra.Command {
