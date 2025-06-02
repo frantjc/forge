@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"os/exec"
-	"strings"
 
 	xos "github.com/frantjc/x/os"
-	"github.com/opencontainers/go-digest"
 	imagespecsv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -34,15 +32,6 @@ func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
 	}
 
 	return configFile.Config, json.NewDecoder(buf).Decode(configFile)
-}
-
-func (i *Image) Digest() (digest.Digest, error) {
-	cmd := exec.Command(i.Path, "inspect", "--format={{.Id}}", i.Ref)
-	out, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return digest.FromString(strings.TrimSpace(string(out))), nil
 }
 
 func (i *Image) Blob() io.Reader {

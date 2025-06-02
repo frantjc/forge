@@ -5,7 +5,6 @@ import (
 	"io"
 
 	xslice "github.com/frantjc/x/slice"
-	"github.com/opencontainers/go-digest"
 	imagespecsv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -49,7 +48,6 @@ type Container interface {
 // Used to create Containers from.
 type Image interface {
 	Config() (*imagespecsv1.ImageConfig, error)
-	Digest() (digest.Digest, error)
 	Blob() io.Reader
 	Name() string
 }

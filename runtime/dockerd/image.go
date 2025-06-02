@@ -8,23 +8,12 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
-	"github.com/opencontainers/go-digest"
 	imagespecsv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 type Image struct {
 	v1.Image
 	name.Reference
-}
-
-func (i *Image) Digest() (digest.Digest, error) {
-	hash, err := i.Image.Digest()
-	if err != nil {
-		return "", err
-	}
-
-	d := digest.Digest(hash.String())
-	return d, d.Validate()
 }
 
 func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
