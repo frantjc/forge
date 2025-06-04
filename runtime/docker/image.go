@@ -23,6 +23,7 @@ func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
 			Config *imagespecsv1.ImageConfig `json:"config"`
 		}{}
 		buf = new(bytes.Buffer)
+		//nolint:gosec
 		cmd = exec.Command(i.Path, "inspect", i.Ref)
 	)
 	cmd.Stdout = buf
@@ -38,6 +39,7 @@ func (i *Image) Blob() io.Reader {
 	pr, pw := io.Pipe()
 
 	go func() {
+		//nolint:gosec
 		cmd := exec.Command(i.Path, "save", i.Ref)
 		cmd.Stdout = pw
 		if err := cmd.Run(); err != nil {

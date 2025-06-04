@@ -55,6 +55,7 @@ func (r *ContainerRuntime) CreateContainer(ctx context.Context, img forge.Image,
 	args = append(args, cfg.Entrypoint...)
 	args = append(args, cfg.Cmd...)
 
+	//nolint:gosec
 	cmd := exec.CommandContext(ctx, r.Path, args...)
 	buf := new(bytes.Buffer)
 	cmd.Stdout = buf
@@ -65,7 +66,7 @@ func (r *ContainerRuntime) CreateContainer(ctx context.Context, img forge.Image,
 
 	id := strings.TrimSpace(buf.String())
 
-	return &DockerContainer{ID: id, Path: r.Path}, nil
+	return &Container{ID: id, Path: r.Path}, nil
 }
 
 func (r *ContainerRuntime) PullImage(ctx context.Context, reference string) (forge.Image, error) {
@@ -74,6 +75,7 @@ func (r *ContainerRuntime) PullImage(ctx context.Context, reference string) (for
 		return nil, err
 	}
 
+	//nolint:gosec
 	cmd := exec.CommandContext(ctx, r.Path, "pull", ref.String())
 
 	if err := cmd.Run(); err != nil {

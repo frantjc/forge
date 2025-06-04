@@ -11,7 +11,7 @@ First, ensure you've installed the necessary prerequisites:
 
 Next, get an understanding for how `forge` works. Each `forge` command follows roughly the same pattern:
 
-![Diagram](diag.png)
+![Diagram](diagram.excalidraw.svg)
 
 Finally, get an understanding for some useful `make` commands.
 
