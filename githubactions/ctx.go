@@ -1,8 +1,8 @@
 package githubactions
 
 import (
-	"errors"
 	"cmp"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
