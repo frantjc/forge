@@ -2,6 +2,7 @@ package githubactions
 
 import (
 	"errors"
+	"cmp"
 	"fmt"
 	"net/url"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge/internal/envconv"
-	xslice "github.com/frantjc/x/slice"
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"
 )
@@ -405,7 +405,7 @@ loop:
 	}
 
 	if conf, err := r.Config(); err == nil {
-		c.GitHubContext.Actor = xslice.Coalesce(
+		c.GitHubContext.Actor = cmp.Or(
 			conf.User.Name,
 			conf.Author.Name,
 			conf.Committer.Name,

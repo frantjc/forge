@@ -18,7 +18,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/frantjc/forge"
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
 	"github.com/moby/go-archive"
@@ -256,7 +256,7 @@ func (d *ContainerRuntime) CreateContainer(ctx context.Context, image forge.Imag
 		}
 	}
 
-	hostConfig.Mounts = append(hostConfig.Mounts, xslice.Map(
+	hostConfig.Mounts = append(hostConfig.Mounts, xslices.Map(
 		config.Mounts,
 		func(m forge.Mount, _ int) mount.Mount {
 			mountType := mount.TypeVolume
