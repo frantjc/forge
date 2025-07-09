@@ -10,8 +10,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/docker/cli/cli/command/image/build"
-	"github.com/docker/docker/api/types"
+	clibuild "github.com/docker/cli/cli/command/image/build"
+	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
@@ -76,7 +76,7 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dockerfile, refe
 
 	dir := filepath.Dir(dockerfile)
 
-	excludes, err := build.ReadDockerignore(dir)
+	excludes, err := clibuild.ReadDockerignore(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -89,11 +89,11 @@ func (d *ContainerRuntime) BuildDockerfile(ctx context.Context, dockerfile, refe
 		return nil, err
 	}
 
-	if bc, err := build.Compress(buildCtx); err == nil {
+	if bc, err := clibuild.Compress(buildCtx); err == nil {
 		buildCtx = bc
 	}
 
-	ibr, err := d.ImageBuild(ctx, buildCtx, types.ImageBuildOptions{
+	ibr, err := d.ImageBuild(ctx, buildCtx, build.ImageBuildOptions{
 		Tags:       []string{ref.Name()},
 		Dockerfile: filepath.Base(dockerfile),
 		PullParent: true,
