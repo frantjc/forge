@@ -9,6 +9,32 @@ builds:
     goarch:
       - amd64
       - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+upx:
+  - enabled: true
+    goos:
+      - linux
+checksum:
+  name_template: checksums.txt
+source:
+  enabled: true
+sboms:
+  - artifacts: archive
+  - id: source
+    artifacts: source
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - --output-certificate=${certificate}
+      - --output-signature=${signature}
+      - ${artifact}
+      - --yes
+    artifacts: checksum
+    output: true
 release:
   prerelease: auto
 changelog:
@@ -19,14 +45,20 @@ changelog:
       - Merge pull request
       - Merge remote-tracking branch
       - Merge branch
-brews:
+homebrew_casks:
   - repository:
       owner: frantjc
       name: homebrew-tap
-    directory: Formula
-    skip_upload: auto
-    homepage:  https://github.com/frantjc/forge
+    name: forge
+    homepage: https://github.com/frantjc/forge
     description: Easily run reusable steps from proprietary CI systems.
-    license: MIT
-    test: |
-      system "#{bin}/forge version"
+    conflicts:
+      - formula: forge
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+              system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/rvglsm"]
+            end
+          end

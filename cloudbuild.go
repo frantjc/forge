@@ -12,7 +12,7 @@ import (
 	"github.com/frantjc/forge/internal/bin"
 	"github.com/frantjc/forge/internal/envconv"
 	xos "github.com/frantjc/x/os"
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 )
 
 type CloudBuild struct {
@@ -145,11 +145,11 @@ func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Im
 		}
 	}
 
-	containerConfig.Entrypoint = xslice.Map(containerConfig.Entrypoint, func(s string, _ int) string {
+	containerConfig.Entrypoint = xslices.Map(containerConfig.Entrypoint, func(s string, _ int) string {
 		return os.Expand(s, mapping)
 	})
 
-	containerConfig.Env = xslice.Map(containerConfig.Env, func(s string, _ int) string {
+	containerConfig.Env = xslices.Map(containerConfig.Env, func(s string, _ int) string {
 		return os.Expand(s, mapping)
 	})
 

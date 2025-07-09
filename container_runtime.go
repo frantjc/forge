@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 	imagespecsv1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -14,8 +14,8 @@ type Mount struct {
 }
 
 func overrideMounts(oldMounts []Mount, newMounts ...Mount) []Mount {
-	return append(xslice.Filter(oldMounts, func(m Mount, _ int) bool {
-		return !xslice.Some(newMounts, func(n Mount, _ int) bool {
+	return append(xslices.Filter(oldMounts, func(m Mount, _ int) bool {
+		return !xslices.Some(newMounts, func(n Mount, _ int) bool {
 			return m.Destination == n.Destination
 		})
 	}), newMounts...)

@@ -3,10 +3,11 @@ package command
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/frantjc/forge/internal/hostfs"
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 	"github.com/spf13/cobra"
 )
 
@@ -30,20 +31,20 @@ func NewCache() *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				var (
 					cache = hostfs.CacheHome
-					arg   = strings.ToLower(xslice.Find(args, func(_ string, _ int) bool {
+					arg   = strings.ToLower(xslices.Find(args, func(_ string, _ int) bool {
 						return true
 					}))
 				)
 
 				switch {
 				case arg == "":
-				case xslice.Includes(runnerTmpArgs, arg):
+				case slices.Contains(runnerTmpArgs, arg):
 					cache = hostfs.RunnerTmp
-				case xslice.Includes(runnerToolCacheArgs, arg):
+				case slices.Contains(runnerToolCacheArgs, arg):
 					cache = hostfs.RunnerToolCache
-				case xslice.Includes(actionsArgs, arg):
+				case slices.Contains(actionsArgs, arg):
 					cache = hostfs.ActionsCache
-				case xslice.Includes(cloudbuildWorkspaceArgs, arg):
+				case slices.Contains(cloudbuildWorkspaceArgs, arg):
 					cache = hostfs.CloudBuildWorkspace
 				default:
 					return fmt.Errorf("unknown cache: %s", arg)

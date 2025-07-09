@@ -8,14 +8,14 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/runtime/dockerd"
-	xslice "github.com/frantjc/x/slice"
+	xslices "github.com/frantjc/x/slices"
 	"github.com/spf13/cobra"
 )
 
 func commandStreams(cmd *cobra.Command, stdoutUsed ...bool) *forge.Streams {
 	return &forge.Streams{
 		Out: func() io.Writer {
-			if xslice.Some(stdoutUsed, func(b bool, _ int) bool {
+			if xslices.Some(stdoutUsed, func(b bool, _ int) bool {
 				return b
 			}) {
 				return cmd.ErrOrStderr()

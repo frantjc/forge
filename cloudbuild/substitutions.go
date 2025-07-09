@@ -1,6 +1,7 @@
 package cloudbuild
 
 import (
+	"cmp"
 	"fmt"
 	"io"
 	"net/url"
@@ -12,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge/internal/envconv"
-	xslice "github.com/frantjc/x/slice"
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"
 )
@@ -70,13 +70,13 @@ func (s *Substitutions) Env() []string {
 		EnvVarProjectNumber:          projectNumber,
 		EnvVarLocation:               s.Location,
 		EnvVarTriggerName:            s.TriggerName,
-		EnvVarCommitSha:              xslice.Coalesce(s.CommitSha, s.RevisionID),
-		EnvVarRevisionID:             xslice.Coalesce(s.RevisionID, s.CommitSha),
+		EnvVarCommitSha:              cmp.Or(s.CommitSha, s.RevisionID),
+		EnvVarRevisionID:             cmp.Or(s.RevisionID, s.CommitSha),
 		EnvVarRepoName:               repoName,
 		EnvVarRepoFullName:           s.RepoFullName,
-		EnvVarBranchName:             xslice.Coalesce(s.BranchName, s.RefName),
-		EnvVarTagName:                xslice.Coalesce(s.TagName, s.RefName),
-		EnvVarRefName:                xslice.Coalesce(s.RefName, s.BranchName, s.TagName),
+		EnvVarBranchName:             cmp.Or(s.BranchName, s.RefName),
+		EnvVarTagName:                cmp.Or(s.TagName, s.RefName),
+		EnvVarRefName:                cmp.Or(s.RefName, s.BranchName, s.TagName),
 		EnvVarTriggerBuildConfigPath: s.TriggerBuildConfigPath,
 		EnvVarServiceAccountEmail:    s.ServiceAccountEmail,
 		EnvVarServiceAccount:         s.ServiceAccountEmail,
@@ -96,7 +96,7 @@ func (s *Substitutions) Env() []string {
 		j = 7
 	}
 
-	substitutionsM[EnvVarShortSha] = xslice.Coalesce(s.ShortSha, s.CommitSha[:i], s.RevisionID[:j])
+	substitutionsM[EnvVarShortSha] = cmp.Or(s.ShortSha, s.CommitSha[:i], s.RevisionID[:j])
 
 	maps.Copy(substitutionsM, s.UserDefined)
 
@@ -253,36 +253,36 @@ func NewSubstituionsFromPath(path string, userDefinedSubstitutions map[string]st
 
 	if ref, err := r.Head(); err == nil {
 		if sha := ref.Hash().String(); sha != "" {
-			substitutions.CommitSha = xslice.Coalesce(substitutions.CommitSha, sha)
-			substitutions.RevisionID = xslice.Coalesce(substitutions.RevisionID, sha)
+			substitutions.CommitSha = cmp.Or(substitutions.CommitSha, sha)
+			substitutions.RevisionID = cmp.Or(substitutions.RevisionID, sha)
 			i := len(sha)
 			if i > 7 {
 				i = 7
 			}
-			substitutions.ShortSha = xslice.Coalesce(substitutions.ShortSha, sha[:i])
+			substitutions.ShortSha = cmp.Or(substitutions.ShortSha, sha[:i])
 		}
 
 		refName := ref.Name().Short()
-		substitutions.RefName = xslice.Coalesce(substitutions.RefName, refName)
+		substitutions.RefName = cmp.Or(substitutions.RefName, refName)
 		if ref.Name().IsBranch() {
-			substitutions.BranchName = xslice.Coalesce(substitutions.BranchName, refName)
+			substitutions.BranchName = cmp.Or(substitutions.BranchName, refName)
 		} else {
-			substitutions.TagName = xslice.Coalesce(substitutions.TagName, refName)
+			substitutions.TagName = cmp.Or(substitutions.TagName, refName)
 		}
 
 		if conf, err := r.Config(); err == nil {
 			for _, remote := range conf.Remotes {
 				for _, rurl := range remote.URLs {
 					if prurl, err := url.Parse(rurl); err == nil {
-						substitutions.GitHubHeadRepoURL = xslice.Coalesce(substitutions.GitHubHeadRepoURL, prurl.String())
-						substitutions.RepoFullName = xslice.Coalesce(
+						substitutions.GitHubHeadRepoURL = cmp.Or(substitutions.GitHubHeadRepoURL, prurl.String())
+						substitutions.RepoFullName = cmp.Or(
 							substitutions.RepoFullName,
 							strings.TrimSuffix(
 								strings.TrimPrefix(prurl.Path, "/"),
 								".git",
 							),
 						)
-						substitutions.RepoName = xslice.Coalesce(
+						substitutions.RepoName = cmp.Or(
 							substitutions.RepoName,
 							strings.Split(substitutions.RepoFullName, "/")[1],
 						)
