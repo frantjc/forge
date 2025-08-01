@@ -5,7 +5,7 @@ From a [release](https://github.com/frantjc/forge/releases).
 Using `brew`:
 
 ```sh
-brew install frantjc/tap/forge
+brew install --cask frantjc/tap/forge
 ```
 
 From source:
