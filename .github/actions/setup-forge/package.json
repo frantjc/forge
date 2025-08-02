@@ -26,7 +26,7 @@
     "yaml": "^2.8.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.0.15",
     "@typescript-eslint/parser": "^8.37.0",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^8.57.1",
