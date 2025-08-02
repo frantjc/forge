@@ -6,4 +6,4 @@ jobs:
   uses-nonstd-dockerfile:
     runs-on: ubuntu-latest
     steps:
-      - uses: frantjc/forge/testdata/actions/dockerfile/nonstd@${{ github.sha }}
+      - uses: frantjc/forge/testdata/actions/dockerfile/nonstd@main

@@ -6,4 +6,4 @@ jobs:
   save-state:
     runs-on: ubuntu-latest
     steps:
-      - uses: frantjc/forge/testdata/actions/save-state@${{ github.sha }}
+      - uses: frantjc/forge/testdata/actions/save-state@main
