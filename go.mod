@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/adrg/xdg v0.5.3
-	github.com/docker/cli v28.3.2+incompatible
+	github.com/docker/cli v28.3.3+incompatible
 	github.com/docker/docker v28.3.3+incompatible
 	github.com/frantjc/x v0.0.0-20250708221246-4821241349c4
 	github.com/go-git/go-git/v5 v5.16.2
@@ -59,7 +59,6 @@ require (
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
-	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
 	github.com/moby/sys/symlink v0.2.0 // indirect
 	github.com/moby/sys/user v0.4.0 // indirect
