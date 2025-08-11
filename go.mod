@@ -19,7 +19,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
-	golang.org/x/text v0.27.0
+	golang.org/x/text v0.28.0
 	k8s.io/apimachinery v0.33.3
 	k8s.io/cli-runtime v0.33.3
 	k8s.io/client-go v0.33.3
