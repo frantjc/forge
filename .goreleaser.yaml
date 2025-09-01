@@ -52,8 +52,6 @@ homebrew_casks:
     name: forge
     homepage: https://github.com/frantjc/forge
     description: Easily run reusable steps from proprietary CI systems.
-    conflicts:
-      - formula: forge
     hooks:
       post:
         install: |
