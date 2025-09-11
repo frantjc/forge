@@ -19,3 +19,10 @@ version
 # mkdocs
 site/
 gh-pages/
+
+# dagger
+/dagger.gen.go
+/internal/dagger
+/internal/querybuilder
+/internal/telemetry
+/.env

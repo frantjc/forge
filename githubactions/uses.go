@@ -1,15 +1,11 @@
 package githubactions
 
 import (
-	"archive/tar"
-	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
-
-	xtar "github.com/frantjc/x/archive/tar"
 )
 
 type Uses struct {
@@ -103,28 +99,6 @@ func Parse(uses string) (*Uses, error) {
 
 func (u *Uses) MarshalJSON() ([]byte, error) {
 	return []byte("\"" + u.String() + "\""), nil
-}
-
-func GetUsesMetadata(ctx context.Context, uses *Uses, dir string) (*Metadata, error) {
-	if r, err := OpenDirectoryMetadata(filepath.Join(dir, uses.GetActionPath())); err == nil {
-		return NewMetadataFromReader(r)
-	}
-
-	if uses.IsRemote() {
-		metadata, rc, err := DownloadAction(ctx, uses)
-		if err != nil {
-			return nil, err
-		}
-		defer rc.Close()
-
-		if err = xtar.Extract(tar.NewReader(rc), dir); err != nil {
-			return nil, err
-		}
-
-		return metadata, nil
-	}
-
-	return nil, fmt.Errorf("open local action: %s", dir)
 }
 
 func OpenUsesMetadata(uses *Uses) (io.Reader, error) {

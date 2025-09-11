@@ -27,9 +27,9 @@ linters:
       - legacy
       - std-error-handling
     paths:
-      - third_party$
-      - builtin$
-      - examples$
+      - internal/dagger/
+      - internal/querybuilder/
+      - internal/telemetry/
 formatters:
   enable:
     - gofmt
@@ -38,6 +38,6 @@ formatters:
   exclusions:
     generated: lax
     paths:
-      - third_party$
-      - builtin$
-      - examples$
+      - internal/dagger/
+      - internal/querybuilder/
+      - internal/telemetry/

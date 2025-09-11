@@ -1,0 +1,16 @@
+{
+  "name": "github.com/frantjc/forge/internal/client",
+  "engineVersion": "v0.18.17",
+  "dependencies": [
+    {
+      "name": "forge",
+      "source": "../.."
+    }
+  ],
+  "clients": [
+    {
+      "generator": "go",
+      "directory": "./"
+    }
+  ]
+}

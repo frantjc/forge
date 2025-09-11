@@ -36,10 +36,15 @@ const (
 	EnvVarState  = "GITHUB_STATE"
 	EnvVarOutput = "GITHUB_OUTPUT"
 
-	EnvVarToken = "GITHUB_TOKEN" //nolint:gosec
+	EnvVarToken               = "GITHUB_TOKEN"          //nolint:gosec
+	EnvVarActionsRuntimeToken = "ACTIONS_RUNTIME_TOKEN" //nolint:gosec
 
 	EnvVarRepositoryOwner  = "GITHUB_REPOSITORY_OWNER"
 	EnvVarRetentionDays    = "GITHUB_RETENTION_DAYS"
 	EnvVarStepSummary      = "GITHUB_STEP_SUMMARY"
 	EnvVarActionRepository = "GITHUB_ACTION_REPOSITORY"
+
+	EnvVarActionsResultsURL     = "ACTIONS_RESULTS_URL"
+	EnvVarActionsCacheURL       = "ACTIONS_CACHE_URL"
+	EnvVarActionsCacheServiceV2 = "ACTIONS_CACHE_SERVICE_V2"
 )
