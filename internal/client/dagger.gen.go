@@ -176,6 +176,9 @@ type FileID string
 // The `ForgeActionID` scalar type represents an identifier for an object of type ForgeAction.
 type ForgeActionID string
 
+// The `ForgeCloudBuildID` scalar type represents an identifier for an object of type ForgeCloudBuild.
+type ForgeCloudBuildID string
+
 // The `ForgeID` scalar type represents an identifier for an object of type Forge.
 type ForgeID string
 
@@ -184,6 +187,9 @@ type ForgePostActionID string
 
 // The `ForgePreActionID` scalar type represents an identifier for an object of type ForgePreAction.
 type ForgePreActionID string
+
+// The `ForgeResourceID` scalar type represents an identifier for an object of type ForgeResource.
+type ForgeResourceID string
 
 // The `FunctionArgID` scalar type represents an identifier for an object of type FunctionArg.
 type FunctionArgID string
@@ -407,6 +413,15 @@ func (r *Binding) AsForgeAction() *ForgeAction {
 	}
 }
 
+// Retrieve the binding value, as type ForgeCloudBuild
+func (r *Binding) AsForgeCloudBuild() *ForgeCloudBuild {
+	q := r.query.Select("asForgeCloudBuild")
+
+	return &ForgeCloudBuild{
+		query: q,
+	}
+}
+
 // Retrieve the binding value, as type ForgePostAction
 func (r *Binding) AsForgePostAction() *ForgePostAction {
 	q := r.query.Select("asForgePostAction")
@@ -421,6 +436,15 @@ func (r *Binding) AsForgePreAction() *ForgePreAction {
 	q := r.query.Select("asForgePreAction")
 
 	return &ForgePreAction{
+		query: q,
+	}
+}
+
+// Retrieve the binding value, as type ForgeResource
+func (r *Binding) AsForgeResource() *ForgeResource {
+	q := r.query.Select("asForgeResource")
+
+	return &ForgeResource{
 		query: q,
 	}
 }
@@ -4041,6 +4065,30 @@ func (r *Env) WithForgeActionOutput(name string, description string) *Env {
 	}
 }
 
+// Create or update a binding of type ForgeCloudBuild in the environment
+func (r *Env) WithForgeCloudBuildInput(name string, value *ForgeCloudBuild, description string) *Env {
+	assertNotNil("value", value)
+	q := r.query.Select("withForgeCloudBuildInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Declare a desired ForgeCloudBuild output to be assigned in the environment
+func (r *Env) WithForgeCloudBuildOutput(name string, description string) *Env {
+	q := r.query.Select("withForgeCloudBuildOutput")
+	q = q.Arg("name", name)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
 // Create or update a binding of type Forge in the environment
 func (r *Env) WithForgeInput(name string, value *Forge, description string) *Env {
 	assertNotNil("value", value)
@@ -4105,6 +4153,30 @@ func (r *Env) WithForgePreActionInput(name string, value *ForgePreAction, descri
 // Declare a desired ForgePreAction output to be assigned in the environment
 func (r *Env) WithForgePreActionOutput(name string, description string) *Env {
 	q := r.query.Select("withForgePreActionOutput")
+	q = q.Arg("name", name)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Create or update a binding of type ForgeResource in the environment
+func (r *Env) WithForgeResourceInput(name string, value *ForgeResource, description string) *Env {
+	assertNotNil("value", value)
+	q := r.query.Select("withForgeResourceInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Declare a desired ForgeResource output to be assigned in the environment
+func (r *Env) WithForgeResourceOutput(name string, description string) *Env {
+	q := r.query.Select("withForgeResourceOutput")
 	q = q.Arg("name", name)
 	q = q.Arg("description", description)
 
@@ -5151,7 +5223,8 @@ func (r *File) WithTimestamps(timestamp int) *File {
 	}
 }
 
-type Forge struct { // forge (../../use.go:36:6)
+// Forge is the struct that methods are defined on for forge's Dagger module.
+type Forge struct { // forge (../../use.go:57:6)
 	query *querybuilder.Selection
 
 	id *ForgeID
@@ -5159,6 +5232,74 @@ type Forge struct { // forge (../../use.go:36:6)
 
 func (r *Forge) WithGraphQLQuery(q *querybuilder.Selection) *Forge {
 	return &Forge{
+		query: q,
+	}
+}
+
+// ForgeCloudBuildOpts contains options for Forge.CloudBuild
+type ForgeCloudBuildOpts struct {
+	Workdir *Directory // forge (../../cloudbuild.go:26:2)
+
+	Entrypoint []string // forge (../../cloudbuild.go:28:2)
+
+	Args []string // forge (../../cloudbuild.go:30:2)
+
+	Env []string // forge (../../cloudbuild.go:32:2)
+
+	GcloudConfig *Directory // forge (../../cloudbuild.go:34:2)
+
+	Script *File // forge (../../cloudbuild.go:36:2)
+
+	Substitutions []string // forge (../../cloudbuild.go:38:2)
+
+	DynamicSubstitutions bool // forge (../../cloudbuild.go:40:2)
+
+	AutomapSubstitutions bool // forge (../../cloudbuild.go:42:2)
+}
+
+func (r *Forge) CloudBuild(name string, opts ...ForgeCloudBuildOpts) *ForgeCloudBuild { // forge (../../cloudbuild.go:22:1)
+	q := r.query.Select("cloudBuild")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `workdir` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Workdir) {
+			q = q.Arg("workdir", opts[i].Workdir)
+		}
+		// `entrypoint` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Entrypoint) {
+			q = q.Arg("entrypoint", opts[i].Entrypoint)
+		}
+		// `args` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Args) {
+			q = q.Arg("args", opts[i].Args)
+		}
+		// `env` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Env) {
+			q = q.Arg("env", opts[i].Env)
+		}
+		// `gcloudConfig` optional argument
+		if !querybuilder.IsZeroValue(opts[i].GcloudConfig) {
+			q = q.Arg("gcloudConfig", opts[i].GcloudConfig)
+		}
+		// `script` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Script) {
+			q = q.Arg("script", opts[i].Script)
+		}
+		// `substitutions` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Substitutions) {
+			q = q.Arg("substitutions", opts[i].Substitutions)
+		}
+		// `dynamicSubstitutions` optional argument
+		if !querybuilder.IsZeroValue(opts[i].DynamicSubstitutions) {
+			q = q.Arg("dynamicSubstitutions", opts[i].DynamicSubstitutions)
+		}
+		// `automapSubstitutions` optional argument
+		if !querybuilder.IsZeroValue(opts[i].AutomapSubstitutions) {
+			q = q.Arg("automapSubstitutions", opts[i].AutomapSubstitutions)
+		}
+	}
+	q = q.Arg("name", name)
+
+	return &ForgeCloudBuild{
 		query: q,
 	}
 }
@@ -5203,22 +5344,49 @@ func (r *Forge) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
-// ForgeUseOpts contains options for Forge.Use
-type ForgeUseOpts struct {
-	Repo *Directory // forge (../../use.go:68:2)
+// ForgeResourceOpts contains options for Forge.Resource
+type ForgeResourceOpts struct {
+	Pipeline *File // forge (../../resource.go:29:2)
 
-	Workspace *Directory // forge (../../use.go:70:2)
-
-	With []string // forge (../../use.go:72:2)
-
-	Env []string // forge (../../use.go:74:2)
-
-	Debug bool // forge (../../use.go:76:2)
-
-	Token *Secret // forge (../../use.go:78:2)
+	Workdir *Directory // forge (../../resource.go:31:2)
 }
 
-func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // forge (../../use.go:64:1)
+func (r *Forge) Resource(resource string, opts ...ForgeResourceOpts) *ForgeResource { // forge (../../resource.go:25:1)
+	q := r.query.Select("resource")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `pipeline` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Pipeline) {
+			q = q.Arg("pipeline", opts[i].Pipeline)
+		}
+		// `workdir` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Workdir) {
+			q = q.Arg("workdir", opts[i].Workdir)
+		}
+	}
+	q = q.Arg("resource", resource)
+
+	return &ForgeResource{
+		query: q,
+	}
+}
+
+// ForgeUseOpts contains options for Forge.Use
+type ForgeUseOpts struct {
+	Repo *Directory // forge (../../use.go:96:2)
+
+	Workspace *Directory // forge (../../use.go:98:2)
+
+	With []string // forge (../../use.go:100:2)
+
+	Env []string // forge (../../use.go:102:2)
+
+	Debug bool // forge (../../use.go:104:2)
+
+	Token *Secret // forge (../../use.go:106:2)
+}
+
+// Use creates a container to execute a GitHub Action in.
+func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // forge (../../use.go:92:1)
 	q := r.query.Select("use")
 	for i := len(opts) - 1; i >= 0; i-- {
 		// `repo` optional argument
@@ -5253,7 +5421,9 @@ func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // fo
 	}
 }
 
-type ForgeAction struct { // forge (../../use.go:55:6)
+// Action has a container that's prepared to execute an action and the subpath to that
+// action, but has not yet executed the main step.
+type ForgeAction struct { // forge (../../use.go:80:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -5271,7 +5441,8 @@ func (r *ForgeAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgeAction {
 	}
 }
 
-func (r *ForgeAction) Action() *Directory { // forge (../../use.go:323:1)
+// Action returns the current state of the GITHUB_ACTION_PATH directory.
+func (r *ForgeAction) Action() *Directory { // forge (../../use.go:365:1)
 	q := r.query.Select("action")
 
 	return &Directory{
@@ -5279,7 +5450,8 @@ func (r *ForgeAction) Action() *Directory { // forge (../../use.go:323:1)
 	}
 }
 
-func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:311:1)
+// CombinedOutput is a convenient alias for Container().CombinedOutput().
+func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:350:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5291,7 +5463,8 @@ func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // f
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Container() *Container { // forge (../../use.go:295:1)
+// Container gives access to the underlying container.
+func (r *ForgeAction) Container() *Container { // forge (../../use.go:330:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5299,7 +5472,8 @@ func (r *ForgeAction) Container() *Container { // forge (../../use.go:295:1)
 	}
 }
 
-func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:331:1)
+// Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
+func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:375:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -5311,7 +5485,8 @@ func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../..
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Home() *Directory { // forge (../../use.go:327:1)
+// Home returns the current state of the HOME directory.
+func (r *ForgeAction) Home() *Directory { // forge (../../use.go:370:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -5359,7 +5534,8 @@ func (r *ForgeAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
-func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:209:1)
+// Main executes the main step of the GitHub Action in the underlying container.
+func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:239:1)
 	q := r.query.Select("main")
 
 	return &ForgePostAction{
@@ -5367,7 +5543,8 @@ func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:209:1)
 	}
 }
 
-func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:349:1)
+// Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
+func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:395:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -5379,7 +5556,8 @@ func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (..
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Post() *Container { // forge (../../use.go:286:1)
+// Post executes the main and post-steps of the GitHub Action in the underlying container.
+func (r *ForgeAction) Post() *Container { // forge (../../use.go:320:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -5387,7 +5565,7 @@ func (r *ForgeAction) Post() *Container { // forge (../../use.go:286:1)
 	}
 }
 
-func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:56:2)
+func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:81:2)
 	q := r.query.Select("postAction")
 
 	return &ForgePostAction{
@@ -5395,7 +5573,8 @@ func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:56:
 	}
 }
 
-func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
+// State returns the parsed key-value pairs that were saved to GITHUB_STATE.
+func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../../use.go:385:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -5407,7 +5586,8 @@ func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:307:1)
+// Stderr is a convenient alias for Container().Stderr().
+func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:345:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5419,7 +5599,8 @@ func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (..
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:303:1)
+// Stdout is a convenient alias for Container().Stdout().
+func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5431,7 +5612,8 @@ func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (..
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:299:1)
+// Terminal is a convenient alias for Container().Terminal().
+func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:335:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5439,7 +5621,8 @@ func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:299:1)
 	}
 }
 
-func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:319:1)
+// Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
+func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:360:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -5447,7 +5630,8 @@ func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:319:1)
 	}
 }
 
-func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:315:1)
+// Workspace returns the current state of the GITHUB_WORKSPACE directory.
+func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:355:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -5455,7 +5639,147 @@ func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:315:1)
 	}
 }
 
-type ForgePostAction struct { // forge (../../use.go:59:6)
+type ForgeCloudBuild struct { // forge (../../cloudbuild.go:13:6)
+	query *querybuilder.Selection
+
+	combinedOutput *string
+	id             *ForgeCloudBuildID
+	stderr         *string
+	stdout         *string
+}
+
+func (r *ForgeCloudBuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeCloudBuild {
+	return &ForgeCloudBuild{
+		query: q,
+	}
+}
+
+// CombinedOutput is a convenient alias for Container().CombinedOutput().
+func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:139:1)
+	if r.combinedOutput != nil {
+		return *r.combinedOutput, nil
+	}
+	q := r.query.Select("combinedOutput")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Container gives access to the underlying container.
+func (r *ForgeCloudBuild) Container() *Container { // forge (../../cloudbuild.go:119:1)
+	q := r.query.Select("container")
+
+	return &Container{
+		query: q,
+	}
+}
+
+func (r *ForgeCloudBuild) Ctr() *Container { // forge (../../cloudbuild.go:14:2)
+	q := r.query.Select("ctr")
+
+	return &Container{
+		query: q,
+	}
+}
+
+// A unique identifier for this ForgeCloudBuild.
+func (r *ForgeCloudBuild) ID(ctx context.Context) (ForgeCloudBuildID, error) {
+	if r.id != nil {
+		return *r.id, nil
+	}
+	q := r.query.Select("id")
+
+	var response ForgeCloudBuildID
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// XXX_GraphQLType is an internal function. It returns the native GraphQL type name
+func (r *ForgeCloudBuild) XXX_GraphQLType() string {
+	return "ForgeCloudBuild"
+}
+
+// XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
+func (r *ForgeCloudBuild) XXX_GraphQLIDType() string {
+	return "ForgeCloudBuildID"
+}
+
+// XXX_GraphQLID is an internal function. It returns the underlying type ID
+func (r *ForgeCloudBuild) XXX_GraphQLID(ctx context.Context) (string, error) {
+	id, err := r.ID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func (r *ForgeCloudBuild) MarshalJSON() ([]byte, error) {
+	id, err := r.ID(marshalCtx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(id)
+}
+
+// Stderr is a convenient alias for Container().Stderr().
+func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:134:1)
+	if r.stderr != nil {
+		return *r.stderr, nil
+	}
+	q := r.query.Select("stderr")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Stdout is a convenient alias for Container().Stdout().
+func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:129:1)
+	if r.stdout != nil {
+		return *r.stdout, nil
+	}
+	q := r.query.Select("stdout")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Terminal is a convenient alias for Container().Terminal().
+func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:124:1)
+	q := r.query.Select("terminal")
+
+	return &Container{
+		query: q,
+	}
+}
+
+// Workdir returns the current state of the working directory.
+func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:149:1)
+	q := r.query.Select("workdir")
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Workspace returns the current state of the /workspace directory.
+func (r *ForgeCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:144:1)
+	q := r.query.Select("workspace")
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Action has a container that's prepared to execute an action and the subpath to that
+// action, but has not yet executed the post-step.
+type ForgePostAction struct { // forge (../../use.go:86:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -5474,7 +5798,8 @@ func (r *ForgePostAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePost
 	}
 }
 
-func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:323:1)
+// Action returns the current state of the GITHUB_ACTION_PATH directory.
+func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:365:1)
 	q := r.query.Select("action")
 
 	return &Directory{
@@ -5482,7 +5807,8 @@ func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:323:1)
 	}
 }
 
-func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:311:1)
+// CombinedOutput is a convenient alias for Container().CombinedOutput().
+func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:350:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5494,7 +5820,8 @@ func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { 
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Container() *Container { // forge (../../use.go:295:1)
+// Container gives access to the underlying container.
+func (r *ForgePostAction) Container() *Container { // forge (../../use.go:330:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5502,7 +5829,7 @@ func (r *ForgePostAction) Container() *Container { // forge (../../use.go:295:1)
 	}
 }
 
-func (r *ForgePostAction) Ctr() *Container { // forge (../../use.go:60:2)
+func (r *ForgePostAction) Ctr() *Container { // forge (../../use.go:87:2)
 	q := r.query.Select("ctr")
 
 	return &Container{
@@ -5510,7 +5837,8 @@ func (r *ForgePostAction) Ctr() *Container { // forge (../../use.go:60:2)
 	}
 }
 
-func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:331:1)
+// Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
+func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:375:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -5522,7 +5850,8 @@ func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (.
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Home() *Directory { // forge (../../use.go:327:1)
+// Home returns the current state of the HOME directory.
+func (r *ForgePostAction) Home() *Directory { // forge (../../use.go:370:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -5570,7 +5899,8 @@ func (r *ForgePostAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
-func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:349:1)
+// Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
+func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:395:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -5582,7 +5912,8 @@ func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Post() *Container { // forge (../../use.go:245:1)
+// Post executes the post-step of the GitHub Action in the underlying container.
+func (r *ForgePostAction) Post() *Container { // forge (../../use.go:277:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -5590,7 +5921,8 @@ func (r *ForgePostAction) Post() *Container { // forge (../../use.go:245:1)
 	}
 }
 
-func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
+// State returns the parsed key-value pairs that were saved to GITHUB_STATE.
+func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge (../../use.go:385:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -5602,7 +5934,8 @@ func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge 
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:307:1)
+// Stderr is a convenient alias for Container().Stderr().
+func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:345:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5614,7 +5947,8 @@ func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:303:1)
+// Stdout is a convenient alias for Container().Stdout().
+func (r *ForgePostAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5626,7 +5960,7 @@ func (r *ForgePostAction) Stdout(ctx context.Context) (string, error) { // forge
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Subpath(ctx context.Context) (string, error) { // forge (../../use.go:61:2)
+func (r *ForgePostAction) Subpath(ctx context.Context) (string, error) { // forge (../../use.go:88:2)
 	if r.subpath != nil {
 		return *r.subpath, nil
 	}
@@ -5638,7 +5972,8 @@ func (r *ForgePostAction) Subpath(ctx context.Context) (string, error) { // forg
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:299:1)
+// Terminal is a convenient alias for Container().Terminal().
+func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:335:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5646,7 +5981,8 @@ func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:299:1)
 	}
 }
 
-func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:319:1)
+// Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
+func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:360:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -5654,7 +5990,8 @@ func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:319:1)
 	}
 }
 
-func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:315:1)
+// Workspace returns the current state of the GITHUB_WORKSPACE directory.
+func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:355:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -5662,7 +5999,9 @@ func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:315:1)
 	}
 }
 
-type ForgePreAction struct { // forge (../../use.go:51:6)
+// PreAction has a container that's prepared to execute an action and the subpath to that
+// action, but has not yet executed the pre-step.
+type ForgePreAction struct { // forge (../../use.go:74:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -5680,7 +6019,7 @@ func (r *ForgePreAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePreAc
 	}
 }
 
-func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:52:2)
+func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:75:2)
 	q := r.query.Select("action")
 
 	return &ForgeAction{
@@ -5688,7 +6027,8 @@ func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:52:2)
 	}
 }
 
-func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:311:1)
+// CombinedOutput is a convenient alias for Container().CombinedOutput().
+func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:350:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5700,7 +6040,8 @@ func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { /
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Container() *Container { // forge (../../use.go:295:1)
+// Container gives access to the underlying container.
+func (r *ForgePreAction) Container() *Container { // forge (../../use.go:330:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5708,7 +6049,8 @@ func (r *ForgePreAction) Container() *Container { // forge (../../use.go:295:1)
 	}
 }
 
-func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:331:1)
+// Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
+func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:375:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -5720,7 +6062,8 @@ func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (..
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Home() *Directory { // forge (../../use.go:327:1)
+// Home returns the current state of the HOME directory.
+func (r *ForgePreAction) Home() *Directory { // forge (../../use.go:370:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -5768,7 +6111,8 @@ func (r *ForgePreAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
-func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:236:1)
+// Main executes the pre- and main steps of the GitHub Action in the underlying container.
+func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:267:1)
 	q := r.query.Select("main")
 
 	return &ForgePostAction{
@@ -5776,7 +6120,8 @@ func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:236:1)
 	}
 }
 
-func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:349:1)
+// Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
+func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:395:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -5788,7 +6133,8 @@ func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge 
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Post() *Container { // forge (../../use.go:277:1)
+// Post executes the pre-, main and post-steps of the GitHub Action in the underlying container.
+func (r *ForgePreAction) Post() *Container { // forge (../../use.go:310:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -5796,7 +6142,8 @@ func (r *ForgePreAction) Post() *Container { // forge (../../use.go:277:1)
 	}
 }
 
-func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:172:1)
+// Pre executes the pre-step of the GitHub Action in the underlying container.
+func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:201:1)
 	q := r.query.Select("pre")
 
 	return &ForgeAction{
@@ -5804,7 +6151,8 @@ func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:172:1)
 	}
 }
 
-func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
+// State returns the parsed key-value pairs that were saved to GITHUB_STATE.
+func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (../../use.go:385:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -5816,7 +6164,8 @@ func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:307:1)
+// Stderr is a convenient alias for Container().Stderr().
+func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:345:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5828,7 +6177,8 @@ func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge 
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:303:1)
+// Stdout is a convenient alias for Container().Stdout().
+func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:340:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5840,7 +6190,8 @@ func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge 
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:299:1)
+// Terminal is a convenient alias for Container().Terminal().
+func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:335:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5848,7 +6199,8 @@ func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:299:1)
 	}
 }
 
-func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:319:1)
+// Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
+func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:360:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -5856,10 +6208,177 @@ func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:319:1)
 	}
 }
 
-func (r *ForgePreAction) Workspace() *Directory { // forge (../../use.go:315:1)
+// Workspace returns the current state of the GITHUB_WORKSPACE directory.
+func (r *ForgePreAction) Workspace() *Directory { // forge (../../use.go:355:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
+		query: q,
+	}
+}
+
+type ForgeResource struct { // forge (../../resource.go:15:6)
+	query *querybuilder.Selection
+
+	id   *ForgeResourceID
+	name *string
+}
+
+func (r *ForgeResource) WithGraphQLQuery(q *querybuilder.Selection) *ForgeResource {
+	return &ForgeResource{
+		query: q,
+	}
+}
+
+// ForgeResourceCheckOpts contains options for ForgeResource.Check
+type ForgeResourceCheckOpts struct {
+	Version []string // forge (../../resource.go:112:2)
+}
+
+// Check runs the check step.
+func (r *ForgeResource) Check(opts ...ForgeResourceCheckOpts) *Container { // forge (../../resource.go:110:1)
+	q := r.query.Select("check")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `version` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Version) {
+			q = q.Arg("version", opts[i].Version)
+		}
+	}
+
+	return &Container{
+		query: q,
+	}
+}
+
+// Container gives access to the underlying container.
+func (r *ForgeResource) Container() *Container { // forge (../../resource.go:190:1)
+	q := r.query.Select("container")
+
+	return &Container{
+		query: q,
+	}
+}
+
+func (r *ForgeResource) Ctr() *Container { // forge (../../resource.go:16:2)
+	q := r.query.Select("ctr")
+
+	return &Container{
+		query: q,
+	}
+}
+
+// ForgeResourceGetOpts contains options for ForgeResource.Get
+type ForgeResourceGetOpts struct {
+	Version []string // forge (../../resource.go:95:2)
+
+	Param []string // forge (../../resource.go:97:2)
+}
+
+// Get runs the get step.
+func (r *ForgeResource) Get(opts ...ForgeResourceGetOpts) *Container { // forge (../../resource.go:93:1)
+	q := r.query.Select("get")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `version` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Version) {
+			q = q.Arg("version", opts[i].Version)
+		}
+		// `param` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Param) {
+			q = q.Arg("param", opts[i].Param)
+		}
+	}
+
+	return &Container{
+		query: q,
+	}
+}
+
+// A unique identifier for this ForgeResource.
+func (r *ForgeResource) ID(ctx context.Context) (ForgeResourceID, error) {
+	if r.id != nil {
+		return *r.id, nil
+	}
+	q := r.query.Select("id")
+
+	var response ForgeResourceID
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// XXX_GraphQLType is an internal function. It returns the native GraphQL type name
+func (r *ForgeResource) XXX_GraphQLType() string {
+	return "ForgeResource"
+}
+
+// XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
+func (r *ForgeResource) XXX_GraphQLIDType() string {
+	return "ForgeResourceID"
+}
+
+// XXX_GraphQLID is an internal function. It returns the underlying type ID
+func (r *ForgeResource) XXX_GraphQLID(ctx context.Context) (string, error) {
+	id, err := r.ID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func (r *ForgeResource) MarshalJSON() ([]byte, error) {
+	id, err := r.ID(marshalCtx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(id)
+}
+
+func (r *ForgeResource) Name(ctx context.Context) (string, error) { // forge (../../resource.go:17:2)
+	if r.name != nil {
+		return *r.name, nil
+	}
+	q := r.query.Select("name")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// ForgeResourcePutOpts contains options for ForgeResource.Put
+type ForgeResourcePutOpts struct {
+	Param []string // forge (../../resource.go:127:2)
+}
+
+// Put runs the put step.
+func (r *ForgeResource) Put(opts ...ForgeResourcePutOpts) *Container { // forge (../../resource.go:125:1)
+	q := r.query.Select("put")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `param` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Param) {
+			q = q.Arg("param", opts[i].Param)
+		}
+	}
+
+	return &Container{
+		query: q,
+	}
+}
+
+func (r *ForgeResource) Source(ctx context.Context) ([]string, error) { // forge (../../resource.go:18:2)
+	q := r.query.Select("source")
+
+	var response []string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Terminal is a convenient alias for Container().Terminal().
+func (r *ForgeResource) Terminal() *Container { // forge (../../resource.go:195:1)
+	q := r.query.Select("terminal")
+
+	return &Container{
 		query: q,
 	}
 }
@@ -9575,7 +10094,7 @@ func (r *Client) File(name string, contents string, opts ...FileOpts) *File {
 	}
 }
 
-func (r *Client) Forge() *Forge { // forge (../../use.go:36:6)
+func (r *Client) Forge() *Forge { // forge (../../use.go:57:6)
 	q := r.query.Select("forge")
 
 	return &Forge{
@@ -9903,6 +10422,16 @@ func (r *Client) LoadForgeActionFromID(id ForgeActionID) *ForgeAction {
 	}
 }
 
+// Load a ForgeCloudBuild from its ID.
+func (r *Client) LoadForgeCloudBuildFromID(id ForgeCloudBuildID) *ForgeCloudBuild {
+	q := r.query.Select("loadForgeCloudBuildFromID")
+	q = q.Arg("id", id)
+
+	return &ForgeCloudBuild{
+		query: q,
+	}
+}
+
 // Load a Forge from its ID.
 func (r *Client) LoadForgeFromID(id ForgeID) *Forge {
 	q := r.query.Select("loadForgeFromID")
@@ -9929,6 +10458,16 @@ func (r *Client) LoadForgePreActionFromID(id ForgePreActionID) *ForgePreAction {
 	q = q.Arg("id", id)
 
 	return &ForgePreAction{
+		query: q,
+	}
+}
+
+// Load a ForgeResource from its ID.
+func (r *Client) LoadForgeResourceFromID(id ForgeResourceID) *ForgeResource {
+	q := r.query.Select("loadForgeResourceFromID")
+	q = q.Arg("id", id)
+
+	return &ForgeResource{
 		query: q,
 	}
 }

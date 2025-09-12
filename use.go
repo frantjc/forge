@@ -57,16 +57,16 @@ var (
 type Forge struct{}
 
 const (
-	actionPath    = "/github/action"
-	workspacePath = "/github/workspace"
-	tmpPath       = "/runner/tmp"
-	toolcachePath = "/runner/toolcache"
-	envPath       = "/github/env"
-	pathPath      = "/github/path"
-	outputPath    = "/github/output"
-	statePath     = "/github/state"
-	shimPath      = "/shim"
-	homePath      = "/github/home"
+	actionPath    = "/forge/github/action"
+	workspacePath = "/forge/github/workspace"
+	tmpPath       = "/forge/github/runner/tmp"
+	toolcachePath = "/forge/github/runner/toolcache"
+	envPath       = "/forge/github/env"
+	pathPath      = "/forge/github/path"
+	outputPath    = "/forge/github/output"
+	statePath     = "/forge/github/state"
+	shimPath      = "/forge/shim"
+	homePath      = "/forge/home"
 )
 
 // PreAction has a container that's prepared to execute an action and the subpath to that
@@ -81,15 +81,20 @@ type Action struct {
 	PostAction
 }
 
-// Action has a container that's prepared to execute an action and the subpath to that
+// PostAction has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the post-step.
 type PostAction struct {
-	Ctr     *dagger.Container
+	FinalizedAction
 	Subpath string
 }
 
+// FinalizedAction has a container that's prepared to execute an action and has executed that action.
+type FinalizedAction struct {
+	Ctr *dagger.Container
+}
+
 // Use creates a container to execute a GitHub Action in.
-func (f *Forge) Use(
+func (a *Forge) Use(
 	ctx context.Context,
 	action string,
 	// +defaultPath="."
@@ -150,12 +155,6 @@ func (f *Forge) Use(
 		return nil, fmt.Errorf("actions that run using %s are not supported", metadata.Runs.Using)
 	}
 
-	container = withToken(ctx, container, token)
-
-	if debug {
-		container = withDebug(container)
-	}
-
 	container = withActionsCache(container)
 	container = withGitHubEnvVarsFromRef(ctx, container, repo.AsGit().Head())
 	container = withDefaultGitHubEnvVars(container)
@@ -164,15 +163,6 @@ func (f *Forge) Use(
 	if err != nil {
 		return nil, err
 	}
-
-	container = withGitHubEnv(container)
-	container = withGitHubPath(container)
-	container = withGitHubOutput(container)
-	container = withGitHubState(container)
-	container = withRunnerTmp(container)
-	container = withRunnerToolcache(container)
-	container = withHome(container)
-	container = withWorkspace(container, workspace)
 
 	for k, v := range ekv {
 		container = container.WithEnvVariable(k, v)
@@ -188,10 +178,26 @@ func (f *Forge) Use(
 		return nil, err
 	}
 
+	container = withGitHubEnv(container)
+	container = withGitHubPath(container)
+	container = withGitHubOutput(container)
+	container = withGitHubState(container)
+	container = withRunnerTmp(container)
+	container = withRunnerToolcache(container)
+	container = withHome(container)
+	container = withToken(ctx, container, token)
+	container = withWorkspace(container, workspace)
+
+	if debug {
+		container = withDebug(container)
+	}
+
 	return &PreAction{
 		Action: Action{
 			PostAction: PostAction{
-				Ctr:     container,
+				FinalizedAction: FinalizedAction{
+					Ctr: container,
+				},
 				Subpath: subpath,
 			},
 		},
@@ -328,52 +334,52 @@ func (a *Action) Post(ctx context.Context) (*dagger.Container, error) {
 }
 
 // Container gives access to the underlying container.
-func (a *PostAction) Container() *dagger.Container {
+func (a *FinalizedAction) Container() *dagger.Container {
 	return a.Ctr
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (a *PostAction) Terminal() *dagger.Container {
+func (a *FinalizedAction) Terminal() *dagger.Container {
 	return a.Container().Terminal()
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (a *PostAction) Stdout(ctx context.Context) (string, error) {
+func (a *FinalizedAction) Stdout(ctx context.Context) (string, error) {
 	return a.Container().Stdout(ctx)
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (a *PostAction) Stderr(ctx context.Context) (string, error) {
+func (a *FinalizedAction) Stderr(ctx context.Context) (string, error) {
 	return a.Container().Stderr(ctx)
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (a *PostAction) CombinedOutput(ctx context.Context) (string, error) {
+func (a *FinalizedAction) CombinedOutput(ctx context.Context) (string, error) {
 	return a.Container().CombinedOutput(ctx)
 }
 
 // Workspace returns the current state of the GITHUB_WORKSPACE directory.
-func (a *PostAction) Workspace() *dagger.Directory {
+func (a *FinalizedAction) Workspace() *dagger.Directory {
 	return a.Container().Directory(workspacePath)
 }
 
 // Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
-func (a *PostAction) Toolcache() *dagger.Directory {
+func (a *FinalizedAction) Toolcache() *dagger.Directory {
 	return a.Container().Directory(toolcachePath)
 }
 
 // Action returns the current state of the GITHUB_ACTION_PATH directory.
-func (a *PostAction) Action() *dagger.Directory {
+func (a *FinalizedAction) Action() *dagger.Directory {
 	return a.Container().Directory(actionPath)
 }
 
 // Home returns the current state of the HOME directory.
-func (a *PostAction) Home() *dagger.Directory {
+func (a *FinalizedAction) Home() *dagger.Directory {
 	return a.Container().Directory(homePath)
 }
 
 // Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
-func (a *PostAction) Env(ctx context.Context) (string, error) {
+func (a *FinalizedAction) Env(ctx context.Context) (string, error) {
 	env, err := gitHubEnv(ctx, a.Container())
 	if err != nil {
 		return "", err
@@ -383,7 +389,7 @@ func (a *PostAction) Env(ctx context.Context) (string, error) {
 }
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
-func (a *PostAction) State(ctx context.Context) (string, error) {
+func (a *FinalizedAction) State(ctx context.Context) (string, error) {
 	env, err := gitHubState(ctx, a.Container())
 	if err != nil {
 		return "", err
@@ -393,7 +399,7 @@ func (a *PostAction) State(ctx context.Context) (string, error) {
 }
 
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
-func (a *PostAction) Output(ctx context.Context) (string, error) {
+func (a *FinalizedAction) Output(ctx context.Context) (string, error) {
 	env, err := gitHubOutput(ctx, a.Container())
 	if err != nil {
 		return "", err
@@ -426,7 +432,18 @@ func withShim(ctx context.Context, container *dagger.Container) (*dagger.Contain
 	workdir := path.Join(gopath, "src", gomod.Module.Mod.Path)
 
 	shim := golang.
-		WithMountedDirectory(workdir, src).
+		WithDirectory(workdir, src, dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				"go.mod",
+				"go.sum",
+				"cmd/shim/**",
+				"command/shim.go",
+				"githubactions/**",
+				"internal/envconv/**",
+				"internal/yaml/**",
+				"internal/rangemap/**",
+			},
+		}).
 		WithWorkdir(workdir).
 		WithExec([]string{"go", "build", "-o", shimPath, "./cmd/shim"}).
 		File(shimPath)
@@ -495,8 +512,8 @@ func withEmptyFile(container *dagger.Container, fullpath string) *dagger.Contain
 	return withFile(container, fullpath, "")
 }
 
-func withFile(container *dagger.Container, fullpath, contents string) *dagger.Container {
-	return container.WithFile(path.Dir(fullpath), dag.File(path.Base(fullpath), contents))
+func withFile(container *dagger.Container, fullpath, contents string, opts ...dagger.ContainerWithFileOpts) *dagger.Container {
+	return container.WithFile(path.Dir(fullpath), dag.File(path.Base(fullpath), contents), opts...)
 }
 
 func withGitHubEnvVarsFromRef(ctx context.Context, container *dagger.Container, gitRef *dagger.GitRef) *dagger.Container {
@@ -529,8 +546,10 @@ func withDefaultGitHubEnvVars(container *dagger.Container) *dagger.Container {
 }
 
 func withActionsCache(container *dagger.Container) *dagger.Container {
-	actionsResultsURL := "http://actions-cache:3000"
-	storageFilesystemPath := "/data"
+	var (
+		actionsResultsURL     = "http://actions-cache:3000"
+		storageFilesystemPath = "/data"
+	)
 
 	return container.
 		WithServiceBinding(

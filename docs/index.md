@@ -4,6 +4,4 @@ Forge is here to help.
 
 Forge is a library and CLI for running reusable steps from various proprietary CI systems using Docker. This, for example, makes the functionality provided to GitHub Actions easily consumable (or testable) by users of other CI systems.
 
-Forge currently exposes running:
-
-- [GitHub Actions](github-actions.md) (e.g. [`actions/setup-go`](https://github.com/actions/setup-go))
+**UNDER CONSTRUCTION**

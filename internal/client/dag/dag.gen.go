@@ -258,6 +258,12 @@ func LoadForgeActionFromID(id dagger.ForgeActionID) *dagger.ForgeAction {
 	return client.LoadForgeActionFromID(id)
 }
 
+// Load a ForgeCloudBuild from its ID.
+func LoadForgeCloudBuildFromID(id dagger.ForgeCloudBuildID) *dagger.ForgeCloudBuild {
+	client := initClient()
+	return client.LoadForgeCloudBuildFromID(id)
+}
+
 // Load a Forge from its ID.
 func LoadForgeFromID(id dagger.ForgeID) *dagger.Forge {
 	client := initClient()
@@ -274,6 +280,12 @@ func LoadForgePostActionFromID(id dagger.ForgePostActionID) *dagger.ForgePostAct
 func LoadForgePreActionFromID(id dagger.ForgePreActionID) *dagger.ForgePreAction {
 	client := initClient()
 	return client.LoadForgePreActionFromID(id)
+}
+
+// Load a ForgeResource from its ID.
+func LoadForgeResourceFromID(id dagger.ForgeResourceID) *dagger.ForgeResource {
+	client := initClient()
+	return client.LoadForgeResourceFromID(id)
 }
 
 // Load a FunctionArg from its ID.

@@ -14,6 +14,14 @@ YARN ?= yarn
 
 GOARCH ?= $(shell $(GO) env GOARCH)
 
+# FIXME(frantjc): The places that this is imported must be commented out before the install works.
+.PHONY: internal/client internal/client/
+internal/client internal/client/:
+	@cd $@ && rm -r dag/ dagger.gen.go || true
+	@cd $@ && cat dagger.json | jq 'del(.clients)' > dagger.json.tmp && mv dagger.json.tmp dagger.json
+	@cd $@ && dagger client install go ./
+	@cd $@ && rm go.mod go.sum
+
 .PHONY: .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/
 .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/:
 	@cd .github/actions/setup-forge && $(YARN)
