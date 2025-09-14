@@ -74,7 +74,7 @@ func (f *Forge) CloudBuild(
 			scriptPath,
 			contents,
 			dagger.ContainerWithFileOpts{
-				Permissions: 0700,
+				Permissions: 0o700,
 			},
 		).WithExec([]string{scriptPath})
 	} else {
@@ -87,6 +87,15 @@ func (f *Forge) CloudBuild(
 		}
 
 		container.WithExec(append(entrypoint, args...))
+	}
+
+	ekv, err := parseKeyValuePairs(env)
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range ekv {
+		container = container.WithEnvVariable(k, v)
 	}
 
 	skv, err := parseKeyValuePairs(substitutions)

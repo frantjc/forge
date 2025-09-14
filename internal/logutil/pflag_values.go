@@ -13,9 +13,7 @@ type genericBool[T any] struct {
 	IfSet T
 }
 
-var (
-	_ pflag.Value = new(genericBool[any])
-)
+var _ pflag.Value = new(genericBool[any])
 
 // Set implements pflag.Value.
 func (b *genericBool[T]) Set(s string) error {
@@ -46,9 +44,7 @@ type incrementalCount[T constraints.Integer] struct {
 	Increment T
 }
 
-var (
-	_ pflag.Value = new(incrementalCount[int])
-)
+var _ pflag.Value = new(incrementalCount[int])
 
 // Set implements pflag.Value.
 func (c *incrementalCount[T]) Set(s string) error {

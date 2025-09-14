@@ -58,13 +58,11 @@ func (b *genericBool[T]) IsBoolFlag() bool {
 // NewForge returns the command which acts as
 // the entrypoint for `forge use`.
 func NewForge() *cobra.Command {
-	var (
-		cmd = &cobra.Command{
-			Use:           "forge",
-			SilenceErrors: true,
-			SilenceUsage:  true,
-		}
-	)
+	cmd := &cobra.Command{
+		Use:           "forge",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+	}
 
 	cmd.AddCommand(NewUse())
 

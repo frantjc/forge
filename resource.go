@@ -102,7 +102,7 @@ func (r *Resource) Get(
 		return nil, err
 	}
 
-	r.FinalizedResource.Ctr = r.Container().WithExec([]string{concourse.EntrypointGet, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointGet, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
 		Stdin: stdin,
 	})
 
@@ -124,7 +124,7 @@ func (r *Resource) Check(
 		return nil, err
 	}
 
-	r.FinalizedResource.Ctr = r.Container().WithExec([]string{concourse.EntrypointCheck, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointCheck, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
 		Stdin: stdin,
 	})
 
@@ -141,7 +141,7 @@ func (r *Resource) Put(
 		return nil, err
 	}
 
-	r.FinalizedResource.Ctr = r.Container().WithExec([]string{concourse.EntrypointPut, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointPut, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
 		Stdin: stdin,
 	})
 
