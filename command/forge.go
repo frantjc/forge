@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/url"
 	"os"
 	"strconv"
@@ -12,9 +13,9 @@ import (
 	"github.com/frantjc/forge/githubactions"
 	client "github.com/frantjc/forge/internal/client"
 	"github.com/frantjc/forge/internal/envconv"
+	"github.com/frantjc/forge/internal/logutil"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"golang.org/x/exp/constraints"
 )
 
 const (
@@ -54,36 +55,12 @@ func (b *genericBool[T]) IsBoolFlag() bool {
 	return true
 }
 
-type incrementalCount[T constraints.Integer] struct {
-	Value     *T
-	Increment T
-}
-
-var _ pflag.Value = new(incrementalCount[int])
-
-// Set implements pflag.Value.
-func (c *incrementalCount[T]) Set(s string) error {
-	v, err := strconv.ParseInt(s, 0, 0)
-	*c.Value += (T(v) * c.Increment)
-	return err
-}
-
-// String implements pflag.Value.
-func (c *incrementalCount[T]) String() string {
-	return strconv.Itoa(int(*c.Value))
-}
-
-// Type implements pflag.Value.
-func (c *incrementalCount[T]) Type() string {
-	return "count"
-}
-
 // NewForge returns the command which acts as
 // the entrypoint for `forge use`.
 func NewForge() *cobra.Command {
 	var (
 		cmd = &cobra.Command{
-			Use:           "use",
+			Use:           "forge",
 			SilenceErrors: true,
 			SilenceUsage:  true,
 		}
@@ -100,20 +77,24 @@ const errWhenNoExecs = "empty result reference"
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
-		with      = map[string]string{}
-		debug, _  = strconv.ParseBool(os.Getenv("DEBUG"))
-		token     string
-		repo      string
-		stage     = stageMain
-		verbosity = 0
-		export    bool
-		cmd       = &cobra.Command{
+		with       = map[string]string{}
+		token      string
+		repo       string
+		stage      = stageMain
+		export     bool
+		slogConfig = &logutil.SlogConfig{}
+		cmd        = &cobra.Command{
 			Use:           "use",
+			Aliases:       []string{"u", "uses"},
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			Args:          cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := cmd.Context()
+				var (
+					log   = slog.New(slog.NewTextHandler(cmd.OutOrStdout(), &slog.HandlerOptions{Level: slogConfig}))
+					ctx   = logutil.SloggerInto(cmd.Context(), log)
+					debug = log.Enabled(ctx, slog.LevelDebug)
+				)
 
 				uses, err := githubactions.Parse(args[0])
 				if err != nil {
@@ -129,12 +110,11 @@ func NewUse() *cobra.Command {
 					dagger.WithEnvironmentVariable(githubactions.EnvVarToken, token),
 				}
 
-				if verbosity > 4 {
+				if debug {
 					opts = append(opts,
 						dagger.WithLogOutput(cmd.ErrOrStderr()),
-						dagger.WithVerbosity(verbosity),
+						dagger.WithVerbosity(int(slogConfig.Level())),
 					)
-					debug = true
 				}
 
 				dag, err := client.Connect(ctx, opts...)
@@ -244,27 +224,7 @@ func NewUse() *cobra.Command {
 
 	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the action made to your workspace")
 
-	cmd.Flags().BoolVarP(&debug, "debug", "d", debug, "Debug logging")
-	cmd.Flags().AddFlag(&pflag.Flag{
-		Name:      "quiet",
-		Shorthand: "q",
-		Value: &genericBool[bool]{
-			Value: &debug,
-			IfSet: false,
-		},
-		NoOptDefVal: "true",
-		Usage:       "Run only the pre-action step",
-	})
-	cmd.Flags().AddFlag(&pflag.Flag{
-		Name:      "verbose",
-		Shorthand: "v",
-		Value: &incrementalCount[int]{
-			Value:     &verbosity,
-			Increment: 1,
-		},
-		NoOptDefVal: "+1",
-		Usage:       "More vebose logging",
-	})
+	slogConfig.AddFlags(cmd.Flags())
 
 	cmd.Flags().AddFlag(&pflag.Flag{
 		Name: "pre",
