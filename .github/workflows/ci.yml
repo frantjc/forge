@@ -17,6 +17,7 @@ jobs:
       - uses: dagger/dagger-for-github@8.0.0
         with:
           verb: develop
+          args: --debug
       - uses: actions/setup-node@v5
         with:
           node-version: 20
