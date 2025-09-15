@@ -73,8 +73,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge check resource
-        run: forge check mock -v version=v0.0.0
+        run: forge check mock -V version=v0.0.0
       - name: Run forge get resource
-        run: forge get mock -v version=v0.0.0
+        run: forge get mock -V version=v0.0.0
       - name: Run forge put resource
-        run: forge put mock -v version=v0.0.0 -p version=v0.0.0
+        run: forge put mock -V version=v0.0.0 -P version=v0.0.0
