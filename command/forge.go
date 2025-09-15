@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -300,16 +301,28 @@ func NewCloudBuild() *cobra.Command {
 				defer dag.Close()
 
 				workdir := dag.Host().Directory(".")
+				gc := dag.Directory()
+
+				if _, err := os.Stat(gcloudConfig); errors.Is(err, os.ErrNotExist) {
+					if cmd.Flag("gcloud-config").Changed {
+						return err
+					}
+
+					gc = dag.Host().Directory(gcloudConfig)
+				} else if err != nil {
+					return err
+				}
 
 				cloudbuild := dag.Forge().CloudBuild(args[0], client.ForgeCloudBuildOpts{
 					Workdir:      workdir,
 					Entrypoint:   strings.Split(entrypoint, " "),
 					Args:         args[1:],
 					Env:          os.Environ(),
-					GcloudConfig: dag.Host().Directory(gcloudConfig),
+					GcloudConfig: gc,
 					Script: dag.File("script", script, client.FileOpts{
 						Permissions: 700,
 					}),
+					// TODO(frantjc): Get additional substitutions from gcloud-config.
 					Substitutions:        envconv.MapToArr(userDefinedSubstitutions),
 					DynamicSubstitutions: dynamicSubstituations,
 					AutomapSubstitutions: automapSubstituations,
