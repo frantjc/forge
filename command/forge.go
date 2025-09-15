@@ -270,7 +270,7 @@ func NewCloudBuild() *cobra.Command {
 		export                   bool
 		slogConfig               = &logutil.SlogConfig{}
 		cmd                      = &cobra.Command{
-			Use:           "cloudbuild cloudbuilder [-S script.sh | -E entrypoint.sh | arg...] [-s user_defined=substitution] [-ad] [-E] [-dqv] [-c ~/.gcloud/config]",
+			Use:           "cloudbuild cloudbuilder [-S script.sh | -E entrypoint.sh | arg...] [-s user_defined=substitution] [-AD] [-E] [-dqv] [-c ~/.gcloud/config]",
 			Aliases:       []string{"cb"},
 			SilenceErrors: true,
 			SilenceUsage:  true,
@@ -339,8 +339,8 @@ func NewCloudBuild() *cobra.Command {
 	cmd.Flags().StringVarP(&script, "script", "S", "", "Script to run")
 
 	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Substitutions")
-	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "a", false, "Automap substitutions")
-	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "d", false, "Dynamic substitutions")
+	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "A", false, "Automap substitutions")
+	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "D", false, "Dynamic substitutions")
 
 	cmd.Flags().StringVarP(&gcloudConfig, "gcloud-config", "c", "~/.gcloud/config", "GCloud config directory")
 
