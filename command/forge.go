@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"dagger.io/dagger"
+	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/githubactions"
 	client "github.com/frantjc/forge/internal/client"
 	"github.com/frantjc/forge/internal/envconv"
@@ -64,7 +65,13 @@ func NewForge() *cobra.Command {
 		SilenceUsage:  true,
 	}
 
-	cmd.AddCommand(NewUse())
+	cmd.AddCommand(
+		NewUse(),
+		NewCloudBuild(),
+		NewResource(concourse.MethodCheck),
+		NewResource(concourse.MethodGet),
+		NewResource(concourse.MethodPut),
+	)
 
 	return cmd
 }
@@ -82,7 +89,7 @@ func NewUse() *cobra.Command {
 		export     bool
 		slogConfig = &logutil.SlogConfig{}
 		cmd        = &cobra.Command{
-			Use:           "use",
+			Use:           "use action [-w go-version=1.24] [--pre | --post] [-r https://github.com/frantjc/forge] [-t $GH_TOKEN] [-E] [-dqv]",
 			Aliases:       []string{"u", "uses"},
 			SilenceErrors: true,
 			SilenceUsage:  true,
@@ -105,14 +112,13 @@ func NewUse() *cobra.Command {
 
 				opts := []dagger.ClientOpt{
 					dagger.WithLogOutput(io.Discard),
-					dagger.WithEnvironmentVariable(githubactions.EnvVarToken, token),
 				}
 
 				if debug {
-					opts = append(opts,
+					opts = []dagger.ClientOpt{
 						dagger.WithLogOutput(cmd.ErrOrStderr()),
 						dagger.WithVerbosity(int(slogConfig.Level())),
-					)
+					}
 				}
 
 				dag, err := client.Connect(ctx, opts...)
@@ -121,8 +127,10 @@ func NewUse() *cobra.Command {
 				}
 				defer dag.Close()
 
-				workspace := dag.Host().Directory(".")
-				repository := workspace
+				var (
+					workspace  = dag.Host().Directory(".")
+					repository = workspace
+				)
 
 				if cmd.Flag("repo").Changed {
 					src, ref, found := strings.Cut(repo, "@")
@@ -158,6 +166,7 @@ func NewUse() *cobra.Command {
 
 				if export {
 					finalize = func() error {
+						// This is the same as action.Workspace() and postAction.Workspace().
 						if _, err := preAction.Workspace().Export(ctx, "."); err != nil {
 							return err
 						}
@@ -242,6 +251,229 @@ func NewUse() *cobra.Command {
 		NoOptDefVal: "true",
 		Usage:       "Run the post-action step",
 	})
+
+	cmd.MarkFlagsMutuallyExclusive("pre", "post")
+
+	return cmd
+}
+
+// NewCloudBuild returns the command which acts as
+// the entrypoint for `forge cloudbuild`.
+func NewCloudBuild() *cobra.Command {
+	var (
+		script                   string
+		entrypoint               string
+		userDefinedSubstitutions = map[string]string{}
+		automapSubstituations    bool
+		dynamicSubstituations    bool
+		gcloudConfig             string
+		export                   bool
+		slogConfig               = &logutil.SlogConfig{}
+		cmd                      = &cobra.Command{
+			Use:           "cloudbuild cloudbuilder [-S script.sh | -E entrypoint.sh | arg...] [-s user_defined=substitution] [-ad] [-E] [-dqv] [-c ~/.gcloud/config]",
+			Aliases:       []string{"cb"},
+			SilenceErrors: true,
+			SilenceUsage:  true,
+			Args:          cobra.MinimumNArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				var (
+					log   = slog.New(slog.NewTextHandler(cmd.OutOrStdout(), &slog.HandlerOptions{Level: slogConfig}))
+					ctx   = logutil.SloggerInto(cmd.Context(), log)
+					debug = log.Enabled(ctx, slog.LevelDebug)
+				)
+
+				opts := []dagger.ClientOpt{
+					dagger.WithLogOutput(io.Discard),
+				}
+
+				if debug {
+					opts = []dagger.ClientOpt{
+						dagger.WithLogOutput(cmd.ErrOrStderr()),
+						dagger.WithVerbosity(int(slogConfig.Level())),
+					}
+				}
+
+				dag, err := client.Connect(ctx, opts...)
+				if err != nil {
+					return err
+				}
+				defer dag.Close()
+
+				workdir := dag.Host().Directory(".")
+
+				cloudbuild := dag.Forge().CloudBuild(args[0], client.ForgeCloudBuildOpts{
+					Workdir:      workdir,
+					Entrypoint:   strings.Split(entrypoint, " "),
+					Args:         args[1:],
+					Env:          os.Environ(),
+					GcloudConfig: dag.Host().Directory(gcloudConfig),
+					Script: dag.File("script", script, client.FileOpts{
+						Permissions: 700,
+					}),
+					Substitutions:        envconv.MapToArr(userDefinedSubstitutions),
+					DynamicSubstitutions: dynamicSubstituations,
+					AutomapSubstitutions: automapSubstituations,
+				})
+
+				logs, err := cloudbuild.CombinedOutput(ctx)
+				if err != nil {
+					return err
+				}
+
+				if _, err := fmt.Fprint(cmd.OutOrStdout(), logs); err != nil {
+					return err
+				}
+
+				if export {
+					if _, err := cloudbuild.Workdir().Export(ctx, "."); err != nil {
+						return err
+					}
+				}
+
+				return nil
+			},
+		}
+	)
+
+	cmd.Flags().StringVarP(&entrypoint, "entrypoint", "E", "", "Entrypoint to execute")
+	cmd.Flags().StringVarP(&script, "script", "S", "", "Script to run")
+
+	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Substitutions")
+	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "a", false, "Automap substitutions")
+	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "d", false, "Dynamic substitutions")
+
+	cmd.Flags().StringVarP(&gcloudConfig, "gcloud-config", "c", "~/.gcloud/config", "GCloud config directory")
+
+	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the action made to your working directory")
+
+	slogConfig.AddFlags(cmd.Flags())
+
+	cmd.MarkFlagsMutuallyExclusive("entrypoint", "script")
+
+	return cmd
+}
+
+// NewResource returns the command which acts as
+// the entrypoint for `forge check`, `forge get`, and `forge put`.
+func NewResource(method string) *cobra.Command {
+	var (
+		version    map[string]string
+		param      map[string]string
+		pipeline   string
+		export     bool
+		slogConfig = &logutil.SlogConfig{}
+		cmd        = &cobra.Command{
+			Use:           fmt.Sprintf("%s resource [-p pipeline.yml] [-E] [-dqv]", method),
+			SilenceErrors: true,
+			SilenceUsage:  true,
+			Args:          cobra.MinimumNArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				var (
+					log   = slog.New(slog.NewTextHandler(cmd.OutOrStdout(), &slog.HandlerOptions{Level: slogConfig}))
+					ctx   = logutil.SloggerInto(cmd.Context(), log)
+					debug = log.Enabled(ctx, slog.LevelDebug)
+				)
+
+				opts := []dagger.ClientOpt{
+					dagger.WithLogOutput(io.Discard),
+				}
+
+				if debug {
+					opts = []dagger.ClientOpt{
+						dagger.WithLogOutput(cmd.ErrOrStderr()),
+						dagger.WithVerbosity(int(slogConfig.Level())),
+					}
+				}
+
+				f, err := os.Open(pipeline)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+
+				b, err := io.ReadAll(f)
+				if err != nil {
+					return err
+				}
+
+				dag, err := client.Connect(ctx, opts...)
+				if err != nil {
+					return err
+				}
+				defer dag.Close()
+
+				workdir := dag.Host().Directory(".")
+
+				resource := dag.Forge().Resource(args[0], client.ForgeResourceOpts{
+					Pipeline: dag.File(pipeline, string(b)),
+					Workdir:  workdir,
+				})
+
+				switch method {
+				case concourse.MethodCheck:
+					logs, err := resource.Check(client.ForgeResourceCheckOpts{
+						Version: envconv.MapToArr(version),
+					}).
+						Container().
+						CombinedOutput(ctx)
+					if err != nil {
+						return err
+					}
+
+					if _, err := fmt.Fprint(cmd.OutOrStdout(), logs); err != nil {
+						return err
+					}
+				case concourse.MethodGet:
+					logs, err := resource.Get(client.ForgeResourceGetOpts{
+						Version: envconv.MapToArr(version),
+						Param:   envconv.MapToArr(param),
+					}).
+						Container().
+						CombinedOutput(ctx)
+					if err != nil {
+						return err
+					}
+
+					if _, err := fmt.Fprint(cmd.OutOrStdout(), logs); err != nil {
+						return err
+					}
+				case concourse.MethodPut:
+					logs, err := resource.Put(client.ForgeResourcePutOpts{
+						Param: envconv.MapToArr(param),
+					}).
+						Container().
+						CombinedOutput(ctx)
+					if err != nil {
+						return err
+					}
+
+					if _, err := fmt.Fprint(cmd.OutOrStdout(), logs); err != nil {
+						return err
+					}
+				default:
+					return fmt.Errorf("unknown resource method %s", method)
+				}
+
+				return nil
+			},
+		}
+	)
+
+	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the action made to your working directory")
+
+	cmd.Flags().StringVarP(&pipeline, "pipeline", "p", ".forge.yml", "Pipeline")
+
+	switch method {
+	case concourse.MethodCheck:
+		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Version")
+	case concourse.MethodGet:
+		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Version")
+		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Params")
+	case concourse.MethodPut:
+		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Params")
+	}
+
+	slogConfig.AddFlags(cmd.Flags())
 
 	return cmd
 }

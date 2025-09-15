@@ -59,7 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge use local
-        run: forge --no-dind use ./testdata/actions/node
+        run: forge use ./testdata/actions/node
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge use dotdot
@@ -75,14 +75,9 @@ jobs:
           forge use .
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - name: Run forge use dind
-        run: forge use frantjc/forge/testdata/actions/dind@${{ github.sha }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
       - name: Run forge check resource
-        run: forge --no-dind check mock -v version=v0.0.0
+        run: forge check mock -v version=v0.0.0
       - name: Run forge get resource
         run: forge get mock -v version=v0.0.0
       - name: Run forge put resource
         run: forge put mock -v version=v0.0.0 -p version=v0.0.0
-      - run: forge cache --clean
