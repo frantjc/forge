@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 	"regexp"
 
 	"github.com/frantjc/forge/cloudbuild"
@@ -60,9 +59,9 @@ func (f *Forge) CloudBuild(
 
 	container = withHome(container)
 
-	if gcloudConfig != nil {
-		container = container.WithDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
-	}
+	// if gcloudConfig != nil {
+	// 	container = container.WithDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
+	// }
 
 	if script != nil {
 		if len(entrypoint) > 0 {
