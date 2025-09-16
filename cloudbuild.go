@@ -58,7 +58,9 @@ func (f *Forge) CloudBuild(
 		).
 		WithMountedDirectory(workdirPath, workdir)
 
-	container = withHome(container)
+	container = container.
+		WithEnvVariable("HOME", homePath).
+		WithDirectory(homePath, dag.Directory())
 
 	if gcloudConfig != nil && false {
 		container = container.WithDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
