@@ -27,7 +27,7 @@ func NewShim() *cobra.Command {
 
 			globalContext, err := githubactions.NewGlobalContextFromPath(wd)
 			if err != nil {
-				return err
+				globalContext = githubactions.NewGlobalContextFromEnv()
 			}
 
 			subcmd := exec.CommandContext(ctx, args[0], args[1:]...) //nolint:gosec
