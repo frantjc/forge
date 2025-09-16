@@ -18,6 +18,7 @@ jobs:
         with:
           verb: develop
           args: --debug
+          version: v0.18.17
       - uses: actions/setup-node@v5
         with:
           node-version: 20
