@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"dagger.io/dagger"
+	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/githubactions"
 	client "github.com/frantjc/forge/internal/client"
@@ -307,12 +308,17 @@ func NewCloudbuild() *cobra.Command {
 					script  *client.File
 				)
 
-				if _, err := os.Stat(gcloudConfig); errors.Is(err, os.ErrNotExist) {
-					if cmd.Flag("gcloud-config").Changed {
+				substitutions, err := cloudbuild.NewSubstitutionsFromPath(".", userDefinedSubstitutions)
+				if err != nil {
+					if substitutions, err = cloudbuild.NewSubstitutionsFromEnv(userDefinedSubstitutions); err != nil {
 						return err
 					}
-				} else if err != nil {
-					return err
+				}
+
+				if _, err := os.Stat("~/.gcloud/config"); err != nil {
+					if !errors.Is(err, os.ErrNotExist) {
+						return err
+					}
 				} else {
 					gc = dag.Host().Directory(gcloudConfig)
 				}
@@ -331,7 +337,7 @@ func NewCloudbuild() *cobra.Command {
 					GcloudConfig: gc,
 					Script:       script,
 					// TODO(frantjc): Get additional substitutions from gcloud-config.
-					Substitutions:        envconv.MapToArr(userDefinedSubstitutions),
+					Substitutions:        substitutions.Env(),
 					DynamicSubstitutions: dynamicSubstituations,
 					AutomapSubstitutions: automapSubstituations,
 				})
@@ -359,13 +365,13 @@ func NewCloudbuild() *cobra.Command {
 	cmd.Flags().StringVarP(&entrypoint, "entrypoint", "E", "", "Entrypoint to execute")
 	cmd.Flags().StringVarP(&scriptPath, "script", "S", "", "Script to run")
 
-	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Substitutions")
-	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "A", false, "Automap substitutions")
-	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "D", false, "Dynamic substitutions")
+	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Cloud Build substitutions")
+	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "A", false, "Automap substitutions to environment variables")
+	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "D", false, "Expand substitutions")
 
-	cmd.Flags().StringVarP(&gcloudConfig, "gcloud-config", "c", "~/.gcloud/config", "GCloud config directory")
+	cmd.Flags().StringVarP(&gcloudConfig, "gcloud-config", "c", "~/.gcloud/config", "Google Cloud config directory")
 
-	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the action made to your working directory")
+	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the Cloud Builder made to your working directory")
 
 	slogConfig.AddFlags(cmd.Flags())
 
@@ -480,18 +486,18 @@ func NewResource(method string) *cobra.Command {
 		}
 	)
 
-	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the action made to your working directory")
+	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the resource made to your working directory")
 
-	cmd.Flags().StringVarP(&pipeline, "pipeline", "p", ".forge.yml", "Pipeline")
+	cmd.Flags().StringVarP(&pipeline, "pipeline", "p", ".forge.yml", "Concourse pipeline file to get resources from")
 
 	switch method {
 	case concourse.MethodCheck:
-		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Version")
+		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Concourse resource version")
 	case concourse.MethodGet:
-		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Version")
-		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Params")
+		cmd.Flags().StringToStringVarP(&version, "version", "V", nil, "Concourse resource version")
+		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Concourse resource params")
 	case concourse.MethodPut:
-		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Params")
+		cmd.Flags().StringToStringVarP(&param, "param", "P", nil, "Concourse resource params")
 	}
 
 	slogConfig.AddFlags(cmd.Flags())
