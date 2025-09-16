@@ -30,9 +30,6 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           install-only: true
-      - uses: crazy-max/ghaction-upx@v3
-        with:
-          install-only: true
       - name: Run make forge
         run: make forge LOCALBIN=$RUNNER_TEMP
       - name: Set path

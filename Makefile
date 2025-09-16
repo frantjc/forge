@@ -9,7 +9,6 @@ SHELL = /usr/bin/env bash -o pipefail
 
 GO ?= go
 GIT ?= git
-UPX ?= upx
 YARN ?= yarn
 
 GOARCH ?= $(shell $(GO) env GOARCH)
@@ -21,6 +20,7 @@ internal/client internal/client/:
 	@cd $@ && cat dagger.json | jq 'del(.clients)' > dagger.json.tmp && mv dagger.json.tmp dagger.json
 	@cd $@ && dagger client install go ./
 	@cd $@ && rm go.mod go.sum
+	@$(MAKE) tidy
 
 .PHONY: .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/
 .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/:

@@ -307,10 +307,10 @@ func NewCloudBuild() *cobra.Command {
 					if cmd.Flag("gcloud-config").Changed {
 						return err
 					}
-
-					gc = dag.Host().Directory(gcloudConfig)
 				} else if err != nil {
 					return err
+				} else {
+					gc = dag.Host().Directory(gcloudConfig)
 				}
 
 				cloudbuild := dag.Forge().CloudBuild(args[0], client.ForgeCloudBuildOpts{

@@ -5763,7 +5763,7 @@ func (r *ForgeCloudBuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeClou
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:154:1)
+func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:163:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5776,7 +5776,7 @@ func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { 
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeCloudBuild) Container() *Container { // forge (../../cloudbuild.go:134:1)
+func (r *ForgeCloudBuild) Container() *Container { // forge (../../cloudbuild.go:143:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5833,7 +5833,7 @@ func (r *ForgeCloudBuild) MarshalJSON() ([]byte, error) {
 }
 
 // Run executes the CloudBuild.
-func (r *ForgeCloudBuild) Run() *ForgeFinalizedCloudBuild { // forge (../../cloudbuild.go:125:1)
+func (r *ForgeCloudBuild) Run() *ForgeFinalizedCloudBuild { // forge (../../cloudbuild.go:134:1)
 	q := r.query.Select("run")
 
 	return &ForgeFinalizedCloudBuild{
@@ -5842,7 +5842,7 @@ func (r *ForgeCloudBuild) Run() *ForgeFinalizedCloudBuild { // forge (../../clou
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:149:1)
+func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:158:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5855,7 +5855,7 @@ func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:144:1)
+func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5868,7 +5868,7 @@ func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:139:1)
+func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:148:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5877,7 +5877,7 @@ func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:
 }
 
 // Workdir returns the current state of the working directory.
-func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:164:1)
+func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:173:1)
 	q := r.query.Select("workdir")
 
 	return &Directory{
@@ -5886,7 +5886,7 @@ func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:1
 }
 
 // Workspace returns the current state of the /workspace directory.
-func (r *ForgeCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:159:1)
+func (r *ForgeCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:168:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -6109,7 +6109,7 @@ func (r *ForgeFinalizedCloudBuild) WithGraphQLQuery(q *querybuilder.Selection) *
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeFinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:154:1)
+func (r *ForgeFinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:163:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -6122,7 +6122,7 @@ func (r *ForgeFinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, 
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeFinalizedCloudBuild) Container() *Container { // forge (../../cloudbuild.go:134:1)
+func (r *ForgeFinalizedCloudBuild) Container() *Container { // forge (../../cloudbuild.go:143:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -6179,7 +6179,7 @@ func (r *ForgeFinalizedCloudBuild) MarshalJSON() ([]byte, error) {
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeFinalizedCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:149:1)
+func (r *ForgeFinalizedCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:158:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -6192,7 +6192,7 @@ func (r *ForgeFinalizedCloudBuild) Stderr(ctx context.Context) (string, error) {
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeFinalizedCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:144:1)
+func (r *ForgeFinalizedCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -6205,7 +6205,7 @@ func (r *ForgeFinalizedCloudBuild) Stdout(ctx context.Context) (string, error) {
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeFinalizedCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:139:1)
+func (r *ForgeFinalizedCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:148:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -6214,7 +6214,7 @@ func (r *ForgeFinalizedCloudBuild) Terminal() *Container { // forge (../../cloud
 }
 
 // Workdir returns the current state of the working directory.
-func (r *ForgeFinalizedCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:164:1)
+func (r *ForgeFinalizedCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:173:1)
 	q := r.query.Select("workdir")
 
 	return &Directory{
@@ -6223,7 +6223,7 @@ func (r *ForgeFinalizedCloudBuild) Workdir() *Directory { // forge (../../cloudb
 }
 
 // Workspace returns the current state of the /workspace directory.
-func (r *ForgeFinalizedCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:159:1)
+func (r *ForgeFinalizedCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:168:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
