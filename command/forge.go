@@ -69,7 +69,7 @@ func NewForge() *cobra.Command {
 
 	cmd.AddCommand(
 		NewUse(),
-		NewCloudBuild(),
+		NewCloudbuild(),
 		NewResource(concourse.MethodCheck),
 		NewResource(concourse.MethodGet),
 		NewResource(concourse.MethodPut),
@@ -259,9 +259,9 @@ func NewUse() *cobra.Command {
 	return cmd
 }
 
-// NewCloudBuild returns the command which acts as
+// NewCloudbuild returns the command which acts as
 // the entrypoint for `forge cloudbuild`.
-func NewCloudBuild() *cobra.Command {
+func NewCloudbuild() *cobra.Command {
 	var (
 		scriptPath               string
 		entrypoint               string

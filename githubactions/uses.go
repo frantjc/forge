@@ -85,13 +85,13 @@ func Parse(uses string) (*Uses, error) {
 			r.Path = "./" + r.Path
 		}
 	default:
-		spl := strings.Split(uses, "@")
-		if len(spl) != 2 {
+		before, after, ok := strings.Cut(uses, "@")
+		if !ok {
 			return nil, fmt.Errorf("parse uses: not a path or a versioned reference: %s", uses)
 		}
 
-		r.Path = filepath.Clean(spl[0])
-		r.Version = spl[1]
+		r.Path = filepath.Clean(before)
+		r.Version = after
 	}
 
 	return r, nil

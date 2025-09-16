@@ -139,7 +139,7 @@ func (a *Forge) Use(
 				dockerfile = "Dockerfile"
 			}
 
-			container = actn.DockerBuild(dagger.DirectoryDockerBuildOpts{Dockerfile: dockerfile})
+			container = actn.Directory(subpath).DockerBuild(dagger.DirectoryDockerBuildOpts{Dockerfile: dockerfile})
 		} else {
 			container = container.From(strings.TrimPrefix(metadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix))
 		}
@@ -221,7 +221,7 @@ func (a *PreAction) Pre(ctx context.Context) (*Action, error) {
 	switch {
 	case metadata.IsDocker():
 		if metadata.Runs.PreEntrypoint != "" {
-			a.Ctr = a.Container().WithExec(append([]string{shimPath, metadata.Runs.PreEntrypoint}, metadata.Runs.Args...))
+			a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", metadata.Runs.PreEntrypoint}, metadata.Runs.Args...))
 
 			a.Ctr, err = withExportedEnv(ctx, a.Container())
 			if err != nil {
@@ -230,7 +230,7 @@ func (a *PreAction) Pre(ctx context.Context) (*Action, error) {
 		}
 	case metadata.IsNode():
 		if metadata.Runs.Pre != "" {
-			a.Ctr = a.Container().WithExec(append([]string{shimPath, "node", path.Join(actionPath, a.Subpath, metadata.Runs.Pre)}, metadata.Runs.Args...))
+			a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", "node", path.Join(actionPath, a.Subpath, metadata.Runs.Pre)}, metadata.Runs.Args...))
 
 			a.Ctr, err = withExportedEnv(ctx, a.Container())
 			if err != nil {
@@ -254,12 +254,17 @@ func (a *Action) Main(ctx context.Context) (*PostAction, error) {
 	switch {
 	case metadata.IsDocker():
 		if metadata.Runs.Entrypoint != "" {
-			a.Ctr = a.Container().WithExec(append([]string{shimPath, metadata.Runs.Entrypoint}, metadata.Runs.Args...))
+			a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", metadata.Runs.Entrypoint}, metadata.Runs.Args...))
 		} else {
-			a.Ctr = a.Container().WithExec(metadata.Runs.Args)
+			entrypoint, err := a.Container().Entrypoint(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			a.Ctr = a.Container().WithExec(append(append([]string{shimPath, "--"}, entrypoint...), metadata.Runs.Args...))
 		}
 	case metadata.IsNode():
-		a.Ctr = a.Container().WithExec(append([]string{shimPath, "node", path.Join(actionPath, a.Subpath, metadata.Runs.Main)}, metadata.Runs.Args...))
+		a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", "node", path.Join(actionPath, a.Subpath, metadata.Runs.Main)}, metadata.Runs.Args...))
 	default:
 		return nil, fmt.Errorf("actions that run using %s are not supported", metadata.Runs.Using)
 	}
@@ -292,7 +297,7 @@ func (a *PostAction) Post(ctx context.Context) (*dagger.Container, error) {
 	switch {
 	case metadata.IsDocker():
 		if metadata.Runs.PostEntrypoint != "" {
-			a.Ctr = a.Container().WithExec(append([]string{shimPath, metadata.Runs.PostEntrypoint}, metadata.Runs.Args...))
+			a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", metadata.Runs.PostEntrypoint}, metadata.Runs.Args...))
 
 			a.Ctr, err = withExportedEnv(ctx, a.Container())
 			if err != nil {
@@ -301,7 +306,7 @@ func (a *PostAction) Post(ctx context.Context) (*dagger.Container, error) {
 		}
 	case metadata.IsNode():
 		if metadata.Runs.Post != "" {
-			a.Ctr = a.Container().WithExec(append([]string{shimPath, "node", path.Join(actionPath, a.Subpath, metadata.Runs.Post)}, metadata.Runs.Args...))
+			a.Ctr = a.Container().WithExec(append([]string{shimPath, "--", "node", path.Join(actionPath, a.Subpath, metadata.Runs.Post)}, metadata.Runs.Args...))
 
 			a.Ctr, err = withExportedEnv(ctx, a.Container())
 			if err != nil {
