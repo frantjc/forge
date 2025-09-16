@@ -143,6 +143,8 @@ func (a *Forge) Use(
 		} else {
 			container = container.From(strings.TrimPrefix(metadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix))
 		}
+
+		container = withAction(container, actn)
 	case githubactions.RunsUsingNode12:
 		container = withAction(container.From(Node12ImageReference), actn)
 	case githubactions.RunsUsingNode16:
@@ -432,6 +434,7 @@ func withShim(ctx context.Context, container *dagger.Container) (*dagger.Contain
 	workdir := path.Join(gopath, "src", gomod.Module.Mod.Path)
 
 	shim := golang.
+		WithEnvVariable("CGO_ENABLED", "0").
 		WithDirectory(workdir, src, dagger.ContainerWithDirectoryOpts{
 			Include: []string{
 				"go.mod",
