@@ -75,7 +75,7 @@ func (f *Forge) CloudBuild(
 		}
 
 		if !hasShebang(contents) {
-			contents = fmt.Sprintf("#!/usr/bin/env sh\n%s", contents) 
+			contents = fmt.Sprintf("#!/usr/bin/env sh\n%s", contents)
 		}
 
 		container = withFile(
