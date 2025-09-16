@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -313,9 +314,13 @@ func NewCloudBuild() *cobra.Command {
 					gc = dag.Host().Directory(gcloudConfig)
 				}
 
+
+				
 				cloudbuild := dag.Forge().CloudBuild(args[0], client.ForgeCloudBuildOpts{
 					Workdir:      workdir,
-					Entrypoint:   strings.Split(entrypoint, " "),
+					Entrypoint:   slices.DeleteFunc(strings.Split(entrypoint, " "), func(s string) bool {
+						return s == ""
+					}),
 					Args:         args[1:],
 					Env:          os.Environ(),
 					GcloudConfig: gc,
