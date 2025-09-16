@@ -61,7 +61,7 @@ func (f *Forge) CloudBuild(
 	container = withHome(container)
 
 	if gcloudConfig != nil {
-		container = container.WithMountedDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
+		container = container.WithDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
 	}
 
 	if script != nil {
