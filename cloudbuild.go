@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/internal/dagger"
@@ -22,6 +23,10 @@ const (
 	scriptPath  = "/forge/script"
 	workdirPath = "/forge/workdir"
 )
+
+func hasShebang(script string) bool {
+	return regexp.MustCompile(`^\s*#!.+\n`).MatchString(script)
+}
 
 func (f *Forge) CloudBuild(
 	ctx context.Context,
@@ -60,13 +65,17 @@ func (f *Forge) CloudBuild(
 	}
 
 	if script != nil {
+		if len(entrypoint) > 0 {
+			return nil, fmt.Errorf("cannot specify entrypoint with script")
+		}
+
 		contents, err := script.Contents(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		if len(entrypoint) > 0 || len(args) > 0 {
-			return nil, fmt.Errorf("cannot specify entrypoint or args with script")
+		if !hasShebang(contents) {
+			contents = fmt.Sprintf("#!/usr/bin/env sh\n%s", contents) 
 		}
 
 		container = withFile(
@@ -76,7 +85,7 @@ func (f *Forge) CloudBuild(
 			dagger.ContainerWithFileOpts{
 				Permissions: 0o700,
 			},
-		).WithExec([]string{scriptPath})
+		).WithExec(append([]string{scriptPath}, args...))
 	} else {
 		if len(entrypoint) == 0 {
 			var err error
