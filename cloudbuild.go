@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"regexp"
 
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/internal/dagger"
 )
 
-type CloudBuild struct {
-	FinalizedCloudBuild
+type Cloudbuild struct {
+	FinalizedCloudbuild
 }
 
-type FinalizedCloudBuild struct {
+type FinalizedCloudbuild struct {
 	Ctr *dagger.Container
 }
 
@@ -24,11 +23,7 @@ const (
 	workdirPath = "/forge/workdir"
 )
 
-func hasShebang(script string) bool {
-	return regexp.MustCompile(`^\s*#!.+\n`).MatchString(script)
-}
-
-func (f *Forge) CloudBuild(
+func (f *Forge) Cloudbuild(
 	ctx context.Context,
 	name string,
 	// +defaultPath="."
@@ -49,7 +44,7 @@ func (f *Forge) CloudBuild(
 	dynamicSubstitutions bool,
 	// +optional
 	automapSubstitutions bool,
-) (*CloudBuild, error) {
+) (*Cloudbuild, error) {
 	container := dag.Container().
 		From(name).
 		WithMountedCache(
@@ -58,11 +53,9 @@ func (f *Forge) CloudBuild(
 		).
 		WithMountedDirectory(workdirPath, workdir)
 
-	container = container.
-		WithEnvVariable("HOME", homePath).
-		WithDirectory(homePath, dag.Directory())
+	container = withHome(container)
 
-	if gcloudConfig != nil && false {
+	if gcloudConfig != nil {
 		container = container.WithDirectory(path.Join(homePath, ".config", "gcloud"), gcloudConfig)
 	}
 
@@ -71,23 +64,9 @@ func (f *Forge) CloudBuild(
 			return nil, fmt.Errorf("cannot specify entrypoint with script")
 		}
 
-		contents, err := script.Contents(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		if !hasShebang(contents) {
-			contents = fmt.Sprintf("#!/usr/bin/env sh\n%s", contents)
-		}
-
-		container = withFile(
-			container,
-			scriptPath,
-			contents,
-			dagger.ContainerWithFileOpts{
-				Permissions: 0o700,
-			},
-		).WithExec(append([]string{scriptPath}, args...))
+		container = container.
+			WithFile(scriptPath, script, dagger.ContainerWithFileOpts{Permissions: 0o700}).
+			WithExec(append([]string{scriptPath}, args...))
 	} else {
 		if len(entrypoint) == 0 {
 			var err error
@@ -134,53 +113,53 @@ func (f *Forge) CloudBuild(
 		}
 	}
 
-	return &CloudBuild{
-		FinalizedCloudBuild: FinalizedCloudBuild{
+	return &Cloudbuild{
+		FinalizedCloudbuild: FinalizedCloudbuild{
 			Ctr: container,
 		},
 	}, nil
 }
 
-// Run executes the CloudBuild.
-func (c *CloudBuild) Run(ctx context.Context) (*FinalizedCloudBuild, error) {
+// Run executes the cloudbuild.
+func (c *Cloudbuild) Run(ctx context.Context) (*FinalizedCloudbuild, error) {
 	if _, err := c.Stdout(ctx); err != nil {
 		return nil, err
 	}
 
-	return &c.FinalizedCloudBuild, nil
+	return &c.FinalizedCloudbuild, nil
 }
 
 // Container gives access to the underlying container.
-func (c *FinalizedCloudBuild) Container() *dagger.Container {
+func (c *FinalizedCloudbuild) Container() *dagger.Container {
 	return c.Ctr
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (c *FinalizedCloudBuild) Terminal() *dagger.Container {
+func (c *FinalizedCloudbuild) Terminal() *dagger.Container {
 	return c.Container().Terminal()
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (c *FinalizedCloudBuild) Stdout(ctx context.Context) (string, error) {
+func (c *FinalizedCloudbuild) Stdout(ctx context.Context) (string, error) {
 	return c.Container().Stdout(ctx)
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (c *FinalizedCloudBuild) Stderr(ctx context.Context) (string, error) {
+func (c *FinalizedCloudbuild) Stderr(ctx context.Context) (string, error) {
 	return c.Container().Stderr(ctx)
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (c *FinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, error) {
+func (c *FinalizedCloudbuild) CombinedOutput(ctx context.Context) (string, error) {
 	return c.Container().CombinedOutput(ctx)
 }
 
 // Workspace returns the current state of the /workspace directory.
-func (c *FinalizedCloudBuild) Workspace() *dagger.Directory {
+func (c *FinalizedCloudbuild) Workspace() *dagger.Directory {
 	return c.Container().Directory(cloudbuild.WorkspacePath)
 }
 
 // Workdir returns the current state of the working directory.
-func (c *FinalizedCloudBuild) Workdir() *dagger.Directory {
+func (c *FinalizedCloudbuild) Workdir() *dagger.Directory {
 	return c.Container().Directory(workdirPath)
 }

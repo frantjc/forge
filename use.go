@@ -499,7 +499,7 @@ func withToken(ctx context.Context, container *dagger.Container, secret *dagger.
 func withHome(container *dagger.Container) *dagger.Container {
 	return container.
 		WithEnvVariable("HOME", homePath).
-		WithMountedCache(homePath, dag.CacheVolume("home"))
+		WithDirectory(homePath, dag.Directory())
 }
 
 func withAction(container *dagger.Container, action *dagger.Directory) *dagger.Container {

@@ -176,14 +176,14 @@ type FileID string
 // The `ForgeActionID` scalar type represents an identifier for an object of type ForgeAction.
 type ForgeActionID string
 
-// The `ForgeCloudBuildID` scalar type represents an identifier for an object of type ForgeCloudBuild.
-type ForgeCloudBuildID string
+// The `ForgeCloudbuildID` scalar type represents an identifier for an object of type ForgeCloudbuild.
+type ForgeCloudbuildID string
 
 // The `ForgeFinalizedActionID` scalar type represents an identifier for an object of type ForgeFinalizedAction.
 type ForgeFinalizedActionID string
 
-// The `ForgeFinalizedCloudBuildID` scalar type represents an identifier for an object of type ForgeFinalizedCloudBuild.
-type ForgeFinalizedCloudBuildID string
+// The `ForgeFinalizedCloudbuildID` scalar type represents an identifier for an object of type ForgeFinalizedCloudbuild.
+type ForgeFinalizedCloudbuildID string
 
 // The `ForgeFinalizedResourceID` scalar type represents an identifier for an object of type ForgeFinalizedResource.
 type ForgeFinalizedResourceID string
@@ -422,11 +422,11 @@ func (r *Binding) AsForgeAction() *ForgeAction {
 	}
 }
 
-// Retrieve the binding value, as type ForgeCloudBuild
-func (r *Binding) AsForgeCloudBuild() *ForgeCloudBuild {
-	q := r.query.Select("asForgeCloudBuild")
+// Retrieve the binding value, as type ForgeCloudbuild
+func (r *Binding) AsForgeCloudbuild() *ForgeCloudbuild {
+	q := r.query.Select("asForgeCloudbuild")
 
-	return &ForgeCloudBuild{
+	return &ForgeCloudbuild{
 		query: q,
 	}
 }
@@ -440,11 +440,11 @@ func (r *Binding) AsForgeFinalizedAction() *ForgeFinalizedAction {
 	}
 }
 
-// Retrieve the binding value, as type ForgeFinalizedCloudBuild
-func (r *Binding) AsForgeFinalizedCloudBuild() *ForgeFinalizedCloudBuild {
-	q := r.query.Select("asForgeFinalizedCloudBuild")
+// Retrieve the binding value, as type ForgeFinalizedCloudbuild
+func (r *Binding) AsForgeFinalizedCloudbuild() *ForgeFinalizedCloudbuild {
+	q := r.query.Select("asForgeFinalizedCloudbuild")
 
-	return &ForgeFinalizedCloudBuild{
+	return &ForgeFinalizedCloudbuild{
 		query: q,
 	}
 }
@@ -4101,10 +4101,10 @@ func (r *Env) WithForgeActionOutput(name string, description string) *Env {
 	}
 }
 
-// Create or update a binding of type ForgeCloudBuild in the environment
-func (r *Env) WithForgeCloudBuildInput(name string, value *ForgeCloudBuild, description string) *Env {
+// Create or update a binding of type ForgeCloudbuild in the environment
+func (r *Env) WithForgeCloudbuildInput(name string, value *ForgeCloudbuild, description string) *Env {
 	assertNotNil("value", value)
-	q := r.query.Select("withForgeCloudBuildInput")
+	q := r.query.Select("withForgeCloudbuildInput")
 	q = q.Arg("name", name)
 	q = q.Arg("value", value)
 	q = q.Arg("description", description)
@@ -4114,9 +4114,9 @@ func (r *Env) WithForgeCloudBuildInput(name string, value *ForgeCloudBuild, desc
 	}
 }
 
-// Declare a desired ForgeCloudBuild output to be assigned in the environment
-func (r *Env) WithForgeCloudBuildOutput(name string, description string) *Env {
-	q := r.query.Select("withForgeCloudBuildOutput")
+// Declare a desired ForgeCloudbuild output to be assigned in the environment
+func (r *Env) WithForgeCloudbuildOutput(name string, description string) *Env {
+	q := r.query.Select("withForgeCloudbuildOutput")
 	q = q.Arg("name", name)
 	q = q.Arg("description", description)
 
@@ -4149,10 +4149,10 @@ func (r *Env) WithForgeFinalizedActionOutput(name string, description string) *E
 	}
 }
 
-// Create or update a binding of type ForgeFinalizedCloudBuild in the environment
-func (r *Env) WithForgeFinalizedCloudBuildInput(name string, value *ForgeFinalizedCloudBuild, description string) *Env {
+// Create or update a binding of type ForgeFinalizedCloudbuild in the environment
+func (r *Env) WithForgeFinalizedCloudbuildInput(name string, value *ForgeFinalizedCloudbuild, description string) *Env {
 	assertNotNil("value", value)
-	q := r.query.Select("withForgeFinalizedCloudBuildInput")
+	q := r.query.Select("withForgeFinalizedCloudbuildInput")
 	q = q.Arg("name", name)
 	q = q.Arg("value", value)
 	q = q.Arg("description", description)
@@ -4162,9 +4162,9 @@ func (r *Env) WithForgeFinalizedCloudBuildInput(name string, value *ForgeFinaliz
 	}
 }
 
-// Declare a desired ForgeFinalizedCloudBuild output to be assigned in the environment
-func (r *Env) WithForgeFinalizedCloudBuildOutput(name string, description string) *Env {
-	q := r.query.Select("withForgeFinalizedCloudBuildOutput")
+// Declare a desired ForgeFinalizedCloudbuild output to be assigned in the environment
+func (r *Env) WithForgeFinalizedCloudbuildOutput(name string, description string) *Env {
+	q := r.query.Select("withForgeFinalizedCloudbuildOutput")
 	q = q.Arg("name", name)
 	q = q.Arg("description", description)
 
@@ -5344,8 +5344,8 @@ func (r *Forge) WithGraphQLQuery(q *querybuilder.Selection) *Forge {
 	}
 }
 
-// ForgeCloudBuildOpts contains options for Forge.CloudBuild
-type ForgeCloudBuildOpts struct {
+// ForgeCloudbuildOpts contains options for Forge.Cloudbuild
+type ForgeCloudbuildOpts struct {
 	Workdir *Directory // forge (../../cloudbuild.go:30:2)
 
 	Entrypoint []string // forge (../../cloudbuild.go:32:2)
@@ -5365,8 +5365,8 @@ type ForgeCloudBuildOpts struct {
 	AutomapSubstitutions bool // forge (../../cloudbuild.go:46:2)
 }
 
-func (r *Forge) CloudBuild(name string, opts ...ForgeCloudBuildOpts) *ForgeCloudBuild { // forge (../../cloudbuild.go:26:1)
-	q := r.query.Select("cloudBuild")
+func (r *Forge) Cloudbuild(name string, opts ...ForgeCloudbuildOpts) *ForgeCloudbuild { // forge (../../cloudbuild.go:26:1)
+	q := r.query.Select("cloudbuild")
 	for i := len(opts) - 1; i >= 0; i-- {
 		// `workdir` optional argument
 		if !querybuilder.IsZeroValue(opts[i].Workdir) {
@@ -5407,7 +5407,7 @@ func (r *Forge) CloudBuild(name string, opts ...ForgeCloudBuildOpts) *ForgeCloud
 	}
 	q = q.Arg("name", name)
 
-	return &ForgeCloudBuild{
+	return &ForgeCloudbuild{
 		query: q,
 	}
 }
@@ -5747,23 +5747,23 @@ func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:362:1)
 	}
 }
 
-type ForgeCloudBuild struct { // forge (../../cloudbuild.go:13:6)
+type ForgeCloudbuild struct { // forge (../../cloudbuild.go:13:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
-	id             *ForgeCloudBuildID
+	id             *ForgeCloudbuildID
 	stderr         *string
 	stdout         *string
 }
 
-func (r *ForgeCloudBuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeCloudBuild {
-	return &ForgeCloudBuild{
+func (r *ForgeCloudbuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeCloudbuild {
+	return &ForgeCloudbuild{
 		query: q,
 	}
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:163:1)
+func (r *ForgeCloudbuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5776,7 +5776,7 @@ func (r *ForgeCloudBuild) CombinedOutput(ctx context.Context) (string, error) { 
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeCloudBuild) Container() *Container { // forge (../../cloudbuild.go:143:1)
+func (r *ForgeCloudbuild) Container() *Container { // forge (../../cloudbuild.go:133:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5784,39 +5784,39 @@ func (r *ForgeCloudBuild) Container() *Container { // forge (../../cloudbuild.go
 	}
 }
 
-func (r *ForgeCloudBuild) FinalizedCloudBuild() *ForgeFinalizedCloudBuild { // forge (../../cloudbuild.go:14:2)
-	q := r.query.Select("finalizedCloudBuild")
+func (r *ForgeCloudbuild) FinalizedCloudbuild() *ForgeFinalizedCloudbuild { // forge (../../cloudbuild.go:14:2)
+	q := r.query.Select("finalizedCloudbuild")
 
-	return &ForgeFinalizedCloudBuild{
+	return &ForgeFinalizedCloudbuild{
 		query: q,
 	}
 }
 
-// A unique identifier for this ForgeCloudBuild.
-func (r *ForgeCloudBuild) ID(ctx context.Context) (ForgeCloudBuildID, error) {
+// A unique identifier for this ForgeCloudbuild.
+func (r *ForgeCloudbuild) ID(ctx context.Context) (ForgeCloudbuildID, error) {
 	if r.id != nil {
 		return *r.id, nil
 	}
 	q := r.query.Select("id")
 
-	var response ForgeCloudBuildID
+	var response ForgeCloudbuildID
 
 	q = q.Bind(&response)
 	return response, q.Execute(ctx)
 }
 
 // XXX_GraphQLType is an internal function. It returns the native GraphQL type name
-func (r *ForgeCloudBuild) XXX_GraphQLType() string {
-	return "ForgeCloudBuild"
+func (r *ForgeCloudbuild) XXX_GraphQLType() string {
+	return "ForgeCloudbuild"
 }
 
 // XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
-func (r *ForgeCloudBuild) XXX_GraphQLIDType() string {
-	return "ForgeCloudBuildID"
+func (r *ForgeCloudbuild) XXX_GraphQLIDType() string {
+	return "ForgeCloudbuildID"
 }
 
 // XXX_GraphQLID is an internal function. It returns the underlying type ID
-func (r *ForgeCloudBuild) XXX_GraphQLID(ctx context.Context) (string, error) {
+func (r *ForgeCloudbuild) XXX_GraphQLID(ctx context.Context) (string, error) {
 	id, err := r.ID(ctx)
 	if err != nil {
 		return "", err
@@ -5824,7 +5824,7 @@ func (r *ForgeCloudBuild) XXX_GraphQLID(ctx context.Context) (string, error) {
 	return string(id), nil
 }
 
-func (r *ForgeCloudBuild) MarshalJSON() ([]byte, error) {
+func (r *ForgeCloudbuild) MarshalJSON() ([]byte, error) {
 	id, err := r.ID(marshalCtx)
 	if err != nil {
 		return nil, err
@@ -5832,17 +5832,17 @@ func (r *ForgeCloudBuild) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
-// Run executes the CloudBuild.
-func (r *ForgeCloudBuild) Run() *ForgeFinalizedCloudBuild { // forge (../../cloudbuild.go:134:1)
+// Run executes the cloudbuild.
+func (r *ForgeCloudbuild) Run() *ForgeFinalizedCloudbuild { // forge (../../cloudbuild.go:124:1)
 	q := r.query.Select("run")
 
-	return &ForgeFinalizedCloudBuild{
+	return &ForgeFinalizedCloudbuild{
 		query: q,
 	}
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:158:1)
+func (r *ForgeCloudbuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:148:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5855,7 +5855,7 @@ func (r *ForgeCloudBuild) Stderr(ctx context.Context) (string, error) { // forge
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
+func (r *ForgeCloudbuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:143:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5868,7 +5868,7 @@ func (r *ForgeCloudBuild) Stdout(ctx context.Context) (string, error) { // forge
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:148:1)
+func (r *ForgeCloudbuild) Terminal() *Container { // forge (../../cloudbuild.go:138:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5877,7 +5877,7 @@ func (r *ForgeCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:
 }
 
 // Workdir returns the current state of the working directory.
-func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:173:1)
+func (r *ForgeCloudbuild) Workdir() *Directory { // forge (../../cloudbuild.go:163:1)
 	q := r.query.Select("workdir")
 
 	return &Directory{
@@ -5886,7 +5886,7 @@ func (r *ForgeCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:1
 }
 
 // Workspace returns the current state of the /workspace directory.
-func (r *ForgeCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:168:1)
+func (r *ForgeCloudbuild) Workspace() *Directory { // forge (../../cloudbuild.go:158:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -6093,23 +6093,23 @@ func (r *ForgeFinalizedAction) Workspace() *Directory { // forge (../../use.go:3
 	}
 }
 
-type ForgeFinalizedCloudBuild struct { // forge (../../cloudbuild.go:17:6)
+type ForgeFinalizedCloudbuild struct { // forge (../../cloudbuild.go:17:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
-	id             *ForgeFinalizedCloudBuildID
+	id             *ForgeFinalizedCloudbuildID
 	stderr         *string
 	stdout         *string
 }
 
-func (r *ForgeFinalizedCloudBuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeFinalizedCloudBuild {
-	return &ForgeFinalizedCloudBuild{
+func (r *ForgeFinalizedCloudbuild) WithGraphQLQuery(q *querybuilder.Selection) *ForgeFinalizedCloudbuild {
+	return &ForgeFinalizedCloudbuild{
 		query: q,
 	}
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeFinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:163:1)
+func (r *ForgeFinalizedCloudbuild) CombinedOutput(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -6122,7 +6122,7 @@ func (r *ForgeFinalizedCloudBuild) CombinedOutput(ctx context.Context) (string, 
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeFinalizedCloudBuild) Container() *Container { // forge (../../cloudbuild.go:143:1)
+func (r *ForgeFinalizedCloudbuild) Container() *Container { // forge (../../cloudbuild.go:133:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -6130,7 +6130,7 @@ func (r *ForgeFinalizedCloudBuild) Container() *Container { // forge (../../clou
 	}
 }
 
-func (r *ForgeFinalizedCloudBuild) Ctr() *Container { // forge (../../cloudbuild.go:18:2)
+func (r *ForgeFinalizedCloudbuild) Ctr() *Container { // forge (../../cloudbuild.go:18:2)
 	q := r.query.Select("ctr")
 
 	return &Container{
@@ -6138,31 +6138,31 @@ func (r *ForgeFinalizedCloudBuild) Ctr() *Container { // forge (../../cloudbuild
 	}
 }
 
-// A unique identifier for this ForgeFinalizedCloudBuild.
-func (r *ForgeFinalizedCloudBuild) ID(ctx context.Context) (ForgeFinalizedCloudBuildID, error) {
+// A unique identifier for this ForgeFinalizedCloudbuild.
+func (r *ForgeFinalizedCloudbuild) ID(ctx context.Context) (ForgeFinalizedCloudbuildID, error) {
 	if r.id != nil {
 		return *r.id, nil
 	}
 	q := r.query.Select("id")
 
-	var response ForgeFinalizedCloudBuildID
+	var response ForgeFinalizedCloudbuildID
 
 	q = q.Bind(&response)
 	return response, q.Execute(ctx)
 }
 
 // XXX_GraphQLType is an internal function. It returns the native GraphQL type name
-func (r *ForgeFinalizedCloudBuild) XXX_GraphQLType() string {
-	return "ForgeFinalizedCloudBuild"
+func (r *ForgeFinalizedCloudbuild) XXX_GraphQLType() string {
+	return "ForgeFinalizedCloudbuild"
 }
 
 // XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
-func (r *ForgeFinalizedCloudBuild) XXX_GraphQLIDType() string {
-	return "ForgeFinalizedCloudBuildID"
+func (r *ForgeFinalizedCloudbuild) XXX_GraphQLIDType() string {
+	return "ForgeFinalizedCloudbuildID"
 }
 
 // XXX_GraphQLID is an internal function. It returns the underlying type ID
-func (r *ForgeFinalizedCloudBuild) XXX_GraphQLID(ctx context.Context) (string, error) {
+func (r *ForgeFinalizedCloudbuild) XXX_GraphQLID(ctx context.Context) (string, error) {
 	id, err := r.ID(ctx)
 	if err != nil {
 		return "", err
@@ -6170,7 +6170,7 @@ func (r *ForgeFinalizedCloudBuild) XXX_GraphQLID(ctx context.Context) (string, e
 	return string(id), nil
 }
 
-func (r *ForgeFinalizedCloudBuild) MarshalJSON() ([]byte, error) {
+func (r *ForgeFinalizedCloudbuild) MarshalJSON() ([]byte, error) {
 	id, err := r.ID(marshalCtx)
 	if err != nil {
 		return nil, err
@@ -6179,7 +6179,7 @@ func (r *ForgeFinalizedCloudBuild) MarshalJSON() ([]byte, error) {
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeFinalizedCloudBuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:158:1)
+func (r *ForgeFinalizedCloudbuild) Stderr(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:148:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -6192,7 +6192,7 @@ func (r *ForgeFinalizedCloudBuild) Stderr(ctx context.Context) (string, error) {
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeFinalizedCloudBuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:153:1)
+func (r *ForgeFinalizedCloudbuild) Stdout(ctx context.Context) (string, error) { // forge (../../cloudbuild.go:143:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -6205,7 +6205,7 @@ func (r *ForgeFinalizedCloudBuild) Stdout(ctx context.Context) (string, error) {
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeFinalizedCloudBuild) Terminal() *Container { // forge (../../cloudbuild.go:148:1)
+func (r *ForgeFinalizedCloudbuild) Terminal() *Container { // forge (../../cloudbuild.go:138:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -6214,7 +6214,7 @@ func (r *ForgeFinalizedCloudBuild) Terminal() *Container { // forge (../../cloud
 }
 
 // Workdir returns the current state of the working directory.
-func (r *ForgeFinalizedCloudBuild) Workdir() *Directory { // forge (../../cloudbuild.go:173:1)
+func (r *ForgeFinalizedCloudbuild) Workdir() *Directory { // forge (../../cloudbuild.go:163:1)
 	q := r.query.Select("workdir")
 
 	return &Directory{
@@ -6223,7 +6223,7 @@ func (r *ForgeFinalizedCloudBuild) Workdir() *Directory { // forge (../../cloudb
 }
 
 // Workspace returns the current state of the /workspace directory.
-func (r *ForgeFinalizedCloudBuild) Workspace() *Directory { // forge (../../cloudbuild.go:168:1)
+func (r *ForgeFinalizedCloudbuild) Workspace() *Directory { // forge (../../cloudbuild.go:158:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -10970,12 +10970,12 @@ func (r *Client) LoadForgeActionFromID(id ForgeActionID) *ForgeAction {
 	}
 }
 
-// Load a ForgeCloudBuild from its ID.
-func (r *Client) LoadForgeCloudBuildFromID(id ForgeCloudBuildID) *ForgeCloudBuild {
-	q := r.query.Select("loadForgeCloudBuildFromID")
+// Load a ForgeCloudbuild from its ID.
+func (r *Client) LoadForgeCloudbuildFromID(id ForgeCloudbuildID) *ForgeCloudbuild {
+	q := r.query.Select("loadForgeCloudbuildFromID")
 	q = q.Arg("id", id)
 
-	return &ForgeCloudBuild{
+	return &ForgeCloudbuild{
 		query: q,
 	}
 }
@@ -10990,12 +10990,12 @@ func (r *Client) LoadForgeFinalizedActionFromID(id ForgeFinalizedActionID) *Forg
 	}
 }
 
-// Load a ForgeFinalizedCloudBuild from its ID.
-func (r *Client) LoadForgeFinalizedCloudBuildFromID(id ForgeFinalizedCloudBuildID) *ForgeFinalizedCloudBuild {
-	q := r.query.Select("loadForgeFinalizedCloudBuildFromID")
+// Load a ForgeFinalizedCloudbuild from its ID.
+func (r *Client) LoadForgeFinalizedCloudbuildFromID(id ForgeFinalizedCloudbuildID) *ForgeFinalizedCloudbuild {
+	q := r.query.Select("loadForgeFinalizedCloudbuildFromID")
 	q = q.Arg("id", id)
 
-	return &ForgeFinalizedCloudBuild{
+	return &ForgeFinalizedCloudbuild{
 		query: q,
 	}
 }

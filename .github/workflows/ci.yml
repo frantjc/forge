@@ -35,9 +35,9 @@ jobs:
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       # See https://cloud.google.com/build/docs/configuring-builds/run-bash-scripts.
-      - name: Run forge cloudbuild --script noshebang
+      - name: Run forge cloudbuild --script sh
         run: |
-          forge cloudbuild alpine --script testdata/cloudbuild/scripts/sh
+          forge cloudbuild bash --script testdata/cloudbuild/scripts/sh
       - name: Run forge cloudbuild --script bash
         run: |
           forge cloudbuild bash --script testdata/cloudbuild/scripts/bash

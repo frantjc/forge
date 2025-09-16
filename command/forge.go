@@ -263,7 +263,7 @@ func NewUse() *cobra.Command {
 // the entrypoint for `forge cloudbuild`.
 func NewCloudBuild() *cobra.Command {
 	var (
-		script                   string
+		scriptPath               string
 		entrypoint               string
 		userDefinedSubstitutions = map[string]string{}
 		automapSubstituations    bool
@@ -301,8 +301,11 @@ func NewCloudBuild() *cobra.Command {
 				}
 				defer dag.Close()
 
-				workdir := dag.Host().Directory(".")
-				gc := dag.Directory()
+				var (
+					workdir = dag.Host().Directory(".")
+					gc      = dag.Directory()
+					script  *client.File
+				)
 
 				if _, err := os.Stat(gcloudConfig); errors.Is(err, os.ErrNotExist) {
 					if cmd.Flag("gcloud-config").Changed {
@@ -314,7 +317,11 @@ func NewCloudBuild() *cobra.Command {
 					gc = dag.Host().Directory(gcloudConfig)
 				}
 
-				cloudbuild := dag.Forge().CloudBuild(args[0], client.ForgeCloudBuildOpts{
+				if cmd.Flag("script").Changed {
+					script = dag.Host().File(scriptPath)
+				}
+
+				cloudbuild := dag.Forge().Cloudbuild(args[0], client.ForgeCloudbuildOpts{
 					Workdir: workdir,
 					Entrypoint: slices.DeleteFunc(strings.Split(entrypoint, " "), func(s string) bool {
 						return s == ""
@@ -322,9 +329,7 @@ func NewCloudBuild() *cobra.Command {
 					Args:         args[1:],
 					Env:          os.Environ(),
 					GcloudConfig: gc,
-					Script: dag.File("script", script, client.FileOpts{
-						Permissions: 700,
-					}),
+					Script:       script,
 					// TODO(frantjc): Get additional substitutions from gcloud-config.
 					Substitutions:        envconv.MapToArr(userDefinedSubstitutions),
 					DynamicSubstitutions: dynamicSubstituations,
@@ -352,7 +357,7 @@ func NewCloudBuild() *cobra.Command {
 	)
 
 	cmd.Flags().StringVarP(&entrypoint, "entrypoint", "E", "", "Entrypoint to execute")
-	cmd.Flags().StringVarP(&script, "script", "S", "", "Script to run")
+	cmd.Flags().StringVarP(&scriptPath, "script", "S", "", "Script to run")
 
 	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Substitutions")
 	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "A", false, "Automap substitutions")

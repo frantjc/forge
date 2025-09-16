@@ -258,10 +258,10 @@ func LoadForgeActionFromID(id dagger.ForgeActionID) *dagger.ForgeAction {
 	return client.LoadForgeActionFromID(id)
 }
 
-// Load a ForgeCloudBuild from its ID.
-func LoadForgeCloudBuildFromID(id dagger.ForgeCloudBuildID) *dagger.ForgeCloudBuild {
+// Load a ForgeCloudbuild from its ID.
+func LoadForgeCloudbuildFromID(id dagger.ForgeCloudbuildID) *dagger.ForgeCloudbuild {
 	client := initClient()
-	return client.LoadForgeCloudBuildFromID(id)
+	return client.LoadForgeCloudbuildFromID(id)
 }
 
 // Load a ForgeFinalizedAction from its ID.
@@ -270,10 +270,10 @@ func LoadForgeFinalizedActionFromID(id dagger.ForgeFinalizedActionID) *dagger.Fo
 	return client.LoadForgeFinalizedActionFromID(id)
 }
 
-// Load a ForgeFinalizedCloudBuild from its ID.
-func LoadForgeFinalizedCloudBuildFromID(id dagger.ForgeFinalizedCloudBuildID) *dagger.ForgeFinalizedCloudBuild {
+// Load a ForgeFinalizedCloudbuild from its ID.
+func LoadForgeFinalizedCloudbuildFromID(id dagger.ForgeFinalizedCloudbuildID) *dagger.ForgeFinalizedCloudbuild {
 	client := initClient()
-	return client.LoadForgeFinalizedCloudBuildFromID(id)
+	return client.LoadForgeFinalizedCloudbuildFromID(id)
 }
 
 // Load a ForgeFinalizedResource from its ID.
