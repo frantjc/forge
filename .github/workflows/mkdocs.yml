@@ -2,7 +2,7 @@ name: Mkdocs
 on:
   push:
     branches:
-      - main
+      - release-1.0
     paths:
       - .github/actions/mkdocs/**
       - .github/workflows/mkdocs.yml
