@@ -12,7 +12,6 @@ import (
 	"github.com/frantjc/forge/githubactions"
 	"github.com/frantjc/forge/internal/dagger"
 	"github.com/frantjc/forge/internal/envconv"
-	xos "github.com/frantjc/x/os"
 	"golang.org/x/mod/modfile"
 	"sigs.k8s.io/yaml"
 )
@@ -85,7 +84,9 @@ type Action struct {
 // action, but has not yet executed the post-step.
 type PostAction struct {
 	FinalizedAction
-	Subpath string
+	Metadata string
+	Subpath  string
+	Inputs   []string
 }
 
 // FinalizedAction has a container that's prepared to execute an action and has executed that action.
@@ -123,7 +124,12 @@ func (a *Forge) Use(
 		subpath = uses.GetActionPath()
 	}
 
-	metadata, err := actionMetadata(ctx, withAction(dag.Container(), actn), subpath)
+	rawMetadata, err := actionMetadata(ctx, actn, subpath)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := parseActionMetadata(rawMetadata)
 	if err != nil {
 		return nil, err
 	}
@@ -170,16 +176,6 @@ func (a *Forge) Use(
 		container = container.WithEnvVariable(k, v)
 	}
 
-	wkv, err := parseKeyValuePairs(with)
-	if err != nil {
-		return nil, err
-	}
-
-	container, err = withWith(container, metadata, wkv)
-	if err != nil {
-		return nil, err
-	}
-
 	container = withGitHubEnv(container)
 	container = withGitHubPath(container)
 	container = withGitHubOutput(container)
@@ -187,7 +183,11 @@ func (a *Forge) Use(
 	container = withRunnerTmp(container)
 	container = withRunnerToolcache(container)
 	container = withHome(container)
-	container = withToken(ctx, container, token)
+
+	if token != nil {
+		container = withToken(container, token)
+	}
+
 	container = withWorkspace(container, workspace)
 
 	if debug {
@@ -200,7 +200,9 @@ func (a *Forge) Use(
 				FinalizedAction: FinalizedAction{
 					Ctr: container,
 				},
-				Subpath: subpath,
+				Metadata: rawMetadata,
+				Subpath:  subpath,
+				Inputs:   with,
 			},
 		},
 	}, nil
@@ -208,7 +210,17 @@ func (a *Forge) Use(
 
 // Pre executes the pre-step of the GitHub Action in the underlying container.
 func (a *PreAction) Pre(ctx context.Context) (*Action, error) {
-	metadata, err := actionMetadata(ctx, a.Container(), a.Subpath)
+	metadata, err := parseActionMetadata(a.Metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	wkv, err := parseKeyValuePairs(a.Inputs)
+	if err != nil {
+		return nil, err
+	}
+
+	a.Ctr, err = withWith(a.Container(), metadata, wkv)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +258,7 @@ func (a *PreAction) Pre(ctx context.Context) (*Action, error) {
 
 // Main executes the main step of the GitHub Action in the underlying container.
 func (a *Action) Main(ctx context.Context) (*PostAction, error) {
-	metadata, err := actionMetadata(ctx, a.Container(), a.Subpath)
+	metadata, err := parseActionMetadata(a.Metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +301,7 @@ func (a *PreAction) Main(ctx context.Context) (*PostAction, error) {
 
 // Post executes the post-step of the GitHub Action in the underlying container.
 func (a *PostAction) Post(ctx context.Context) (*dagger.Container, error) {
-	metadata, err := actionMetadata(ctx, a.Container(), a.Subpath)
+	metadata, err := parseActionMetadata(a.Metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -338,6 +350,66 @@ func (a *Action) Post(ctx context.Context) (*dagger.Container, error) {
 	}
 
 	return post.Post(ctx)
+}
+
+func (a *PreAction) WithInput(name, value string) *PreAction {
+	a.Action = *a.Action.WithInput(name, value)
+	return a
+}
+
+func (a *PreAction) WithEnv(name, value string) *PreAction {
+	a.Action = *a.Action.WithEnv(name, value)
+	return a
+}
+
+func (a *PreAction) WithToken(token *dagger.Secret) *PreAction {
+	a.Action = *a.Action.WithToken(token)
+	return a
+}
+
+func (a *PreAction) WithDebug() *PreAction {
+	a.Action = *a.Action.WithDebug()
+	return a
+}
+
+func (a *Action) WithInput(name, value string) *Action {
+	a.PostAction = *a.PostAction.WithInput(name, value)
+	return a
+}
+
+func (a *Action) WithEnv(name, value string) *Action {
+	a.PostAction = *a.PostAction.WithEnv(name, value)
+	return a
+}
+
+func (a *Action) WithToken(token *dagger.Secret) *Action {
+	a.PostAction = *a.PostAction.WithToken(token)
+	return a
+}
+
+func (a *Action) WithDebug() *Action {
+	a.PostAction = *a.PostAction.WithDebug()
+	return a
+}
+
+func (a *PostAction) WithInput(name, value string) *PostAction {
+	a.Inputs = append(a.Inputs, fmt.Sprintf("%s=%s", name, value))
+	return a
+}
+
+func (a *PostAction) WithEnv(name, value string) *PostAction {
+	a.Ctr = a.Ctr.WithEnvVariable(name, value)
+	return a
+}
+
+func (a *PostAction) WithToken(token *dagger.Secret) *PostAction {
+	a.Ctr = withToken(a.Container(), token)
+	return a
+}
+
+func (a *PostAction) WithDebug() *PostAction {
+	a.Ctr = withDebug(a.Container())
+	return a
 }
 
 // Container gives access to the underlying container.
@@ -431,16 +503,12 @@ func withShim(ctx context.Context, container *dagger.Container) (*dagger.Contain
 	golang := dag.Container().
 		From(fmt.Sprintf("docker.io/library/golang:%s", gomod.Go.Version))
 
-	gopath, err := golang.EnvVariable(ctx, "GOPATH")
-	if err != nil {
-		return nil, err
-	}
-
-	workdir := path.Join(gopath, "src", gomod.Module.Mod.Path)
+	workdir := path.Join("$GOPATH", "src", gomod.Module.Mod.Path)
 
 	shim := golang.
 		WithEnvVariable("CGO_ENABLED", "0").
 		WithDirectory(workdir, src, dagger.ContainerWithDirectoryOpts{
+			Expand: true,
 			Include: []string{
 				"go.mod",
 				"go.sum",
@@ -459,30 +527,30 @@ func withShim(ctx context.Context, container *dagger.Container) (*dagger.Contain
 	return container.WithFile(shimPath, shim), nil
 }
 
-func actionMetadata(ctx context.Context, container *dagger.Container, subpath string) (*githubactions.Metadata, error) {
-	var (
-		errs     error
-		metadata = &githubactions.Metadata{}
-	)
-
-	dir := container.Directory(path.Join(actionPath, subpath))
+func actionMetadata(ctx context.Context, dir *dagger.Directory, subpath string) (string, error) {
+	var errs error
 
 	for _, actionYAMLFileName := range githubactions.ActionYAMLFilenames {
-		contents, err := dir.File(actionYAMLFileName).Contents(ctx)
+		contents, err := dir.File(path.Join(subpath, actionYAMLFileName)).Contents(ctx)
 		if err != nil {
 			errs = errors.Join(errs, err)
 			continue
 		}
 
-		if err := yaml.Unmarshal([]byte(contents), metadata); err != nil {
-			errs = errors.Join(errs, err)
-			continue
-		}
-
-		return metadata, nil
+		return contents, nil
 	}
 
-	return nil, fmt.Errorf("find action metadata: %w", errs)
+	return "", fmt.Errorf("find action metadata: %w", errs)
+}
+
+func parseActionMetadata(rawMetadata string) (*githubactions.Metadata, error) {
+	metadata := &githubactions.Metadata{}
+
+	if err := yaml.Unmarshal([]byte(rawMetadata), metadata); err != nil {
+		return nil, err
+	}
+
+	return metadata, nil
 }
 
 func withDebug(container *dagger.Container) *dagger.Container {
@@ -492,16 +560,8 @@ func withDebug(container *dagger.Container) *dagger.Container {
 		WithEnvVariable(githubactions.SecretRunnerDebug, fmt.Sprint(1))
 }
 
-func withToken(ctx context.Context, container *dagger.Container, secret *dagger.Secret) *dagger.Container {
-	if secret != nil {
-		token, err := secret.Plaintext(ctx)
-		if err == nil {
-			return container.
-				WithEnvVariable(githubactions.EnvVarToken, token)
-		}
-	}
-
-	return container
+func withToken(container *dagger.Container, token *dagger.Secret) *dagger.Container {
+	return container.WithSecretVariable(githubactions.EnvVarToken, token)
 }
 
 func withHome(container *dagger.Container) *dagger.Container {
@@ -666,12 +726,10 @@ func withExportedGitHubPath(ctx context.Context, container *dagger.Container) (*
 		return nil, err
 	}
 
-	oldPath, err := container.EnvVariable(ctx, "PATH")
-	if err != nil {
-		return nil, err
-	}
-
-	return container.WithEnvVariable("PATH", xos.JoinPath(newPath, oldPath)), nil
+	return container.WithEnvVariable(
+		"PATH", fmt.Sprintf("%s:$PATH", newPath),
+		dagger.ContainerWithEnvVariableOpts{Expand: true},
+	), nil
 }
 
 func gitHubState(ctx context.Context, container *dagger.Container) (map[string]string, error) {

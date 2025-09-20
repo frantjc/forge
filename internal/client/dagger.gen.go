@@ -131,11 +131,17 @@ func (e *ExecError) Unwrap() error {
 	return e.original
 }
 
+// The `AddressID` scalar type represents an identifier for an object of type Address.
+type AddressID string
+
 // The `BindingID` scalar type represents an identifier for an object of type Binding.
 type BindingID string
 
 // The `CacheVolumeID` scalar type represents an identifier for an object of type CacheVolume.
 type CacheVolumeID string
+
+// The `ChangesetID` scalar type represents an identifier for an object of type Changeset.
+type ChangesetID string
 
 // The `CloudID` scalar type represents an identifier for an object of type Cloud.
 type CloudID string
@@ -154,6 +160,9 @@ type EnumTypeDefID string
 
 // The `EnumValueTypeDefID` scalar type represents an identifier for an object of type EnumValueTypeDef.
 type EnumValueTypeDefID string
+
+// The `EnvFileID` scalar type represents an identifier for an object of type EnvFile.
+type EnvFileID string
 
 // The `EnvID` scalar type represents an identifier for an object of type Env.
 type EnvID string
@@ -333,6 +342,191 @@ type PortForward struct {
 	Protocol NetworkProtocol `json:"protocol,omitempty"`
 }
 
+// A standardized address to load containers, directories, secrets, and other object types. Address format depends on the type, and is validated at type selection.
+type Address struct {
+	query *querybuilder.Selection
+
+	id    *AddressID
+	value *string
+}
+
+func (r *Address) WithGraphQLQuery(q *querybuilder.Selection) *Address {
+	return &Address{
+		query: q,
+	}
+}
+
+// Load a container from the address.
+func (r *Address) Container() *Container {
+	q := r.query.Select("container")
+
+	return &Container{
+		query: q,
+	}
+}
+
+// AddressDirectoryOpts contains options for Address.Directory
+type AddressDirectoryOpts struct {
+	Exclude []string
+
+	Include []string
+
+	NoCache bool
+}
+
+// Load a directory from the address.
+func (r *Address) Directory(opts ...AddressDirectoryOpts) *Directory {
+	q := r.query.Select("directory")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `exclude` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Exclude) {
+			q = q.Arg("exclude", opts[i].Exclude)
+		}
+		// `include` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Include) {
+			q = q.Arg("include", opts[i].Include)
+		}
+		// `noCache` optional argument
+		if !querybuilder.IsZeroValue(opts[i].NoCache) {
+			q = q.Arg("noCache", opts[i].NoCache)
+		}
+	}
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// AddressFileOpts contains options for Address.File
+type AddressFileOpts struct {
+	Exclude []string
+
+	Include []string
+
+	NoCache bool
+}
+
+// Load a file from the address.
+func (r *Address) File(opts ...AddressFileOpts) *File {
+	q := r.query.Select("file")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `exclude` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Exclude) {
+			q = q.Arg("exclude", opts[i].Exclude)
+		}
+		// `include` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Include) {
+			q = q.Arg("include", opts[i].Include)
+		}
+		// `noCache` optional argument
+		if !querybuilder.IsZeroValue(opts[i].NoCache) {
+			q = q.Arg("noCache", opts[i].NoCache)
+		}
+	}
+
+	return &File{
+		query: q,
+	}
+}
+
+// Load a git ref (branch, tag or commit) from the address.
+func (r *Address) GitRef() *GitRef {
+	q := r.query.Select("gitRef")
+
+	return &GitRef{
+		query: q,
+	}
+}
+
+// Load a git repository from the address.
+func (r *Address) GitRepository() *GitRepository {
+	q := r.query.Select("gitRepository")
+
+	return &GitRepository{
+		query: q,
+	}
+}
+
+// A unique identifier for this Address.
+func (r *Address) ID(ctx context.Context) (AddressID, error) {
+	if r.id != nil {
+		return *r.id, nil
+	}
+	q := r.query.Select("id")
+
+	var response AddressID
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// XXX_GraphQLType is an internal function. It returns the native GraphQL type name
+func (r *Address) XXX_GraphQLType() string {
+	return "Address"
+}
+
+// XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
+func (r *Address) XXX_GraphQLIDType() string {
+	return "AddressID"
+}
+
+// XXX_GraphQLID is an internal function. It returns the underlying type ID
+func (r *Address) XXX_GraphQLID(ctx context.Context) (string, error) {
+	id, err := r.ID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func (r *Address) MarshalJSON() ([]byte, error) {
+	id, err := r.ID(marshalCtx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(id)
+}
+
+// Load a secret from the address.
+func (r *Address) Secret() *Secret {
+	q := r.query.Select("secret")
+
+	return &Secret{
+		query: q,
+	}
+}
+
+// Load a service from the address.
+func (r *Address) Service() *Service {
+	q := r.query.Select("service")
+
+	return &Service{
+		query: q,
+	}
+}
+
+// Load a local socket from the address.
+func (r *Address) Socket() *Socket {
+	q := r.query.Select("socket")
+
+	return &Socket{
+		query: q,
+	}
+}
+
+// The address value
+func (r *Address) Value(ctx context.Context) (string, error) {
+	if r.value != nil {
+		return *r.value, nil
+	}
+	q := r.query.Select("value")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
 type Binding struct {
 	query *querybuilder.Selection
 
@@ -350,11 +544,29 @@ func (r *Binding) WithGraphQLQuery(q *querybuilder.Selection) *Binding {
 	}
 }
 
+// Retrieve the binding value, as type Address
+func (r *Binding) AsAddress() *Address {
+	q := r.query.Select("asAddress")
+
+	return &Address{
+		query: q,
+	}
+}
+
 // Retrieve the binding value, as type CacheVolume
 func (r *Binding) AsCacheVolume() *CacheVolume {
 	q := r.query.Select("asCacheVolume")
 
 	return &CacheVolume{
+		query: q,
+	}
+}
+
+// Retrieve the binding value, as type Changeset
+func (r *Binding) AsChangeset() *Changeset {
+	q := r.query.Select("asChangeset")
+
+	return &Changeset{
 		query: q,
 	}
 }
@@ -391,6 +603,15 @@ func (r *Binding) AsEnv() *Env {
 	q := r.query.Select("asEnv")
 
 	return &Env{
+		query: q,
+	}
+}
+
+// Retrieve the binding value, as type EnvFile
+func (r *Binding) AsEnvFile() *EnvFile {
+	q := r.query.Select("asEnvFile")
+
+	return &EnvFile{
 		query: q,
 	}
 }
@@ -749,6 +970,154 @@ func (r *CacheVolume) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return json.Marshal(id)
+}
+
+// A comparison between two directories representing changes that can be applied.
+type Changeset struct {
+	query *querybuilder.Selection
+
+	export *string
+	id     *ChangesetID
+	sync   *ChangesetID
+}
+
+func (r *Changeset) WithGraphQLQuery(q *querybuilder.Selection) *Changeset {
+	return &Changeset{
+		query: q,
+	}
+}
+
+// Files and directories that were added in the newer directory.
+func (r *Changeset) AddedPaths(ctx context.Context) ([]string, error) {
+	q := r.query.Select("addedPaths")
+
+	var response []string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// The newer/upper snapshot.
+func (r *Changeset) After() *Directory {
+	q := r.query.Select("after")
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Return a Git-compatible patch of the changes
+func (r *Changeset) AsPatch() *File {
+	q := r.query.Select("asPatch")
+
+	return &File{
+		query: q,
+	}
+}
+
+// The older/lower snapshot to compare against.
+func (r *Changeset) Before() *Directory {
+	q := r.query.Select("before")
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Applies the diff represented by this changeset to a path on the host.
+func (r *Changeset) Export(ctx context.Context, path string) (string, error) {
+	if r.export != nil {
+		return *r.export, nil
+	}
+	q := r.query.Select("export")
+	q = q.Arg("path", path)
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// A unique identifier for this Changeset.
+func (r *Changeset) ID(ctx context.Context) (ChangesetID, error) {
+	if r.id != nil {
+		return *r.id, nil
+	}
+	q := r.query.Select("id")
+
+	var response ChangesetID
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// XXX_GraphQLType is an internal function. It returns the native GraphQL type name
+func (r *Changeset) XXX_GraphQLType() string {
+	return "Changeset"
+}
+
+// XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
+func (r *Changeset) XXX_GraphQLIDType() string {
+	return "ChangesetID"
+}
+
+// XXX_GraphQLID is an internal function. It returns the underlying type ID
+func (r *Changeset) XXX_GraphQLID(ctx context.Context) (string, error) {
+	id, err := r.ID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func (r *Changeset) MarshalJSON() ([]byte, error) {
+	id, err := r.ID(marshalCtx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(id)
+}
+
+// Return a snapshot containing only the created and modified files
+func (r *Changeset) Layer() *Directory {
+	q := r.query.Select("layer")
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Files and directories that existed before and were updated in the newer directory.
+func (r *Changeset) ModifiedPaths(ctx context.Context) ([]string, error) {
+	q := r.query.Select("modifiedPaths")
+
+	var response []string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Files and directories that were removed. Directories are indicated by a trailing slash, and their child paths are not included.
+func (r *Changeset) RemovedPaths(ctx context.Context) ([]string, error) {
+	q := r.query.Select("removedPaths")
+
+	var response []string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Force evaluation in the engine.
+func (r *Changeset) Sync(ctx context.Context) (*Changeset, error) {
+	q := r.query.Select("sync")
+
+	var id ChangesetID
+	if err := q.Bind(&id).Execute(ctx); err != nil {
+		return nil, err
+	}
+	return &Changeset{
+		query: q.Root().Select("loadChangesetFromID").Arg("id", id),
+	}, nil
 }
 
 // Dagger Cloud configuration and state
@@ -2820,6 +3189,7 @@ type Directory struct {
 	digest *string
 	exists *bool
 	export *string
+	findUp *string
 	id     *DirectoryID
 	name   *string
 	sync   *DirectoryID
@@ -2894,6 +3264,30 @@ func (r *Directory) AsModuleSource(opts ...DirectoryAsModuleSourceOpts) *ModuleS
 	}
 
 	return &ModuleSource{
+		query: q,
+	}
+}
+
+// Return the difference between this directory and another directory, typically an older snapshot.
+//
+// The difference is encoded as a changeset, which also tracks removed files, and can be applied to other directories.
+func (r *Directory) Changes(from *Directory) *Changeset {
+	assertNotNil("from", from)
+	q := r.query.Select("changes")
+	q = q.Arg("from", from)
+
+	return &Changeset{
+		query: q,
+	}
+}
+
+// Change the owner of the directory contents recursively.
+func (r *Directory) Chown(path string, owner string) *Directory {
+	q := r.query.Select("chown")
+	q = q.Arg("path", path)
+	q = q.Arg("owner", owner)
+
+	return &Directory{
 		query: q,
 	}
 }
@@ -3104,6 +3498,21 @@ func (r *Directory) Filter(opts ...DirectoryFilterOpts) *Directory {
 	return &Directory{
 		query: q,
 	}
+}
+
+// Search up the directory tree for a file or directory, and return its path. If no match, return null
+func (r *Directory) FindUp(ctx context.Context, name string, start string) (string, error) {
+	if r.findUp != nil {
+		return *r.findUp, nil
+	}
+	q := r.query.Select("findUp")
+	q = q.Arg("name", name)
+	q = q.Arg("start", start)
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
 }
 
 // Returns a list of files and directories that matche the given pattern.
@@ -3324,12 +3733,29 @@ func (r *Directory) Terminal(opts ...DirectoryTerminalOpts) *Directory {
 	}
 }
 
+// Return a directory with changes from another directory applied to it.
+func (r *Directory) WithChanges(changes *Changeset) *Directory {
+	assertNotNil("changes", changes)
+	q := r.query.Select("withChanges")
+	q = q.Arg("changes", changes)
+
+	return &Directory{
+		query: q,
+	}
+}
+
 // DirectoryWithDirectoryOpts contains options for Directory.WithDirectory
 type DirectoryWithDirectoryOpts struct {
 	// Exclude artifacts that match the given pattern (e.g., ["node_modules/", ".git*"]).
 	Exclude []string
 	// Include only artifacts that match the given pattern (e.g., ["app/", "package.*"]).
 	Include []string
+	// A user:group to set for the copied directory and its contents.
+	//
+	// The user and group must be an ID (1000:1000), not a name (foo:bar).
+	//
+	// If the group is omitted, it defaults to the same as the user.
+	Owner string
 }
 
 // Return a snapshot with a directory added
@@ -3345,6 +3771,10 @@ func (r *Directory) WithDirectory(path string, directory *Directory, opts ...Dir
 		if !querybuilder.IsZeroValue(opts[i].Include) {
 			q = q.Arg("include", opts[i].Include)
 		}
+		// `owner` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Owner) {
+			q = q.Arg("owner", opts[i].Owner)
+		}
 	}
 	q = q.Arg("path", path)
 	q = q.Arg("directory", directory)
@@ -3358,6 +3788,12 @@ func (r *Directory) WithDirectory(path string, directory *Directory, opts ...Dir
 type DirectoryWithFileOpts struct {
 	// Permission given to the copied file (e.g., 0600).
 	Permissions int
+	// A user:group to set for the copied directory and its contents.
+	//
+	// The user and group must be an ID (1000:1000), not a name (foo:bar).
+	//
+	// If the group is omitted, it defaults to the same as the user.
+	Owner string
 }
 
 // Retrieves this directory plus the contents of the given file copied to the given path.
@@ -3368,6 +3804,10 @@ func (r *Directory) WithFile(path string, source *File, opts ...DirectoryWithFil
 		// `permissions` optional argument
 		if !querybuilder.IsZeroValue(opts[i].Permissions) {
 			q = q.Arg("permissions", opts[i].Permissions)
+		}
+		// `owner` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Owner) {
+			q = q.Arg("owner", opts[i].Owner)
 		}
 	}
 	q = q.Arg("path", path)
@@ -3455,6 +3895,19 @@ func (r *Directory) WithNewFile(path string, contents string, opts ...DirectoryW
 // Experimental: This API is highly experimental and may be removed or replaced entirely.
 func (r *Directory) WithPatch(patch string) *Directory {
 	q := r.query.Select("withPatch")
+	q = q.Arg("patch", patch)
+
+	return &Directory{
+		query: q,
+	}
+}
+
+// Retrieves this directory with the given Git-compatible patch file applied.
+//
+// Experimental: This API is highly experimental and may be removed or replaced entirely.
+func (r *Directory) WithPatchFile(patch *File) *Directory {
+	assertNotNil("patch", patch)
+	q := r.query.Select("withPatchFile")
 	q = q.Arg("patch", patch)
 
 	return &Directory{
@@ -3933,6 +4386,30 @@ func (r *Env) Outputs(ctx context.Context) ([]Binding, error) {
 	return convert(response), nil
 }
 
+// Create or update a binding of type Address in the environment
+func (r *Env) WithAddressInput(name string, value *Address, description string) *Env {
+	assertNotNil("value", value)
+	q := r.query.Select("withAddressInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Declare a desired Address output to be assigned in the environment
+func (r *Env) WithAddressOutput(name string, description string) *Env {
+	q := r.query.Select("withAddressOutput")
+	q = q.Arg("name", name)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
 // Create or update a binding of type CacheVolume in the environment
 func (r *Env) WithCacheVolumeInput(name string, value *CacheVolume, description string) *Env {
 	assertNotNil("value", value)
@@ -3949,6 +4426,30 @@ func (r *Env) WithCacheVolumeInput(name string, value *CacheVolume, description 
 // Declare a desired CacheVolume output to be assigned in the environment
 func (r *Env) WithCacheVolumeOutput(name string, description string) *Env {
 	q := r.query.Select("withCacheVolumeOutput")
+	q = q.Arg("name", name)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Create or update a binding of type Changeset in the environment
+func (r *Env) WithChangesetInput(name string, value *Changeset, description string) *Env {
+	assertNotNil("value", value)
+	q := r.query.Select("withChangesetInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Declare a desired Changeset output to be assigned in the environment
+func (r *Env) WithChangesetOutput(name string, description string) *Env {
+	q := r.query.Select("withChangesetOutput")
 	q = q.Arg("name", name)
 	q = q.Arg("description", description)
 
@@ -4021,6 +4522,30 @@ func (r *Env) WithDirectoryInput(name string, value *Directory, description stri
 // Declare a desired Directory output to be assigned in the environment
 func (r *Env) WithDirectoryOutput(name string, description string) *Env {
 	q := r.query.Select("withDirectoryOutput")
+	q = q.Arg("name", name)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Create or update a binding of type EnvFile in the environment
+func (r *Env) WithEnvFileInput(name string, value *EnvFile, description string) *Env {
+	assertNotNil("value", value)
+	q := r.query.Select("withEnvFileInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+	q = q.Arg("description", description)
+
+	return &Env{
+		query: q,
+	}
+}
+
+// Declare a desired EnvFile output to be assigned in the environment
+func (r *Env) WithEnvFileOutput(name string, description string) *Env {
+	q := r.query.Select("withEnvFileOutput")
 	q = q.Arg("name", name)
 	q = q.Arg("description", description)
 
@@ -4604,6 +5129,160 @@ func (r *Env) WithStringOutput(name string, description string) *Env {
 	}
 }
 
+// A collection of environment variables.
+type EnvFile struct {
+	query *querybuilder.Selection
+
+	exists *bool
+	get    *string
+	id     *EnvFileID
+}
+type WithEnvFileFunc func(r *EnvFile) *EnvFile
+
+// With calls the provided function with current EnvFile.
+//
+// This is useful for reusability and readability by not breaking the calling chain.
+func (r *EnvFile) With(f WithEnvFileFunc) *EnvFile {
+	return f(r)
+}
+
+func (r *EnvFile) WithGraphQLQuery(q *querybuilder.Selection) *EnvFile {
+	return &EnvFile{
+		query: q,
+	}
+}
+
+// Return as a file
+func (r *EnvFile) AsFile() *File {
+	q := r.query.Select("asFile")
+
+	return &File{
+		query: q,
+	}
+}
+
+// Check if a variable exists
+func (r *EnvFile) Exists(ctx context.Context, name string) (bool, error) {
+	if r.exists != nil {
+		return *r.exists, nil
+	}
+	q := r.query.Select("exists")
+	q = q.Arg("name", name)
+
+	var response bool
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Lookup a variable (last occurrence wins) and return its value, or an empty string
+func (r *EnvFile) Get(ctx context.Context, name string) (string, error) {
+	if r.get != nil {
+		return *r.get, nil
+	}
+	q := r.query.Select("get")
+	q = q.Arg("name", name)
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// A unique identifier for this EnvFile.
+func (r *EnvFile) ID(ctx context.Context) (EnvFileID, error) {
+	if r.id != nil {
+		return *r.id, nil
+	}
+	q := r.query.Select("id")
+
+	var response EnvFileID
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// XXX_GraphQLType is an internal function. It returns the native GraphQL type name
+func (r *EnvFile) XXX_GraphQLType() string {
+	return "EnvFile"
+}
+
+// XXX_GraphQLIDType is an internal function. It returns the native GraphQL type name for the ID of this object
+func (r *EnvFile) XXX_GraphQLIDType() string {
+	return "EnvFileID"
+}
+
+// XXX_GraphQLID is an internal function. It returns the underlying type ID
+func (r *EnvFile) XXX_GraphQLID(ctx context.Context) (string, error) {
+	id, err := r.ID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+func (r *EnvFile) MarshalJSON() ([]byte, error) {
+	id, err := r.ID(marshalCtx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(id)
+}
+
+// Return all variables
+func (r *EnvFile) Variables(ctx context.Context) ([]EnvVariable, error) {
+	q := r.query.Select("variables")
+
+	q = q.Select("id")
+
+	type variables struct {
+		Id EnvVariableID
+	}
+
+	convert := func(fields []variables) []EnvVariable {
+		out := []EnvVariable{}
+
+		for i := range fields {
+			val := EnvVariable{id: &fields[i].Id}
+			val.query = q.Root().Select("loadEnvVariableFromID").Arg("id", fields[i].Id)
+			out = append(out, val)
+		}
+
+		return out
+	}
+	var response []variables
+
+	q = q.Bind(&response)
+
+	err := q.Execute(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return convert(response), nil
+}
+
+// Add a variable
+func (r *EnvFile) WithVariable(name string, value string) *EnvFile {
+	q := r.query.Select("withVariable")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &EnvFile{
+		query: q,
+	}
+}
+
+// Remove all occurrences of the named variable
+func (r *EnvFile) WithoutVariable(name string) *EnvFile {
+	q := r.query.Select("withoutVariable")
+	q = q.Arg("name", name)
+
+	return &EnvFile{
+		query: q,
+	}
+}
+
 // An environment variable name and value.
 type EnvVariable struct {
 	query *querybuilder.Selection
@@ -5011,6 +5690,37 @@ func (r *File) WithGraphQLQuery(q *querybuilder.Selection) *File {
 	}
 }
 
+// FileAsEnvFileOpts contains options for File.AsEnvFile
+type FileAsEnvFileOpts struct {
+	// Replace "${VAR}" or "$VAR" with the value of other vars
+	Expand bool
+}
+
+// Parse as an env file
+func (r *File) AsEnvFile(opts ...FileAsEnvFileOpts) *EnvFile {
+	q := r.query.Select("asEnvFile")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `expand` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Expand) {
+			q = q.Arg("expand", opts[i].Expand)
+		}
+	}
+
+	return &EnvFile{
+		query: q,
+	}
+}
+
+// Change the owner of the file recursively.
+func (r *File) Chown(owner string) *File {
+	q := r.query.Select("chown")
+	q = q.Arg("owner", owner)
+
+	return &File{
+		query: q,
+	}
+}
+
 // FileContentsOpts contains options for File.Contents
 type FileContentsOpts struct {
 	// Start reading after this line
@@ -5332,7 +6042,7 @@ func (r *File) WithTimestamps(timestamp int) *File {
 }
 
 // Forge is the struct that methods are defined on for forge's Dagger module.
-type Forge struct { // forge (../../use.go:57:6)
+type Forge struct { // forge (../../use.go:56:6)
 	query *querybuilder.Selection
 
 	id *ForgeID
@@ -5480,21 +6190,21 @@ func (r *Forge) Resource(resource string, opts ...ForgeResourceOpts) *ForgeResou
 
 // ForgeUseOpts contains options for Forge.Use
 type ForgeUseOpts struct {
-	Repo *Directory // forge (../../use.go:101:2)
+	Repo *Directory // forge (../../use.go:102:2)
 
-	Workspace *Directory // forge (../../use.go:103:2)
+	Workspace *Directory // forge (../../use.go:104:2)
 
-	With []string // forge (../../use.go:105:2)
+	With []string // forge (../../use.go:106:2)
 
-	Env []string // forge (../../use.go:107:2)
+	Env []string // forge (../../use.go:108:2)
 
-	Debug bool // forge (../../use.go:109:2)
+	Debug bool // forge (../../use.go:110:2)
 
-	Token *Secret // forge (../../use.go:111:2)
+	Token *Secret // forge (../../use.go:112:2)
 }
 
 // Use creates a container to execute a GitHub Action in.
-func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // forge (../../use.go:97:1)
+func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // forge (../../use.go:98:1)
 	q := r.query.Select("use")
 	for i := len(opts) - 1; i >= 0; i-- {
 		// `repo` optional argument
@@ -5531,7 +6241,7 @@ func (r *Forge) Use(action string, opts ...ForgeUseOpts) *ForgePreAction { // fo
 
 // Action has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the main step.
-type ForgeAction struct { // forge (../../use.go:80:6)
+type ForgeAction struct { // forge (../../use.go:79:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -5542,6 +6252,14 @@ type ForgeAction struct { // forge (../../use.go:80:6)
 	stderr         *string
 	stdout         *string
 }
+type WithForgeActionFunc func(r *ForgeAction) *ForgeAction
+
+// With calls the provided function with current ForgeAction.
+//
+// This is useful for reusability and readability by not breaking the calling chain.
+func (r *ForgeAction) With(f WithForgeActionFunc) *ForgeAction {
+	return f(r)
+}
 
 func (r *ForgeAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgeAction {
 	return &ForgeAction{
@@ -5550,7 +6268,7 @@ func (r *ForgeAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgeAction {
 }
 
 // Action returns the current state of the GITHUB_ACTION_PATH directory.
-func (r *ForgeAction) Action() *Directory { // forge (../../use.go:372:1)
+func (r *ForgeAction) Action() *Directory { // forge (../../use.go:451:1)
 	q := r.query.Select("action")
 
 	return &Directory{
@@ -5559,7 +6277,7 @@ func (r *ForgeAction) Action() *Directory { // forge (../../use.go:372:1)
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:357:1)
+func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:436:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5572,7 +6290,7 @@ func (r *ForgeAction) CombinedOutput(ctx context.Context) (string, error) { // f
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeAction) Container() *Container { // forge (../../use.go:337:1)
+func (r *ForgeAction) Container() *Container { // forge (../../use.go:416:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5581,7 +6299,7 @@ func (r *ForgeAction) Container() *Container { // forge (../../use.go:337:1)
 }
 
 // Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
-func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:382:1)
+func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:461:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -5594,7 +6312,7 @@ func (r *ForgeAction) Env(ctx context.Context) (string, error) { // forge (../..
 }
 
 // Home returns the current state of the HOME directory.
-func (r *ForgeAction) Home() *Directory { // forge (../../use.go:377:1)
+func (r *ForgeAction) Home() *Directory { // forge (../../use.go:456:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -5643,7 +6361,7 @@ func (r *ForgeAction) MarshalJSON() ([]byte, error) {
 }
 
 // Main executes the main step of the GitHub Action in the underlying container.
-func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:246:1)
+func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:260:1)
 	q := r.query.Select("main")
 
 	return &ForgePostAction{
@@ -5652,7 +6370,7 @@ func (r *ForgeAction) Main() *ForgePostAction { // forge (../../use.go:246:1)
 }
 
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
-func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:402:1)
+func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:481:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -5665,7 +6383,7 @@ func (r *ForgeAction) Output(ctx context.Context) (string, error) { // forge (..
 }
 
 // Post executes the main and post-steps of the GitHub Action in the underlying container.
-func (r *ForgeAction) Post() *Container { // forge (../../use.go:327:1)
+func (r *ForgeAction) Post() *Container { // forge (../../use.go:346:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -5673,7 +6391,7 @@ func (r *ForgeAction) Post() *Container { // forge (../../use.go:327:1)
 	}
 }
 
-func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:81:2)
+func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:80:2)
 	q := r.query.Select("postAction")
 
 	return &ForgePostAction{
@@ -5682,7 +6400,7 @@ func (r *ForgeAction) PostAction() *ForgePostAction { // forge (../../use.go:81:
 }
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
-func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../../use.go:392:1)
+func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../../use.go:471:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -5695,7 +6413,7 @@ func (r *ForgeAction) State(ctx context.Context) (string, error) { // forge (../
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:352:1)
+func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:431:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -5708,7 +6426,7 @@ func (r *ForgeAction) Stderr(ctx context.Context) (string, error) { // forge (..
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:347:1)
+func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:426:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -5721,7 +6439,7 @@ func (r *ForgeAction) Stdout(ctx context.Context) (string, error) { // forge (..
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:342:1)
+func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:421:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -5730,7 +6448,7 @@ func (r *ForgeAction) Terminal() *Container { // forge (../../use.go:342:1)
 }
 
 // Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
-func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:367:1)
+func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:446:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -5738,8 +6456,46 @@ func (r *ForgeAction) Toolcache() *Directory { // forge (../../use.go:367:1)
 	}
 }
 
+func (r *ForgeAction) WithDebug() *ForgeAction { // forge (../../use.go:390:1)
+	q := r.query.Select("withDebug")
+
+	return &ForgeAction{
+		query: q,
+	}
+}
+
+func (r *ForgeAction) WithEnv(name string, value string) *ForgeAction { // forge (../../use.go:380:1)
+	q := r.query.Select("withEnv")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgeAction{
+		query: q,
+	}
+}
+
+func (r *ForgeAction) WithInput(name string, value string) *ForgeAction { // forge (../../use.go:375:1)
+	q := r.query.Select("withInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgeAction{
+		query: q,
+	}
+}
+
+func (r *ForgeAction) WithToken(token *Secret) *ForgeAction { // forge (../../use.go:385:1)
+	assertNotNil("token", token)
+	q := r.query.Select("withToken")
+	q = q.Arg("token", token)
+
+	return &ForgeAction{
+		query: q,
+	}
+}
+
 // Workspace returns the current state of the GITHUB_WORKSPACE directory.
-func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:362:1)
+func (r *ForgeAction) Workspace() *Directory { // forge (../../use.go:441:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -5895,7 +6651,7 @@ func (r *ForgeCloudbuild) Workspace() *Directory { // forge (../../cloudbuild.go
 }
 
 // FinalizedAction has a container that's prepared to execute an action and has executed that action.
-type ForgeFinalizedAction struct { // forge (../../use.go:92:6)
+type ForgeFinalizedAction struct { // forge (../../use.go:93:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -5914,7 +6670,7 @@ func (r *ForgeFinalizedAction) WithGraphQLQuery(q *querybuilder.Selection) *Forg
 }
 
 // Action returns the current state of the GITHUB_ACTION_PATH directory.
-func (r *ForgeFinalizedAction) Action() *Directory { // forge (../../use.go:372:1)
+func (r *ForgeFinalizedAction) Action() *Directory { // forge (../../use.go:451:1)
 	q := r.query.Select("action")
 
 	return &Directory{
@@ -5923,7 +6679,7 @@ func (r *ForgeFinalizedAction) Action() *Directory { // forge (../../use.go:372:
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgeFinalizedAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:357:1)
+func (r *ForgeFinalizedAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:436:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -5936,7 +6692,7 @@ func (r *ForgeFinalizedAction) CombinedOutput(ctx context.Context) (string, erro
 }
 
 // Container gives access to the underlying container.
-func (r *ForgeFinalizedAction) Container() *Container { // forge (../../use.go:337:1)
+func (r *ForgeFinalizedAction) Container() *Container { // forge (../../use.go:416:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -5944,7 +6700,7 @@ func (r *ForgeFinalizedAction) Container() *Container { // forge (../../use.go:3
 	}
 }
 
-func (r *ForgeFinalizedAction) Ctr() *Container { // forge (../../use.go:93:2)
+func (r *ForgeFinalizedAction) Ctr() *Container { // forge (../../use.go:94:2)
 	q := r.query.Select("ctr")
 
 	return &Container{
@@ -5953,7 +6709,7 @@ func (r *ForgeFinalizedAction) Ctr() *Container { // forge (../../use.go:93:2)
 }
 
 // Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
-func (r *ForgeFinalizedAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:382:1)
+func (r *ForgeFinalizedAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:461:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -5966,7 +6722,7 @@ func (r *ForgeFinalizedAction) Env(ctx context.Context) (string, error) { // for
 }
 
 // Home returns the current state of the HOME directory.
-func (r *ForgeFinalizedAction) Home() *Directory { // forge (../../use.go:377:1)
+func (r *ForgeFinalizedAction) Home() *Directory { // forge (../../use.go:456:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -6015,7 +6771,7 @@ func (r *ForgeFinalizedAction) MarshalJSON() ([]byte, error) {
 }
 
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
-func (r *ForgeFinalizedAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:402:1)
+func (r *ForgeFinalizedAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:481:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -6028,7 +6784,7 @@ func (r *ForgeFinalizedAction) Output(ctx context.Context) (string, error) { // 
 }
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
-func (r *ForgeFinalizedAction) State(ctx context.Context) (string, error) { // forge (../../use.go:392:1)
+func (r *ForgeFinalizedAction) State(ctx context.Context) (string, error) { // forge (../../use.go:471:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -6041,7 +6797,7 @@ func (r *ForgeFinalizedAction) State(ctx context.Context) (string, error) { // f
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgeFinalizedAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:352:1)
+func (r *ForgeFinalizedAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:431:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -6054,7 +6810,7 @@ func (r *ForgeFinalizedAction) Stderr(ctx context.Context) (string, error) { // 
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgeFinalizedAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:347:1)
+func (r *ForgeFinalizedAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:426:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -6067,7 +6823,7 @@ func (r *ForgeFinalizedAction) Stdout(ctx context.Context) (string, error) { // 
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgeFinalizedAction) Terminal() *Container { // forge (../../use.go:342:1)
+func (r *ForgeFinalizedAction) Terminal() *Container { // forge (../../use.go:421:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -6076,7 +6832,7 @@ func (r *ForgeFinalizedAction) Terminal() *Container { // forge (../../use.go:34
 }
 
 // Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
-func (r *ForgeFinalizedAction) Toolcache() *Directory { // forge (../../use.go:367:1)
+func (r *ForgeFinalizedAction) Toolcache() *Directory { // forge (../../use.go:446:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -6085,7 +6841,7 @@ func (r *ForgeFinalizedAction) Toolcache() *Directory { // forge (../../use.go:3
 }
 
 // Workspace returns the current state of the GITHUB_WORKSPACE directory.
-func (r *ForgeFinalizedAction) Workspace() *Directory { // forge (../../use.go:362:1)
+func (r *ForgeFinalizedAction) Workspace() *Directory { // forge (../../use.go:441:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -6332,17 +7088,26 @@ func (r *ForgeFinalizedResource) Workdir() *Directory { // forge (../../resource
 
 // PostAction has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the post-step.
-type ForgePostAction struct { // forge (../../use.go:86:6)
+type ForgePostAction struct { // forge (../../use.go:85:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
 	env            *string
 	id             *ForgePostActionID
+	metadata       *string
 	output         *string
 	state          *string
 	stderr         *string
 	stdout         *string
 	subpath        *string
+}
+type WithForgePostActionFunc func(r *ForgePostAction) *ForgePostAction
+
+// With calls the provided function with current ForgePostAction.
+//
+// This is useful for reusability and readability by not breaking the calling chain.
+func (r *ForgePostAction) With(f WithForgePostActionFunc) *ForgePostAction {
+	return f(r)
 }
 
 func (r *ForgePostAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePostAction {
@@ -6352,7 +7117,7 @@ func (r *ForgePostAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePost
 }
 
 // Action returns the current state of the GITHUB_ACTION_PATH directory.
-func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:372:1)
+func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:451:1)
 	q := r.query.Select("action")
 
 	return &Directory{
@@ -6361,7 +7126,7 @@ func (r *ForgePostAction) Action() *Directory { // forge (../../use.go:372:1)
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:357:1)
+func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:436:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -6374,7 +7139,7 @@ func (r *ForgePostAction) CombinedOutput(ctx context.Context) (string, error) { 
 }
 
 // Container gives access to the underlying container.
-func (r *ForgePostAction) Container() *Container { // forge (../../use.go:337:1)
+func (r *ForgePostAction) Container() *Container { // forge (../../use.go:416:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -6383,7 +7148,7 @@ func (r *ForgePostAction) Container() *Container { // forge (../../use.go:337:1)
 }
 
 // Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
-func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:382:1)
+func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:461:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -6395,7 +7160,7 @@ func (r *ForgePostAction) Env(ctx context.Context) (string, error) { // forge (.
 	return response, q.Execute(ctx)
 }
 
-func (r *ForgePostAction) FinalizedAction() *ForgeFinalizedAction { // forge (../../use.go:87:2)
+func (r *ForgePostAction) FinalizedAction() *ForgeFinalizedAction { // forge (../../use.go:86:2)
 	q := r.query.Select("finalizedAction")
 
 	return &ForgeFinalizedAction{
@@ -6404,7 +7169,7 @@ func (r *ForgePostAction) FinalizedAction() *ForgeFinalizedAction { // forge (..
 }
 
 // Home returns the current state of the HOME directory.
-func (r *ForgePostAction) Home() *Directory { // forge (../../use.go:377:1)
+func (r *ForgePostAction) Home() *Directory { // forge (../../use.go:456:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -6452,8 +7217,29 @@ func (r *ForgePostAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(id)
 }
 
+func (r *ForgePostAction) Inputs(ctx context.Context) ([]string, error) { // forge (../../use.go:89:2)
+	q := r.query.Select("inputs")
+
+	var response []string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+func (r *ForgePostAction) Metadata(ctx context.Context) (string, error) { // forge (../../use.go:87:2)
+	if r.metadata != nil {
+		return *r.metadata, nil
+	}
+	q := r.query.Select("metadata")
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
-func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:402:1)
+func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:481:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -6466,7 +7252,7 @@ func (r *ForgePostAction) Output(ctx context.Context) (string, error) { // forge
 }
 
 // Post executes the post-step of the GitHub Action in the underlying container.
-func (r *ForgePostAction) Post() *Container { // forge (../../use.go:284:1)
+func (r *ForgePostAction) Post() *Container { // forge (../../use.go:303:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -6475,7 +7261,7 @@ func (r *ForgePostAction) Post() *Container { // forge (../../use.go:284:1)
 }
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
-func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge (../../use.go:392:1)
+func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge (../../use.go:471:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -6488,7 +7274,7 @@ func (r *ForgePostAction) State(ctx context.Context) (string, error) { // forge 
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:352:1)
+func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:431:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -6501,7 +7287,7 @@ func (r *ForgePostAction) Stderr(ctx context.Context) (string, error) { // forge
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgePostAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:347:1)
+func (r *ForgePostAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:426:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -6526,7 +7312,7 @@ func (r *ForgePostAction) Subpath(ctx context.Context) (string, error) { // forg
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:342:1)
+func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:421:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -6535,7 +7321,7 @@ func (r *ForgePostAction) Terminal() *Container { // forge (../../use.go:342:1)
 }
 
 // Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
-func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:367:1)
+func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:446:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -6543,8 +7329,46 @@ func (r *ForgePostAction) Toolcache() *Directory { // forge (../../use.go:367:1)
 	}
 }
 
+func (r *ForgePostAction) WithDebug() *ForgePostAction { // forge (../../use.go:410:1)
+	q := r.query.Select("withDebug")
+
+	return &ForgePostAction{
+		query: q,
+	}
+}
+
+func (r *ForgePostAction) WithEnv(name string, value string) *ForgePostAction { // forge (../../use.go:400:1)
+	q := r.query.Select("withEnv")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgePostAction{
+		query: q,
+	}
+}
+
+func (r *ForgePostAction) WithInput(name string, value string) *ForgePostAction { // forge (../../use.go:395:1)
+	q := r.query.Select("withInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgePostAction{
+		query: q,
+	}
+}
+
+func (r *ForgePostAction) WithToken(token *Secret) *ForgePostAction { // forge (../../use.go:405:1)
+	assertNotNil("token", token)
+	q := r.query.Select("withToken")
+	q = q.Arg("token", token)
+
+	return &ForgePostAction{
+		query: q,
+	}
+}
+
 // Workspace returns the current state of the GITHUB_WORKSPACE directory.
-func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:362:1)
+func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:441:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -6554,7 +7378,7 @@ func (r *ForgePostAction) Workspace() *Directory { // forge (../../use.go:362:1)
 
 // PreAction has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the pre-step.
-type ForgePreAction struct { // forge (../../use.go:74:6)
+type ForgePreAction struct { // forge (../../use.go:73:6)
 	query *querybuilder.Selection
 
 	combinedOutput *string
@@ -6565,6 +7389,14 @@ type ForgePreAction struct { // forge (../../use.go:74:6)
 	stderr         *string
 	stdout         *string
 }
+type WithForgePreActionFunc func(r *ForgePreAction) *ForgePreAction
+
+// With calls the provided function with current ForgePreAction.
+//
+// This is useful for reusability and readability by not breaking the calling chain.
+func (r *ForgePreAction) With(f WithForgePreActionFunc) *ForgePreAction {
+	return f(r)
+}
 
 func (r *ForgePreAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePreAction {
 	return &ForgePreAction{
@@ -6572,7 +7404,7 @@ func (r *ForgePreAction) WithGraphQLQuery(q *querybuilder.Selection) *ForgePreAc
 	}
 }
 
-func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:75:2)
+func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:74:2)
 	q := r.query.Select("action")
 
 	return &ForgeAction{
@@ -6581,7 +7413,7 @@ func (r *ForgePreAction) Action() *ForgeAction { // forge (../../use.go:75:2)
 }
 
 // CombinedOutput is a convenient alias for Container().CombinedOutput().
-func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:357:1)
+func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { // forge (../../use.go:436:1)
 	if r.combinedOutput != nil {
 		return *r.combinedOutput, nil
 	}
@@ -6594,7 +7426,7 @@ func (r *ForgePreAction) CombinedOutput(ctx context.Context) (string, error) { /
 }
 
 // Container gives access to the underlying container.
-func (r *ForgePreAction) Container() *Container { // forge (../../use.go:337:1)
+func (r *ForgePreAction) Container() *Container { // forge (../../use.go:416:1)
 	q := r.query.Select("container")
 
 	return &Container{
@@ -6603,7 +7435,7 @@ func (r *ForgePreAction) Container() *Container { // forge (../../use.go:337:1)
 }
 
 // Env returns the parsed key-value pairs that were saved to GITHUB_ENV.
-func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:382:1)
+func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (../../use.go:461:1)
 	if r.env != nil {
 		return *r.env, nil
 	}
@@ -6616,7 +7448,7 @@ func (r *ForgePreAction) Env(ctx context.Context) (string, error) { // forge (..
 }
 
 // Home returns the current state of the HOME directory.
-func (r *ForgePreAction) Home() *Directory { // forge (../../use.go:377:1)
+func (r *ForgePreAction) Home() *Directory { // forge (../../use.go:456:1)
 	q := r.query.Select("home")
 
 	return &Directory{
@@ -6665,7 +7497,7 @@ func (r *ForgePreAction) MarshalJSON() ([]byte, error) {
 }
 
 // Main executes the pre- and main steps of the GitHub Action in the underlying container.
-func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:274:1)
+func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:293:1)
 	q := r.query.Select("main")
 
 	return &ForgePostAction{
@@ -6674,7 +7506,7 @@ func (r *ForgePreAction) Main() *ForgePostAction { // forge (../../use.go:274:1)
 }
 
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
-func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:402:1)
+func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge (../../use.go:481:1)
 	if r.output != nil {
 		return *r.output, nil
 	}
@@ -6687,7 +7519,7 @@ func (r *ForgePreAction) Output(ctx context.Context) (string, error) { // forge 
 }
 
 // Post executes the pre-, main and post-steps of the GitHub Action in the underlying container.
-func (r *ForgePreAction) Post() *Container { // forge (../../use.go:317:1)
+func (r *ForgePreAction) Post() *Container { // forge (../../use.go:336:1)
 	q := r.query.Select("post")
 
 	return &Container{
@@ -6696,7 +7528,7 @@ func (r *ForgePreAction) Post() *Container { // forge (../../use.go:317:1)
 }
 
 // Pre executes the pre-step of the GitHub Action in the underlying container.
-func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:208:1)
+func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:212:1)
 	q := r.query.Select("pre")
 
 	return &ForgeAction{
@@ -6705,7 +7537,7 @@ func (r *ForgePreAction) Pre() *ForgeAction { // forge (../../use.go:208:1)
 }
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
-func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (../../use.go:392:1)
+func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (../../use.go:471:1)
 	if r.state != nil {
 		return *r.state, nil
 	}
@@ -6718,7 +7550,7 @@ func (r *ForgePreAction) State(ctx context.Context) (string, error) { // forge (
 }
 
 // Stderr is a convenient alias for Container().Stderr().
-func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:352:1)
+func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge (../../use.go:431:1)
 	if r.stderr != nil {
 		return *r.stderr, nil
 	}
@@ -6731,7 +7563,7 @@ func (r *ForgePreAction) Stderr(ctx context.Context) (string, error) { // forge 
 }
 
 // Stdout is a convenient alias for Container().Stdout().
-func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:347:1)
+func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge (../../use.go:426:1)
 	if r.stdout != nil {
 		return *r.stdout, nil
 	}
@@ -6744,7 +7576,7 @@ func (r *ForgePreAction) Stdout(ctx context.Context) (string, error) { // forge 
 }
 
 // Terminal is a convenient alias for Container().Terminal().
-func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:342:1)
+func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:421:1)
 	q := r.query.Select("terminal")
 
 	return &Container{
@@ -6753,7 +7585,7 @@ func (r *ForgePreAction) Terminal() *Container { // forge (../../use.go:342:1)
 }
 
 // Toolcache returns the current state of the RUNNER_TOOLCACHE directory.
-func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:367:1)
+func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:446:1)
 	q := r.query.Select("toolcache")
 
 	return &Directory{
@@ -6761,8 +7593,46 @@ func (r *ForgePreAction) Toolcache() *Directory { // forge (../../use.go:367:1)
 	}
 }
 
+func (r *ForgePreAction) WithDebug() *ForgePreAction { // forge (../../use.go:370:1)
+	q := r.query.Select("withDebug")
+
+	return &ForgePreAction{
+		query: q,
+	}
+}
+
+func (r *ForgePreAction) WithEnv(name string, value string) *ForgePreAction { // forge (../../use.go:360:1)
+	q := r.query.Select("withEnv")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgePreAction{
+		query: q,
+	}
+}
+
+func (r *ForgePreAction) WithInput(name string, value string) *ForgePreAction { // forge (../../use.go:355:1)
+	q := r.query.Select("withInput")
+	q = q.Arg("name", name)
+	q = q.Arg("value", value)
+
+	return &ForgePreAction{
+		query: q,
+	}
+}
+
+func (r *ForgePreAction) WithToken(token *Secret) *ForgePreAction { // forge (../../use.go:365:1)
+	assertNotNil("token", token)
+	q := r.query.Select("withToken")
+	q = q.Arg("token", token)
+
+	return &ForgePreAction{
+		query: q,
+	}
+}
+
 // Workspace returns the current state of the GITHUB_WORKSPACE directory.
-func (r *ForgePreAction) Workspace() *Directory { // forge (../../use.go:362:1)
+func (r *ForgePreAction) Workspace() *Directory { // forge (../../use.go:441:1)
 	q := r.query.Select("workspace")
 
 	return &Directory{
@@ -7961,7 +8831,8 @@ func (r *GitRepository) WithAuthToken(token *Secret) *GitRepository {
 type Host struct {
 	query *querybuilder.Selection
 
-	id *HostID
+	findUp *string
+	id     *HostID
 }
 
 func (r *Host) WithGraphQLQuery(q *querybuilder.Selection) *Host {
@@ -7988,8 +8859,8 @@ type HostDirectoryOpts struct {
 	Include []string
 	// If true, the directory will always be reloaded from the host.
 	NoCache bool
-	// Don't apply .gitignore filter rules inside the directory
-	NoGitAutoIgnore bool
+	// Apply .gitignore filter rules inside the directory
+	Gitignore bool
 }
 
 // Accesses a directory on the host.
@@ -8008,9 +8879,9 @@ func (r *Host) Directory(path string, opts ...HostDirectoryOpts) *Directory {
 		if !querybuilder.IsZeroValue(opts[i].NoCache) {
 			q = q.Arg("noCache", opts[i].NoCache)
 		}
-		// `noGitAutoIgnore` optional argument
-		if !querybuilder.IsZeroValue(opts[i].NoGitAutoIgnore) {
-			q = q.Arg("noGitAutoIgnore", opts[i].NoGitAutoIgnore)
+		// `gitignore` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Gitignore) {
+			q = q.Arg("gitignore", opts[i].Gitignore)
 		}
 	}
 	q = q.Arg("path", path)
@@ -8040,6 +8911,31 @@ func (r *Host) File(path string, opts ...HostFileOpts) *File {
 	return &File{
 		query: q,
 	}
+}
+
+// HostFindUpOpts contains options for Host.FindUp
+type HostFindUpOpts struct {
+	NoCache bool
+}
+
+// Search for a file or directory by walking up the tree from system workdir. Return its relative path. If no match, return null
+func (r *Host) FindUp(ctx context.Context, name string, opts ...HostFindUpOpts) (string, error) {
+	if r.findUp != nil {
+		return *r.findUp, nil
+	}
+	q := r.query.Select("findUp")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `noCache` optional argument
+		if !querybuilder.IsZeroValue(opts[i].NoCache) {
+			q = q.Arg("noCache", opts[i].NoCache)
+		}
+	}
+	q = q.Arg("name", name)
+
+	var response string
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
 }
 
 // A unique identifier for this Host.
@@ -10140,6 +11036,16 @@ func (r *ModuleSource) WithUpdateDependencies(dependencies []string) *ModuleSour
 	}
 }
 
+// Update one or more clients.
+func (r *ModuleSource) WithUpdatedClients(clients []string) *ModuleSource {
+	q := r.query.Select("withUpdatedClients")
+	q = q.Arg("clients", clients)
+
+	return &ModuleSource{
+		query: q,
+	}
+}
+
 // Remove the current blueprint from the module source.
 func (r *ModuleSource) WithoutBlueprint() *ModuleSource {
 	q := r.query.Select("withoutBlueprint")
@@ -10464,6 +11370,16 @@ func (r *Client) WithGraphQLQuery(q *querybuilder.Selection) *Client {
 	}
 }
 
+// initialize an address to load directories, containers, secrets or other object types.
+func (r *Client) Address(value string) *Address {
+	q := r.query.Select("address")
+	q = q.Arg("value", value)
+
+	return &Address{
+		query: q,
+	}
+}
+
 // Constructs a cache volume for a given cache key.
 func (r *Client) CacheVolume(key string) *CacheVolume {
 	q := r.query.Select("cacheVolume")
@@ -10607,6 +11523,27 @@ func (r *Client) Env(opts ...EnvOpts) *Env {
 	}
 }
 
+// EnvFileOpts contains options for Client.EnvFile
+type EnvFileOpts struct {
+	// Replace "${VAR}" or "$VAR" with the value of other vars
+	Expand bool
+}
+
+// Initialize an environment file
+func (r *Client) EnvFile(opts ...EnvFileOpts) *EnvFile {
+	q := r.query.Select("envFile")
+	for i := len(opts) - 1; i >= 0; i-- {
+		// `expand` optional argument
+		if !querybuilder.IsZeroValue(opts[i].Expand) {
+			q = q.Arg("expand", opts[i].Expand)
+		}
+	}
+
+	return &EnvFile{
+		query: q,
+	}
+}
+
 // Create a new error.
 func (r *Client) Error(message string) *Error {
 	q := r.query.Select("error")
@@ -10642,7 +11579,7 @@ func (r *Client) File(name string, contents string, opts ...FileOpts) *File {
 	}
 }
 
-func (r *Client) Forge() *Forge { // forge (../../use.go:57:6)
+func (r *Client) Forge() *Forge { // forge (../../use.go:56:6)
 	q := r.query.Select("forge")
 
 	return &Forge{
@@ -10820,6 +11757,16 @@ func (r *Client) LLM(opts ...LLMOpts) *LLM {
 	}
 }
 
+// Load a Address from its ID.
+func (r *Client) LoadAddressFromID(id AddressID) *Address {
+	q := r.query.Select("loadAddressFromID")
+	q = q.Arg("id", id)
+
+	return &Address{
+		query: q,
+	}
+}
+
 // Load a Binding from its ID.
 func (r *Client) LoadBindingFromID(id BindingID) *Binding {
 	q := r.query.Select("loadBindingFromID")
@@ -10836,6 +11783,16 @@ func (r *Client) LoadCacheVolumeFromID(id CacheVolumeID) *CacheVolume {
 	q = q.Arg("id", id)
 
 	return &CacheVolume{
+		query: q,
+	}
+}
+
+// Load a Changeset from its ID.
+func (r *Client) LoadChangesetFromID(id ChangesetID) *Changeset {
+	q := r.query.Select("loadChangesetFromID")
+	q = q.Arg("id", id)
+
+	return &Changeset{
 		query: q,
 	}
 }
@@ -10896,6 +11853,16 @@ func (r *Client) LoadEnumValueTypeDefFromID(id EnumValueTypeDefID) *EnumValueTyp
 	q = q.Arg("id", id)
 
 	return &EnumValueTypeDef{
+		query: q,
+	}
+}
+
+// Load a EnvFile from its ID.
+func (r *Client) LoadEnvFileFromID(id EnvFileID) *EnvFile {
+	q := r.query.Select("loadEnvFileFromID")
+	q = q.Arg("id", id)
+
+	return &EnvFile{
 		query: q,
 	}
 }

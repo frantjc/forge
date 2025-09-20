@@ -170,7 +170,7 @@ func NewUse() *cobra.Command {
 				if export {
 					finalize = func() error {
 						// This is the same as action.Workspace() and postAction.Workspace().
-						if _, err := preAction.Workspace().Export(ctx, "."); err != nil {
+						if _, err := preAction.Workspace().Changes(workspace).Export(ctx, "."); err != nil {
 							return err
 						}
 

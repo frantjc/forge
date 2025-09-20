@@ -4,7 +4,7 @@
   "dependencies": [
     {
       "name": "forge",
-      "source": "../.."
+      "source": "../../dagger"
     }
   ],
   "clients": [
