@@ -20,7 +20,7 @@ jobs:
         with:
           verb: develop
           args: --debug
-          version: v0.18.17
+          version: v0.18.19
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
