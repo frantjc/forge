@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/frantjc/forge/githubactions"
 	"github.com/spf13/cobra"
@@ -40,6 +41,9 @@ func NewShim() *cobra.Command {
 			return subcmd.Run()
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Help for "+cmd.Name())
+	cmd.SetVersionTemplate("{{ .Name }}{{ .Version }} " + runtime.Version() + "\n")
 
 	return cmd
 }

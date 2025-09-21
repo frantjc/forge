@@ -533,7 +533,7 @@ func withShim(ctx context.Context, container *dagger.Container) (*dagger.Contain
 				"internal/rangemap/**",
 			},
 		}).
-		WithWorkdir(workdir).
+		WithWorkdir(workdir, dagger.ContainerWithWorkdirOpts{Expand: true}).
 		WithExec([]string{"go", "build", "-o", shimPath, "./cmd/shim"}).
 		File(shimPath)
 
@@ -644,9 +644,11 @@ func withActionsCache(container *dagger.Container) *dagger.Container {
 				WithExposedPort(3000).
 				AsService(),
 		).
+		// Ensure trailing slash. Ref: https://gha-cache-server.falcondev.io/getting-started#_2-self-hosted-runner-setup.
 		WithEnvVariable(githubactions.EnvVarActionsResultsURL, fmt.Sprintf("%s/", actionsResultsURL)).
 		WithEnvVariable(githubactions.EnvVarActionsCacheURL, fmt.Sprintf("%s/", actionsResultsURL)).
 		WithEnvVariable(githubactions.EnvVarActionsCacheServiceV2, fmt.Sprint(true)).
+		// Ref: https://github.com/actions/toolkit/blob/f58042f9cc16bcaa87afaa86c2974a8c771ce1ea/packages/cache/src/internal/cacheUtils.ts#L162.
 		WithEnvVariable(githubactions.EnvVarActionsRuntimeToken, "fake")
 }
 

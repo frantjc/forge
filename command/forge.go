@@ -73,6 +73,9 @@ func NewForge(version string) *cobra.Command {
 		NewResource(concourse.MethodPut),
 	)
 
+	cmd.Flags().BoolP("help", "h", false, "Help for "+cmd.Name())
+	cmd.Flags().Bool("version", false, "Version for "+cmd.Name())
+
 	return cmd
 }
 
@@ -161,7 +164,7 @@ func NewUse() *cobra.Command {
 					preAction = preAction.WithDebug()
 				}
 
-				for k, v := range envconv.ArrToMap(os.Environ()) {
+				for k, v := range envconv.ArrToMap(githubactions.NewGlobalContextFromEnv().Env()) {
 					preAction = preAction.WithEnv(k, v)
 				}
 
