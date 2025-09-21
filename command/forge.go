@@ -79,20 +79,21 @@ func NewForge(version string) *cobra.Command {
 	return cmd
 }
 
-const errWhenNoExecs = "empty result reference"
+const errWhenNoExecs = "no command has been set"
 
 // NewUse returns the command which acts as
 // the entrypoint for `forge use`.
 func NewUse() *cobra.Command {
 	var (
 		with       = map[string]string{}
+		env        = []string{}
 		token      string
 		repo       string
 		stage      = stageMain
 		export     bool
 		slogConfig = &logutil.SlogConfig{}
 		cmd        = &cobra.Command{
-			Use:           "use action [-w go-version=1.24] [--pre | --post] [-r https://github.com/frantjc/forge] [-t $GH_TOKEN] [-e] [-dqv]",
+			Use:           "use action [-w go-version=1.24] [--env KEY[=VALUE] [--pre | --post] [-r https://github.com/frantjc/forge] [-t $GH_TOKEN] [-e] [-dqv]",
 			Aliases:       []string{"u", "uses"},
 			SilenceErrors: true,
 			SilenceUsage:  true,
@@ -164,8 +165,12 @@ func NewUse() *cobra.Command {
 					preAction = preAction.WithDebug()
 				}
 
-				for k, v := range envconv.ArrToMap(githubactions.NewGlobalContextFromEnv().Env()) {
-					preAction = preAction.WithEnv(k, v)
+				for _, e := range env {
+					if k, v, found := strings.Cut(e, "="); !found {
+						preAction.WithEnv(k, os.Getenv(k))
+					} else {
+						preAction.WithEnv(k, v)
+					}
 				}
 
 				for k, v := range with {
@@ -238,6 +243,7 @@ func NewUse() *cobra.Command {
 	)
 
 	cmd.Flags().StringToStringVarP(&with, "with", "w", nil, "With params")
+	cmd.Flags().StringArrayVar(&env, "env", nil, "Env")
 	cmd.Flags().StringVarP(&token, "token", "t", "", "GitHub token")
 	cmd.Flags().StringVarP(&repo, "repo", "r", "", "Git repository to gather context from")
 
