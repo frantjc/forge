@@ -12,8 +12,11 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// Resource has a container that's prepared to execute a resource method.
 type Resource struct {
+	// +private
 	FinalizedResource
+	// +private
 	Source []string
 }
 
@@ -21,11 +24,15 @@ const (
 	resourcePath = "/forge/resource"
 )
 
+// Resource creates a container to execute a Concourse resource in.
 func (f *Forge) Resource(
 	ctx context.Context,
+	// The resource to execute
 	resource string,
+	// The pipeline file to find the resource in
 	// +defaultPath=".forge.yml"
 	pipeline *dagger.File,
+	// The workdir for the resource to execute in
 	// +defaultPath="."
 	workdir *dagger.Directory,
 ) (*Resource, error) {
@@ -109,8 +116,11 @@ func (r *Resource) Get(
 	return &r.FinalizedResource, nil
 }
 
+// Resource has a container that's executed a resource method.
 type FinalizedResource struct {
-	Ctr  *dagger.Container
+	// +private
+	Ctr *dagger.Container
+	// +private
 	Name string
 }
 
@@ -203,11 +213,27 @@ func (r *FinalizedResource) Container() *dagger.Container {
 	return r.Ctr
 }
 
+// Stdout is a convenient alias for Container().Stdout().
+func (r *FinalizedResource) Stdout(ctx context.Context) (string, error) {
+	return r.Container().Stdout(ctx)
+}
+
+// Stderr is a convenient alias for Container().Stderr().
+func (r *FinalizedResource) Stderr(ctx context.Context) (string, error) {
+	return r.Container().Stderr(ctx)
+}
+
+// CombinedOutput is a convenient alias for Container().CombinedOutput().
+func (r *FinalizedResource) CombinedOutput(ctx context.Context) (string, error) {
+	return r.Container().CombinedOutput(ctx)
+}
+
 // Terminal is a convenient alias for Container().Terminal().
 func (r *FinalizedResource) Terminal() *dagger.Container {
 	return r.Container().Terminal()
 }
 
+// Workdir returns the current state of the working directory.
 func (r *FinalizedResource) Workdir() *dagger.Directory {
 	return r.Container().Directory(path.Join(resourcePath, r.Name))
 }

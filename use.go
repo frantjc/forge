@@ -1,4 +1,4 @@
-// A generated module for Forge functions
+// Run reusable steps from various proprietary CI systems.
 
 package main
 
@@ -71,45 +71,46 @@ const (
 // PreAction has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the pre-step.
 type PreAction struct {
+	// +private
 	Action
 }
 
 // Action has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the main step.
 type Action struct {
+	// +private
 	PostAction
 }
 
 // PostAction has a container that's prepared to execute an action and the subpath to that
 // action, but has not yet executed the post-step.
 type PostAction struct {
+	// +private
 	FinalizedAction
+	// +private
+	Ref *dagger.GitRef
+	// +private
 	Metadata string
-	Subpath  string
-	Inputs   []string
+	// +private
+	Subpath string
+	// +private
+	Inputs []string
 }
 
-// FinalizedAction has a container that's prepared to execute an action and has executed that action.
+// FinalizedAction has a container that has fully executed its action.
 type FinalizedAction struct {
+	// +private
 	Ctr *dagger.Container
 }
 
 // Use creates a container to execute a GitHub Action in.
 func (a *Forge) Use(
 	ctx context.Context,
+	// The action to use
 	action string,
-	// +defaultPath="."
-	repo *dagger.Directory,
+	// The workspace to act on
 	// +defaultPath="."
 	workspace *dagger.Directory,
-	// +optional
-	with []string,
-	// +optional
-	env []string,
-	// +optional
-	debug bool,
-	// +optional
-	token *dagger.Secret,
 ) (*PreAction, error) {
 	uses, err := githubactions.Parse(action)
 	if err != nil {
@@ -149,33 +150,21 @@ func (a *Forge) Use(
 		} else {
 			container = container.From(strings.TrimPrefix(metadata.Runs.Image, githubactions.RunsUsingDockerImagePrefix))
 		}
-
-		container = withAction(container, actn)
 	case githubactions.RunsUsingNode12:
-		container = withAction(container.From(Node12ImageReference), actn)
+		container = container.From(Node12ImageReference)
 	case githubactions.RunsUsingNode16:
-		container = withAction(container.From(Node16ImageReference), actn)
+		container = container.From(Node16ImageReference)
 	case githubactions.RunsUsingNode20:
-		container = withAction(container.From(Node20ImageReference), actn)
+		container = container.From(Node20ImageReference)
 	case githubactions.RunsUsingNode24:
-		container = withAction(container.From(Node24ImageReference), actn)
+		container = container.From(Node24ImageReference)
 	default:
 		return nil, fmt.Errorf("actions that run using %s are not supported", metadata.Runs.Using)
 	}
 
+	container = withAction(container, actn)
 	container = withActionsCache(container)
-	container = withGitHubEnvVarsFromRef(ctx, container, repo.AsGit().Head())
 	container = withDefaultGitHubEnvVars(container)
-
-	ekv, err := parseKeyValuePairs(env)
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range ekv {
-		container = container.WithEnvVariable(k, v)
-	}
-
 	container = withGitHubEnv(container)
 	container = withGitHubPath(container)
 	container = withGitHubOutput(container)
@@ -183,16 +172,7 @@ func (a *Forge) Use(
 	container = withRunnerTmp(container)
 	container = withRunnerToolcache(container)
 	container = withHome(container)
-
-	if token != nil {
-		container = withToken(container, token)
-	}
-
 	container = withWorkspace(container, workspace)
-
-	if debug {
-		container = withDebug(container)
-	}
 
 	return &PreAction{
 		Action: Action{
@@ -202,7 +182,6 @@ func (a *Forge) Use(
 				},
 				Metadata: rawMetadata,
 				Subpath:  subpath,
-				Inputs:   with,
 			},
 		},
 	}, nil
@@ -215,12 +194,16 @@ func (a *PreAction) Pre(ctx context.Context) (*Action, error) {
 		return nil, err
 	}
 
+	if a.Ref != nil {
+		a.Ctr = withGitHubEnvVarsFromRef(ctx, a.Container(), a.Ref)
+	}
+
 	wkv, err := parseKeyValuePairs(a.Inputs)
 	if err != nil {
 		return nil, err
 	}
 
-	a.Ctr, err = withWith(a.Container(), metadata, wkv)
+	a.Ctr, err = withInputs(a.Container(), metadata, wkv)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +283,7 @@ func (a *PreAction) Main(ctx context.Context) (*PostAction, error) {
 }
 
 // Post executes the post-step of the GitHub Action in the underlying container.
-func (a *PostAction) Post(ctx context.Context) (*dagger.Container, error) {
+func (a *PostAction) Post(ctx context.Context) (*FinalizedAction, error) {
 	metadata, err := parseActionMetadata(a.Metadata)
 	if err != nil {
 		return nil, err
@@ -329,11 +312,11 @@ func (a *PostAction) Post(ctx context.Context) (*dagger.Container, error) {
 		return nil, fmt.Errorf("actions that run using %s are not supported", metadata.Runs.Using)
 	}
 
-	return a.Container(), nil
+	return &a.FinalizedAction, nil
 }
 
 // Post executes the pre-, main and post-steps of the GitHub Action in the underlying container.
-func (a *PreAction) Post(ctx context.Context) (*dagger.Container, error) {
+func (a *PreAction) Post(ctx context.Context) (*FinalizedAction, error) {
 	main, err := a.Pre(ctx)
 	if err != nil {
 		return nil, err
@@ -343,7 +326,7 @@ func (a *PreAction) Post(ctx context.Context) (*dagger.Container, error) {
 }
 
 // Post executes the main and post-steps of the GitHub Action in the underlying container.
-func (a *Action) Post(ctx context.Context) (*dagger.Container, error) {
+func (a *Action) Post(ctx context.Context) (*FinalizedAction, error) {
 	post, err := a.Main(ctx)
 	if err != nil {
 		return nil, err
@@ -352,63 +335,93 @@ func (a *Action) Post(ctx context.Context) (*dagger.Container, error) {
 	return post.Post(ctx)
 }
 
+// WithInput set an input (i.e. a key-value pair from the `with` object of a GitHub Action).
 func (a *PreAction) WithInput(name, value string) *PreAction {
 	a.Action = *a.Action.WithInput(name, value)
 	return a
 }
 
+// WithEnv sets a new environment variable for the action.
 func (a *PreAction) WithEnv(name, value string) *PreAction {
 	a.Action = *a.Action.WithEnv(name, value)
 	return a
 }
 
+// WithToken sets the GitHub token for the action.
 func (a *PreAction) WithToken(token *dagger.Secret) *PreAction {
 	a.Action = *a.Action.WithToken(token)
 	return a
 }
 
+// WithDebug enables debug for the action.
 func (a *PreAction) WithDebug() *PreAction {
 	a.Action = *a.Action.WithDebug()
 	return a
 }
 
+// WithRef sets the GitHub environment variables for the action from the given ref.
+func (a *PreAction) WithRef(ref *dagger.GitRef) *PreAction {
+	a.Action = *a.Action.WithRef(ref)
+	return a
+}
+
+// WithInput set an input (i.e. a key-value pair from the `with` object of a GitHub Action).
 func (a *Action) WithInput(name, value string) *Action {
 	a.PostAction = *a.PostAction.WithInput(name, value)
 	return a
 }
 
+// WithEnv sets a new environment variable for the action.
 func (a *Action) WithEnv(name, value string) *Action {
 	a.PostAction = *a.PostAction.WithEnv(name, value)
 	return a
 }
 
+// WithToken sets the GitHub token for the action.
 func (a *Action) WithToken(token *dagger.Secret) *Action {
 	a.PostAction = *a.PostAction.WithToken(token)
 	return a
 }
 
+// WithDebug enables debug for the action.
 func (a *Action) WithDebug() *Action {
 	a.PostAction = *a.PostAction.WithDebug()
 	return a
 }
 
+// WithRef sets the GitHub environment variables for the action from the given ref.
+func (a *Action) WithRef(ref *dagger.GitRef) *Action {
+	a.PostAction = *a.PostAction.WithRef(ref)
+	return a
+}
+
+// WithInput set an input (i.e. a key-value pair from the `with` object of a GitHub Action).
 func (a *PostAction) WithInput(name, value string) *PostAction {
 	a.Inputs = append(a.Inputs, fmt.Sprintf("%s=%s", name, value))
 	return a
 }
 
+// WithEnv sets a new environment variable for the action.
 func (a *PostAction) WithEnv(name, value string) *PostAction {
 	a.Ctr = a.Ctr.WithEnvVariable(name, value)
 	return a
 }
 
+// WithToken sets the GitHub token for the action.
 func (a *PostAction) WithToken(token *dagger.Secret) *PostAction {
 	a.Ctr = withToken(a.Container(), token)
 	return a
 }
 
+// WithDebug enables debug for the action.
 func (a *PostAction) WithDebug() *PostAction {
 	a.Ctr = withDebug(a.Container())
+	return a
+}
+
+// WithRef sets the GitHub environment variables for the action from the given ref.
+func (a *PostAction) WithRef(ref *dagger.GitRef) *PostAction {
+	a.Ref = ref
 	return a
 }
 
@@ -469,22 +482,22 @@ func (a *FinalizedAction) Env(ctx context.Context) (string, error) {
 
 // State returns the parsed key-value pairs that were saved to GITHUB_STATE.
 func (a *FinalizedAction) State(ctx context.Context) (string, error) {
-	env, err := gitHubState(ctx, a.Container())
+	state, err := gitHubState(ctx, a.Container())
 	if err != nil {
 		return "", err
 	}
 
-	return strings.Join(envconv.MapToArr(env), "\n"), nil
+	return strings.Join(envconv.MapToArr(state), "\n"), nil
 }
 
 // Output returns the parsed key-value pairs that were saved to GITHUB_OUTPUT.
 func (a *FinalizedAction) Output(ctx context.Context) (string, error) {
-	env, err := gitHubOutput(ctx, a.Container())
+	output, err := gitHubOutput(ctx, a.Container())
 	if err != nil {
 		return "", err
 	}
 
-	return strings.Join(envconv.MapToArr(env), "\n"), nil
+	return strings.Join(envconv.MapToArr(output), "\n"), nil
 }
 
 func withShim(ctx context.Context, container *dagger.Container) (*dagger.Container, error) {
@@ -807,7 +820,7 @@ func parseKeyValuePairs(args []string) (map[string]string, error) {
 	return with, nil
 }
 
-func withWith(container *dagger.Container, metadata *githubactions.Metadata, with map[string]string) (*dagger.Container, error) {
+func withInputs(container *dagger.Container, metadata *githubactions.Metadata, with map[string]string) (*dagger.Container, error) {
 	with, err := metadata.InputsFromWith(with)
 	if err != nil {
 		return nil, err

@@ -13,7 +13,7 @@ import (
 
 func main() {
 	var (
-		cmd       = command.NewForge()
+		cmd       = command.NewForge(SemVer())
 		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	)
 

@@ -1,10 +1,10 @@
 {
   "name": "github.com/frantjc/forge/internal/client",
-  "engineVersion": "v0.18.17",
+  "engineVersion": "v0.18.19",
   "dependencies": [
     {
       "name": "forge",
-      "source": "../../dagger"
+      "source": "../.."
     }
   ],
   "clients": [

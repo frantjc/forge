@@ -1,21 +1,18 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/url"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 
 	"dagger.io/dagger"
-	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/concourse"
 	"github.com/frantjc/forge/githubactions"
-	client "github.com/frantjc/forge/internal/client"
+	"github.com/frantjc/forge/internal/client"
 	"github.com/frantjc/forge/internal/envconv"
 	"github.com/frantjc/forge/internal/logutil"
 	"github.com/spf13/cobra"
@@ -61,16 +58,16 @@ func (b *genericBool[T]) IsBoolFlag() bool {
 
 // NewForge returns the command which acts as
 // the entrypoint for `forge use`.
-func NewForge() *cobra.Command {
+func NewForge(version string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "forge",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		Version:       version,
 	}
 
 	cmd.AddCommand(
 		NewUse(),
-		NewCloudbuild(),
 		NewResource(concourse.MethodCheck),
 		NewResource(concourse.MethodGet),
 		NewResource(concourse.MethodPut),
@@ -92,7 +89,7 @@ func NewUse() *cobra.Command {
 		export     bool
 		slogConfig = &logutil.SlogConfig{}
 		cmd        = &cobra.Command{
-			Use:           "use action [-w go-version=1.24] [--pre | --post] [-r https://github.com/frantjc/forge] [-t $GH_TOKEN] [-E] [-dqv]",
+			Use:           "use action [-w go-version=1.24] [--pre | --post] [-r https://github.com/frantjc/forge] [-t $GH_TOKEN] [-e] [-dqv]",
 			Aliases:       []string{"u", "uses"},
 			SilenceErrors: true,
 			SilenceUsage:  true,
@@ -131,14 +128,14 @@ func NewUse() *cobra.Command {
 				defer dag.Close()
 
 				var (
-					workspace  = dag.Host().Directory(".")
-					repository = workspace
+					workspace = dag.Host().Directory(".")
+					ref       = workspace.AsGit().Head()
 				)
 
 				if cmd.Flag("repo").Changed {
-					src, ref, found := strings.Cut(repo, "@")
+					src, ver, found := strings.Cut(repo, "@")
 					if found {
-						repository = dag.Git(src).Ref(ref).Tree()
+						ref = dag.Git(src).Ref(ver)
 					} else {
 						r, err := url.Parse(repo)
 						if err != nil {
@@ -147,21 +144,30 @@ func NewUse() *cobra.Command {
 
 						switch r.Scheme {
 						case "file", "":
-							repository = dag.Host().Directory(r.Path)
+							ref = dag.Host().Directory(r.Path).AsGit().Head()
 						default:
-							repository = dag.Git(src).Head().Tree()
+							ref = dag.Git(src).Head()
 						}
 					}
 				}
 
-				preAction := dag.Forge().Use(uses.String(), client.ForgeUseOpts{
-					Workspace: workspace,
-					Repo:      repository,
-					With:      envconv.MapToArr(with),
-					Token:     dag.SetSecret("token", token),
-					Debug:     debug,
-					Env:       os.Environ(),
-				})
+				preAction := dag.
+					Forge().
+					Use(uses.String(), client.ForgeUseOpts{Workspace: workspace}).
+					WithToken(dag.SetSecret("token", token)).
+					WithRef(ref)
+
+				if debug {
+					preAction = preAction.WithDebug()
+				}
+
+				for k, v := range envconv.ArrToMap(os.Environ()) {
+					preAction = preAction.WithEnv(k, v)
+				}
+
+				for k, v := range with {
+					preAction = preAction.WithInput(k, v)
+				}
 
 				finalize := func() error {
 					return nil
@@ -260,126 +266,6 @@ func NewUse() *cobra.Command {
 	return cmd
 }
 
-// NewCloudbuild returns the command which acts as
-// the entrypoint for `forge cloudbuild`.
-func NewCloudbuild() *cobra.Command {
-	var (
-		scriptPath               string
-		entrypoint               string
-		userDefinedSubstitutions = map[string]string{}
-		automapSubstituations    bool
-		dynamicSubstituations    bool
-		gcloudConfig             string
-		export                   bool
-		slogConfig               = &logutil.SlogConfig{}
-		cmd                      = &cobra.Command{
-			Use:           "cloudbuild cloudbuilder [-S script.sh | -E entrypoint.sh | arg...] [-s user_defined=substitution] [-AD] [-E] [-dqv] [-c ~/.gcloud/config]",
-			Aliases:       []string{"cb"},
-			SilenceErrors: true,
-			SilenceUsage:  true,
-			Args:          cobra.MinimumNArgs(1),
-			RunE: func(cmd *cobra.Command, args []string) error {
-				var (
-					log   = slog.New(slog.NewTextHandler(cmd.OutOrStdout(), &slog.HandlerOptions{Level: slogConfig}))
-					ctx   = logutil.SloggerInto(cmd.Context(), log)
-					debug = log.Enabled(ctx, slog.LevelDebug)
-				)
-
-				opts := []dagger.ClientOpt{
-					dagger.WithLogOutput(io.Discard),
-				}
-
-				if debug {
-					opts = []dagger.ClientOpt{
-						dagger.WithLogOutput(cmd.ErrOrStderr()),
-						dagger.WithVerbosity(int(slogConfig.Level())),
-					}
-				}
-
-				dag, err := client.Connect(ctx, opts...)
-				if err != nil {
-					return err
-				}
-				defer dag.Close()
-
-				var (
-					workdir = dag.Host().Directory(".")
-					gc      = dag.Directory()
-					script  *client.File
-				)
-
-				substitutions, err := cloudbuild.NewSubstitutionsFromPath(".", userDefinedSubstitutions)
-				if err != nil {
-					if substitutions, err = cloudbuild.NewSubstitutionsFromEnv(userDefinedSubstitutions); err != nil {
-						return err
-					}
-				}
-
-				if _, err := os.Stat("~/.gcloud/config"); err != nil {
-					if !errors.Is(err, os.ErrNotExist) {
-						return err
-					}
-				} else {
-					gc = dag.Host().Directory(gcloudConfig)
-				}
-
-				if cmd.Flag("script").Changed {
-					script = dag.Host().File(scriptPath)
-				}
-
-				cloudbuild := dag.Forge().Cloudbuild(args[0], client.ForgeCloudbuildOpts{
-					Workdir: workdir,
-					Entrypoint: slices.DeleteFunc(strings.Split(entrypoint, " "), func(s string) bool {
-						return s == ""
-					}),
-					Args:         args[1:],
-					Env:          os.Environ(),
-					GcloudConfig: gc,
-					Script:       script,
-					// TODO(frantjc): Get additional substitutions from gcloud-config.
-					Substitutions:        substitutions.Env(),
-					DynamicSubstitutions: dynamicSubstituations,
-					AutomapSubstitutions: automapSubstituations,
-				})
-
-				logs, err := cloudbuild.CombinedOutput(ctx)
-				if err != nil {
-					return err
-				}
-
-				if _, err := fmt.Fprint(cmd.OutOrStdout(), logs); err != nil {
-					return err
-				}
-
-				if export {
-					if _, err := cloudbuild.Workdir().Export(ctx, "."); err != nil {
-						return err
-					}
-				}
-
-				return nil
-			},
-		}
-	)
-
-	cmd.Flags().StringVarP(&entrypoint, "entrypoint", "E", "", "Entrypoint to execute")
-	cmd.Flags().StringVarP(&scriptPath, "script", "S", "", "Script to run")
-
-	cmd.Flags().StringToStringVarP(&userDefinedSubstitutions, "substitution", "s", nil, "Cloud Build substitutions")
-	cmd.Flags().BoolVarP(&automapSubstituations, "automap-substitutions", "A", false, "Automap substitutions to environment variables")
-	cmd.Flags().BoolVarP(&dynamicSubstituations, "dynamic-substitutions", "D", false, "Expand substitutions")
-
-	cmd.Flags().StringVarP(&gcloudConfig, "gcloud-config", "c", "~/.gcloud/config", "Google Cloud config directory")
-
-	cmd.Flags().BoolVarP(&export, "export", "e", false, "Apply changes that the Cloud Builder made to your working directory")
-
-	slogConfig.AddFlags(cmd.Flags())
-
-	cmd.MarkFlagsMutuallyExclusive("entrypoint", "script")
-
-	return cmd
-}
-
 // NewResource returns the command which acts as
 // the entrypoint for `forge check`, `forge get`, and `forge put`.
 func NewResource(method string) *cobra.Command {
@@ -390,7 +276,7 @@ func NewResource(method string) *cobra.Command {
 		export     bool
 		slogConfig = &logutil.SlogConfig{}
 		cmd        = &cobra.Command{
-			Use:           fmt.Sprintf("%s resource [-p pipeline.yml] [-E] [-dqv]", method),
+			Use:           fmt.Sprintf("%s resource [-p pipeline.yml] [-e] [-dqv]", method),
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			Args:          cobra.MinimumNArgs(1),
@@ -479,6 +365,12 @@ func NewResource(method string) *cobra.Command {
 					}
 				default:
 					return fmt.Errorf("unknown resource method %s", method)
+				}
+
+				if export {
+					if _, err := resource.Workdir().Changes(workdir).Export(ctx, "."); err != nil {
+						return err
+					}
 				}
 
 				return nil

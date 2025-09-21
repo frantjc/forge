@@ -13,23 +13,17 @@ From source:
 ```sh
 git clone https://github.com/frantjc/forge
 cd forge
-make
-```
-
-Using `go`:
-
-```sh
-go install github.com/frantjc/forge/cmd/forge
+make install
 ```
 
 In GitHub Actions:
 
 ```yml
-- uses: frantjc/forge@v1
+- uses: frantjc/forge@v2
 ```
 
-As a library:
+As a Dagger module:
 
 ```sh
-go get -u github.com/frantjc/forge
+dagger install github.com/frantjc/forge
 ```

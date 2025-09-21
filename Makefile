@@ -13,14 +13,20 @@ YARN ?= yarn
 
 GOARCH ?= $(shell $(GO) env GOARCH)
 
-# FIXME(frantjc): The places that this is imported must be commented out before the install works.
 .PHONY: internal/client internal/client/
 internal/client internal/client/:
 	@cd $@ && rm -r dag/ dagger.gen.go || true
 	@cd $@ && cat dagger.json | jq 'del(.clients)' > dagger.json.tmp && mv dagger.json.tmp dagger.json
+	@sed 's|"github.com/frantjc/forge/internal/client"|//\ "github.com/frantjc/forge/internal/client"|g' -i command/forge.go
 	@cd $@ && dagger client install go ./
 	@cd $@ && rm go.mod go.sum
+	@cd $@ &&  sed 's/package\ dagger/package\ client/g' -i dagger.gen.go
+	@sed 's|//\ "github.com/frantjc/forge/internal/client"|"github.com/frantjc/forge/internal/client"|g' -i command/forge.go
 	@$(MAKE) tidy
+
+.PHONY: internal/dagger internal/dagger/ internal/querybuilder internal/querybuilder/ internal/telemetry internal/telemetry/
+internal/dagger internal/dagger/ internal/querybuilder internal/querybuilder/ internal/telemetry internal/telemetry/:
+	@dagger develop
 
 .PHONY: .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/
 .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/:
@@ -89,7 +95,7 @@ GOLANGCI_LINT_VERSION ?= v2.1.5
 
 .PHONY: forge
 forge: $(FORGE)
-$(FORGE): $(LOCALBIN)
+$(FORGE): $(LOCALBIN) generate
 	@$(GO) build -o $@ ./cmd/forge
 
 BIN ?= /usr/local/bin
@@ -113,5 +119,3 @@ rm -f $(1) || true ;\
 GOBIN=$(LOCALBIN) go install $${package} ;\
 } ;
 endef
-
--include docs/gifs.mk
