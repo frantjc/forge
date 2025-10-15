@@ -2,23 +2,8 @@
 .idea/
 .vscode/
 
-# make
-bin/
-
-# goreleaser
-dist/
-
 # macOS
 .DS_Store
-
-# concourse/mock-resource
-rootfs/
-privileged
-version
-
-# mkdocs
-site/
-gh-pages/
 
 # dagger
 /dagger.gen.go

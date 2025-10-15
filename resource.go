@@ -25,7 +25,7 @@ const (
 )
 
 // Resource creates a container to execute a Concourse resource in.
-func (f *Forge) Resource(
+func (m *Forge) Resource(
 	ctx context.Context,
 	// The resource to execute
 	resource string,
@@ -211,6 +211,11 @@ func getStdin(source, version, params []string) (string, error) {
 // Container gives access to the underlying container.
 func (r *FinalizedResource) Container() *dagger.Container {
 	return r.Ctr
+}
+
+// Sync is a convenient alias for Container().Sync().
+func (a *FinalizedResource) Sync(ctx context.Context) (*dagger.Container, error) {
+	return a.Container().Sync(ctx)
 }
 
 // Stdout is a convenient alias for Container().Stdout().

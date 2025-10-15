@@ -104,7 +104,7 @@ type FinalizedAction struct {
 }
 
 // Use creates a container to execute a GitHub Action in.
-func (a *Forge) Use(
+func (m *Forge) Use(
 	ctx context.Context,
 	// The action to use
 	action string,
@@ -435,6 +435,11 @@ func (a *FinalizedAction) Terminal() *dagger.Container {
 	return a.Container().Terminal()
 }
 
+// Sync is a convenient alias for Container().Sync().
+func (a *FinalizedAction) Sync(ctx context.Context) (*dagger.Container, error) {
+	return a.Container().Sync(ctx)
+}
+
 // Stdout is a convenient alias for Container().Stdout().
 func (a *FinalizedAction) Stdout(ctx context.Context) (string, error) {
 	return a.Container().Stdout(ctx)
@@ -580,7 +585,7 @@ func withToken(container *dagger.Container, token *dagger.Secret) *dagger.Contai
 func withHome(container *dagger.Container) *dagger.Container {
 	return container.
 		WithEnvVariable("HOME", homePath).
-		WithDirectory(homePath, dag.Directory())
+		WithMountedDirectory(homePath, dag.Directory())
 }
 
 func withAction(container *dagger.Container, action *dagger.Directory) *dagger.Container {
@@ -687,13 +692,13 @@ func withGitHubEnv(container *dagger.Container) *dagger.Container {
 func withRunnerTmp(container *dagger.Container) *dagger.Container {
 	return container.
 		WithEnvVariable(githubactions.EnvVarRunnerTemp, tmpPath).
-		WithMountedTemp(tmpPath)
+		WithMountedDirectory(tmpPath, dag.Directory())
 }
 
 func withRunnerToolcache(container *dagger.Container) *dagger.Container {
 	return container.
 		WithEnvVariable(githubactions.EnvVarRunnerToolCache, toolcachePath).
-		WithMountedCache(toolcachePath, dag.CacheVolume("runner-toolcache"))
+		WithMountedDirectory(toolcachePath, dag.Directory())
 }
 
 func withWorkspace(container *dagger.Container, workspace *dagger.Directory) *dagger.Container {
