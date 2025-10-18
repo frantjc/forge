@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -19,11 +18,9 @@ func NewShim() *cobra.Command {
 		SilenceUsage:  true,
 		Args:          cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
-
 			wd, err := os.Getwd()
 			if err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, err.Error())
+				return err
 			}
 
 			globalContext, err := githubactions.NewGlobalContextFromPath(wd)
@@ -31,7 +28,7 @@ func NewShim() *cobra.Command {
 				globalContext = githubactions.NewGlobalContextFromEnv()
 			}
 
-			subcmd := exec.CommandContext(ctx, args[0], args[1:]...) //nolint:gosec
+			subcmd := exec.CommandContext(cmd.Context(), args[0], args[1:]...) //nolint:gosec
 			subcmd.Dir = globalContext.GitHubContext.Workspace
 			subcmd.Env = append(os.Environ(), globalContext.Env()...)
 			subcmd.Stdin = cmd.InOrStdin()

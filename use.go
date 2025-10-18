@@ -52,7 +52,7 @@ var (
 	ActionsCacheImageReference = DefaultActionsCacheImageReference
 )
 
-// Forge is the struct that methods are defined on for forge's Dagger module.
+// Forge Dagger module.
 type Forge struct{}
 
 const (

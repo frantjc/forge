@@ -14,3 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.2.0
+        env:
+          DAGGER_NO_NAG: 1
+        with:
+          shell: |
+            use actions/setup-go@v5 | withInput go-version 1.25 | post | combinedOutput
