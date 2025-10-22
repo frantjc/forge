@@ -143,6 +143,7 @@ func (w *workflowCommandWriter) Write(p []byte) (int, error) {
 
 		//nolint:revive
 		if len(line) == 0 || strings.HasPrefix(line, "##[add-matcher]") {
+			continue // We can't do anything with problem matchers.
 		} else if c, err := ParseWorkflowCommandString(line); err == nil {
 			b = w.handleCommand(c)
 		}
