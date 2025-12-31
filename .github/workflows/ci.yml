@@ -3,10 +3,10 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - release-1.0
+      - main
   pull_request:
     branches:
-      - release-1.0
+      - main
 permissions:
   contents: read
 jobs:

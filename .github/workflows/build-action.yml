@@ -2,7 +2,7 @@ name: Build Action
 on:
   push:
     branches:
-      - release-1.0
+      - main
     paths:
       - .github/actions/setup-forge/**
       - "!.github/actions/setup-forge/dist/**"
