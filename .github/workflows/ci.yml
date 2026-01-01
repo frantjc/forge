@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 jobs:
-  dagger:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
