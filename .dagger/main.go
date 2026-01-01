@@ -57,9 +57,38 @@ func (m *ForgeDev) Fmt(ctx context.Context) *dagger.Changeset {
 	return root.Changes(m.Source)
 }
 
+func (m *ForgeDev) BuildShims(ctx context.Context) *dagger.Changeset {
+	root := m.Source
+	g0 := dag.Go(dagger.GoOpts{Module: root})
+	upx := dag.Wolfi().
+		Container(dagger.WolfiContainerOpts{
+			Packages: []string{"upx"},
+		})
+
+	for _, goarch := range []string{"amd64", "arm64"} {
+		tmp := "/usr/local/bin/shim"
+
+		shim := upx.
+			WithFile(
+				tmp,
+				g0.
+					Build(dagger.GoBuildOpts{
+						Pkg:    "./internal/cmd/shim",
+						Goarch: goarch,
+					}),
+			).
+			WithExec([]string{"upx", "--ultra-brute", tmp}).
+			File(tmp)
+
+		root = root.WithFile(fmt.Sprintf("internal/bin/shim_%s", goarch), shim)
+	}
+
+	return root.Changes(m.Source)
+}
+
 func (m *ForgeDev) Test(ctx context.Context) (*dagger.Container, error) {
 	return dag.Go(dagger.GoOpts{
-		Module:                  m.Source,
+		Module: m.Source,
 	}).
 		Container().
 		WithExec([]string{"go", "test", "-race", "-cover", "-test.v", "./..."}), nil

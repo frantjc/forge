@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	DefaultServerURL        *url.URL
+	DefaultServerURL  *url.URL
 	DefaultAPIURL     *url.URL
 	DefaultGraphQLURL *url.URL
 )

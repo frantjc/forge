@@ -6,30 +6,16 @@ on:
       # on complete semantic versions e.g. v1.0.0, but not v1.
       - v[0-9]+.[0-9]+.[0-9]+*
 permissions:
-  contents: read
-  id-token: write
-  attestations: write
+  contents: write
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+      - uses: frantjc/actions/setup-tool@v1
         with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-      - uses: crazy-max/ghaction-upx@v3
-        with:
-          install-only: true
-      - uses: sigstore/cosign-installer@v3.9.2
-      - uses: anchore/sbom-action/download-syft@v0.20.5 
-      - uses: goreleaser/goreleaser-action@v6
-        with:
-          args: release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-      - uses: actions/attest-build-provenance@v3
-        with:
-          subject-checksums: dist/checksums.txt
-      - uses: ./
+          repository: dagger/dagger
+          version: v0.19.8
+      - env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dagger call release --github-token env://GITHUB_TOKEN

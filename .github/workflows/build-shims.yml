@@ -8,13 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v6
+      - uses: frantjc/actions/setup-tool@v1
         with:
-          go-version-file: go.mod
-      - uses: crazy-max/ghaction-upx@v3
-        with:
-          install-only: true
-      - run: make shims
+          repository: dagger/dagger
+          version: v0.19.8
+      - run: dagger call -y build-shims
       - uses: peter-evans/create-pull-request@v7
         with:
           add-paths: |

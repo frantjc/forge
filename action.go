@@ -185,9 +185,9 @@ func newWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id st
 	globalContext = configureGlobalContext(globalContext, opt)
 
 	return &Streams{
-		In: opt.Streams.In,
-		Out: githubactions.NewWorkflowCommandWriter(opt.Streams.Out, globalContext),
-		Err: githubactions.NewWorkflowCommandWriter(opt.Streams.Err, globalContext),
+		In:         opt.Streams.In,
+		Out:        githubactions.NewWorkflowCommandWriter(opt.Streams.Out, globalContext),
+		Err:        githubactions.NewWorkflowCommandWriter(opt.Streams.Err, globalContext),
 		Tty:        opt.Streams.Tty,
 		DetachKeys: opt.Streams.DetachKeys,
 	}

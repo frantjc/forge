@@ -12,7 +12,7 @@ func TestCommandDebugOff(t *testing.T) {
 	var (
 		out           = new(bytes.Buffer)
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, nil)
-		command = &githubactions.WorkflowCommand{
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandDebug,
 			Parameters: map[string]string{},
 			Value:      "hello there",
@@ -35,7 +35,7 @@ func TestCommandEcho(t *testing.T) {
 		out           = new(bytes.Buffer)
 		globalContext = githubactions.NewGlobalContextFromEnv()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		command = &githubactions.WorkflowCommand{
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandEcho,
 			Parameters: map[string]string{},
 			Value:      "on",
@@ -64,13 +64,13 @@ func TestCommandDebugOn(t *testing.T) {
 		out           = new(bytes.Buffer)
 		globalContext = githubactions.NewGlobalContextFromEnv().EnableDebug()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		value   = "hello there"
-		command = &githubactions.WorkflowCommand{
+		value         = "hello there"
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandDebug,
 			Parameters: map[string]string{},
 			Value:      value,
 		}
-		_, err = command.WriteTo(commandWriter)
+		_, err   = command.WriteTo(commandWriter)
 		expected = "[" + githubactions.CommandDebug + "] " + value + "\n"
 		actual   = out.String()
 	)
@@ -91,13 +91,13 @@ func TestCommandNotice(t *testing.T) {
 		out           = new(bytes.Buffer)
 		globalContext = githubactions.NewGlobalContextFromEnv()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		value   = "hello there"
-		command = &githubactions.WorkflowCommand{
+		value         = "hello there"
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandNotice,
 			Parameters: map[string]string{},
 			Value:      value,
 		}
-		_, err = command.WriteTo(commandWriter)
+		_, err   = command.WriteTo(commandWriter)
 		expected = "[" + githubactions.CommandNotice + "] " + value + "\n"
 		actual   = out.String()
 	)
@@ -117,13 +117,13 @@ func TestCommandWarning(t *testing.T) {
 		out           = new(bytes.Buffer)
 		globalContext = githubactions.NewGlobalContextFromEnv()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		value   = "hello there"
-		command = &githubactions.WorkflowCommand{
+		value         = "hello there"
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandWarning,
 			Parameters: map[string]string{},
 			Value:      value,
 		}
-		_, err = command.WriteTo(commandWriter)
+		_, err   = command.WriteTo(commandWriter)
 		expected = "[" + githubactions.CommandWarning + "] " + value + "\n"
 		actual   = out.String()
 	)
@@ -143,13 +143,13 @@ func TestCommandError(t *testing.T) {
 		out           = new(bytes.Buffer)
 		globalContext = githubactions.NewGlobalContextFromEnv().EnableDebug()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		value   = "hello there"
-		command = &githubactions.WorkflowCommand{
+		value         = "hello there"
+		command       = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandError,
 			Parameters: map[string]string{},
 			Value:      value,
 		}
-		_, err = command.WriteTo(commandWriter)
+		_, err   = command.WriteTo(commandWriter)
 		expected = "[" + githubactions.CommandError + "] " + value + "\n"
 		actual   = out.String()
 	)
@@ -170,7 +170,7 @@ func TestMask(t *testing.T) {
 		value         = uuid.NewString()
 		globalContext = githubactions.NewGlobalContextFromEnv()
 		commandWriter = githubactions.NewWorkflowCommandWriter(out, globalContext)
-		maskCommand = &githubactions.WorkflowCommand{
+		maskCommand   = &githubactions.WorkflowCommand{
 			Command:    githubactions.CommandAddMask,
 			Parameters: map[string]string{},
 			Value:      value,
@@ -194,7 +194,7 @@ func TestMask(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	
+
 	actual := out.String()
 
 	if actual != expected {

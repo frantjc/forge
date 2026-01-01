@@ -65,7 +65,7 @@ func runOptsAndContainerRuntime(cmd *cobra.Command, stdoutUsed ...bool) (forge.C
 	var (
 		ctrWorkDir = "/forge"
 		dindPath   = ctrWorkDir
-		opts = &forge.RunOpts{
+		opts       = &forge.RunOpts{
 			Streams:             commandStreams(cmd, stdoutUsed...),
 			InterceptDockerSock: cmd.Flag("fix-dind").Changed,
 			WorkingDir:          ctrWorkDir,
