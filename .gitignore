@@ -3,7 +3,7 @@
 .vscode/
 
 # make
-bin/
+/bin
 
 # macOS
 .DS_Store
