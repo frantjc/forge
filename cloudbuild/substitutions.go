@@ -233,11 +233,11 @@ func NewSubstitutionsFromEnv(userDefinedSubstitutions map[string]string) (*Subst
 	return substitutions, nil
 }
 
-// NewSubstituionsFromPath returns a map of default
+// NewSubstitutionsFromPath returns a map of default
 // substitutions whose values are sourced from the git
 // repository at the given path and the environment.
 // See https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values#using_default_substitutions.
-func NewSubstituionsFromPath(path string, userDefinedSubstitutions map[string]string) (*Substitutions, error) {
+func NewSubstitutionsFromPath(path string, userDefinedSubstitutions map[string]string) (*Substitutions, error) {
 	r, err := git.PlainOpen(path)
 	for ; err != nil && path != "/"; r, err = git.PlainOpen(path) {
 		path = filepath.Dir(path)

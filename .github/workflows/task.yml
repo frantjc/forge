@@ -25,5 +25,5 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: node make.js build --task ${{ inputs.task }}
-      - uses: frantjc/forge@main
+      - uses: frantjc/actions/setup-tool@v1
       - run: forge task -e ${{ inputs.execution }} ${{ inputs.task }}

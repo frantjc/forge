@@ -2,6 +2,7 @@ package githubactions
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/frantjc/forge/internal/rangemap"
 )
@@ -28,6 +29,11 @@ func (c *WorkflowCommand) String() string {
 	})
 
 	return fmt.Sprintf("%s::%s", s, c.Value)
+}
+
+func (c *WorkflowCommand) WriteTo(w io.Writer) (int64, error) {
+	n, err := w.Write([]byte(c.String()))
+	return int64(n), err
 }
 
 func (c *WorkflowCommand) GoString() string {

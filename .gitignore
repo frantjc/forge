@@ -5,9 +5,6 @@
 # make
 bin/
 
-# goreleaser
-dist/
-
 # macOS
 .DS_Store
 

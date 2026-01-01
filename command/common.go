@@ -2,11 +2,14 @@ package command
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"os/exec"
 
 	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/runtime/docker"
 	"github.com/frantjc/forge/runtime/dockerd"
 	xslices "github.com/frantjc/x/slices"
 	"github.com/spf13/cobra"
@@ -59,25 +62,34 @@ func hookAttach(cmd *cobra.Command, workingDir string, stdoutUsed ...bool) func(
 }
 
 func runOptsAndContainerRuntime(cmd *cobra.Command, stdoutUsed ...bool) (forge.ContainerRuntime, *forge.RunOpts, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return nil, nil, err
-	}
-
 	var (
 		ctrWorkDir = "/forge"
 		dindPath   = ctrWorkDir
+		opts = &forge.RunOpts{
+			Streams:             commandStreams(cmd, stdoutUsed...),
+			InterceptDockerSock: cmd.Flag("fix-dind").Changed,
+			WorkingDir:          ctrWorkDir,
+		}
 	)
+
 	if cmd.Flag("no-dind").Changed {
 		dindPath = ""
 	}
 
-	return dockerd.New(cli, dindPath),
-		&forge.RunOpts{
-			Streams:             commandStreams(cmd, stdoutUsed...),
-			InterceptDockerSock: cmd.Flag("fix-dind").Changed,
-			WorkingDir:          ctrWorkDir,
-		}, nil
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		for _, cli := range []string{"docker", "podman", "nerdctl"} {
+			if bin, nerr := exec.LookPath(cli); nerr == nil {
+				return docker.New(bin), opts, nil
+			} else {
+				err = errors.Join(err, nerr)
+			}
+		}
+
+		return nil, nil, err
+	}
+
+	return dockerd.New(cli, dindPath), opts, nil
 }
 
 func setCommon(cmd *cobra.Command) *cobra.Command {

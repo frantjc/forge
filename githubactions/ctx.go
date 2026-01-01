@@ -253,12 +253,12 @@ func NewGlobalContextFromEnv() *GlobalContext {
 
 	rawServerURL := os.Getenv(EnvVarServerURL)
 	if rawServerURL == "" {
-		rawServerURL = DefaultURL.String()
+		rawServerURL = DefaultServerURL.String()
 	}
 
 	serverURL, err := url.Parse(rawServerURL)
 	if err != nil {
-		serverURL = DefaultURL
+		serverURL = DefaultServerURL
 	}
 
 	// NB: While forge supports multiple OS, the GitHub Actions that
@@ -275,17 +275,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 	// arm containers, meaning we can source a sensible default architecture
 	// from the runtime. It is, of course, still overridable with the
 	// desired archiecture via the RUNNER_ARCH environment variable.
-	runnerArch := os.Getenv(EnvVarRunnerArch)
-	if runnerArch == "" {
-		switch runtime.GOARCH {
-		case "arm64":
-			runnerArch = ArchARM64
-		case "arm":
-			runnerArch = ArchARM
-		default:
-			runnerArch = ArchX86
-		}
-	}
+	runnerArch := RunnerArch()
 
 	refProtected, _ := strconv.ParseBool(os.Getenv(EnvVarRefProtected))
 
@@ -312,7 +302,7 @@ func NewGlobalContextFromEnv() *GlobalContext {
 	runnerToolCache, _ := filepath.Abs(os.Getenv(EnvVarRunnerToolCache))
 
 	return &GlobalContext{
-		GitHubContext: &GitHubContext{
+		GitHubContext: GitHubContext{
 			Action:          os.Getenv(EnvVarAction),
 			ActionPath:      os.Getenv(EnvVarActionPath),
 			Actor:           actor,
@@ -337,9 +327,9 @@ func NewGlobalContextFromEnv() *GlobalContext {
 			Workspace:       os.Getenv(EnvVarWorkspace),
 		},
 		EnvContext:   make(map[string]string),
-		JobContext:   &JobContext{},
+		JobContext:   JobContext{},
 		StepsContext: make(map[string]StepContext),
-		RunnerContext: &RunnerContext{
+		RunnerContext: RunnerContext{
 			Name:      runnerName,
 			OS:        runnerOS,
 			Arch:      runnerArch,
@@ -350,6 +340,21 @@ func NewGlobalContextFromEnv() *GlobalContext {
 		SecretsContext: make(map[string]string),
 		NeedsContext:   make(map[string]NeedContext),
 	}
+}
+
+func RunnerArch() string {
+	runnerArch := os.Getenv(EnvVarRunnerArch)
+	if runnerArch == "" {
+		switch runtime.GOARCH {
+		case "arm64":
+			runnerArch = ArchARM64
+		case "arm":
+			runnerArch = ArchARM
+		default:
+			runnerArch = ArchX86
+		}
+	}
+	return runnerArch
 }
 
 const (
@@ -447,7 +452,7 @@ loop:
 
 			for _, u := range urls {
 				if p, err := url.Parse(u); err == nil {
-					if p.Hostname() != DefaultURL.Hostname() {
+					if p.Hostname() != DefaultServerURL.Hostname() {
 						// https://github.myorg.com/frantjc/forge.git
 						// => https://github.myorg.com/
 						m := p
@@ -526,11 +531,11 @@ func (c *GlobalContext) Env() []string {
 //
 // ...in workflow files.
 type GlobalContext struct {
-	GitHubContext  *GitHubContext
+	GitHubContext  GitHubContext
 	EnvContext     map[string]string
-	JobContext     *JobContext
+	JobContext     JobContext
 	StepsContext   map[string]StepContext
-	RunnerContext  *RunnerContext
+	RunnerContext  RunnerContext
 	InputsContext  map[string]string
 	SecretsContext map[string]string
 	NeedsContext   map[string]NeedContext
@@ -540,6 +545,13 @@ func (c *GlobalContext) EnableDebug() *GlobalContext {
 	c.SecretsContext[SecretActionsStepDebug] = "true"
 	c.SecretsContext[SecretRunnerDebug] = "1"
 	c.SecretsContext[SecretActionsRunnerDebug] = "true"
+	return c
+}
+
+func (c *GlobalContext) DisableDebug() *GlobalContext {
+	delete(c.SecretsContext, SecretActionsStepDebug)
+	delete(c.SecretsContext, SecretRunnerDebug)
+	delete(c.SecretsContext, SecretActionsRunnerDebug)
 	return c
 }
 

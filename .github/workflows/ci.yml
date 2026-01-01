@@ -10,22 +10,22 @@ on:
 permissions:
   contents: read
 jobs:
-  ci:
+  dagger:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: frantjc/actions/setup-tool@v1
         with:
-          node-version: 20
+          repository: dagger/dagger
+          version: v0.19.8
+      - run: dagger check
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
-      - uses: golangci/golangci-lint-action@v8.0.0
-      - run: make download
-      - run: make test
-      - uses: goreleaser/goreleaser-action@v6
-        with:
-          install-only: true
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true

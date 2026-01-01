@@ -51,11 +51,11 @@ func ToMap(ss ...string) map[string]string {
 // and returns a corresponding array of the form
 //
 //	["KEY1=val1", "KEY2=val2"].
-func MapToArr(m map[string]string) []string {
+func MapToArr[T any](m map[string]T) []string {
 	a := []string{}
 	for k, v := range m {
 		if k != "" {
-			a = append(a, fmt.Sprintf("%s=%s", k, v))
+			a = append(a, fmt.Sprintf("%s=%s", k, fmt.Sprint(v)))
 		}
 	}
 	return a

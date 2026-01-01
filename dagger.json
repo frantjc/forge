@@ -1,0 +1,21 @@
+{
+  "name": "forge-dev",
+  "engineVersion": "v0.19.8",
+  "sdk": {
+    "source": "go"
+  },
+  "dependencies": [
+    {
+      "name": "go",
+      "source": "github.com/frantjc/daggerverse/go@main",
+      "pin": "20fda2ff7672c789fc919ff018abf03c1a447cfb"
+    },
+    {
+      "name": "wolfi",
+      "source": "github.com/dagger/dagger/modules/wolfi@v0.19.8",
+      "pin": "1c8379708f82e0f1543fbc0a806b4b995793e55b"
+    }
+  ],
+  "source": ".dagger",
+  "disableDefaultFunctionCaching": true
+}

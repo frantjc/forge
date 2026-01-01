@@ -25,7 +25,9 @@ go install github.com/frantjc/forge/cmd/forge
 In GitHub Actions:
 
 ```yml
-- uses: frantjc/forge@v1
+- uses: frantjc/actions/setup-tool@v1
+  with:
+    repo: frantjc/forge
 ```
 
 As a library:

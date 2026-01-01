@@ -183,24 +183,11 @@ func setGlobalContextFromEnvFiles(ctx context.Context, globalContext *githubacti
 
 func newWorkflowCommandStreams(globalContext *githubactions.GlobalContext, id string, opt *RunOpts) *Streams {
 	globalContext = configureGlobalContext(globalContext, opt)
-	debug := globalContext.DebugEnabled()
 
 	return &Streams{
 		In: opt.Streams.In,
-		Out: &githubactions.WorkflowCommandWriter{
-			GlobalContext:      globalContext,
-			ID:                 id,
-			StopCommandsTokens: map[string]bool{},
-			Debug:              debug,
-			Out:                opt.Streams.Out,
-		},
-		Err: &githubactions.WorkflowCommandWriter{
-			GlobalContext:      globalContext,
-			ID:                 id,
-			StopCommandsTokens: map[string]bool{},
-			Debug:              debug,
-			Out:                opt.Streams.Err,
-		},
+		Out: githubactions.NewWorkflowCommandWriter(opt.Streams.Out, globalContext),
+		Err: githubactions.NewWorkflowCommandWriter(opt.Streams.Err, globalContext),
 		Tty:        opt.Streams.Tty,
 		DetachKeys: opt.Streams.DetachKeys,
 	}
@@ -211,16 +198,8 @@ func configureGlobalContext(globalContext *githubactions.GlobalContext, opt *Run
 		globalContext = githubactions.NewGlobalContextFromEnv()
 	}
 
-	if globalContext.GitHubContext == nil {
-		globalContext.GitHubContext = &githubactions.GitHubContext{}
-	}
-
 	globalContext.GitHubContext.Workspace = GitHubWorkspace(opt.WorkingDir)
 	globalContext.GitHubContext.ActionPath = GitHubActionPath(opt.WorkingDir)
-
-	if globalContext.RunnerContext == nil {
-		globalContext.RunnerContext = &githubactions.RunnerContext{}
-	}
 
 	globalContext.RunnerContext.Temp = GitHubRunnerTmp(opt.WorkingDir)
 	globalContext.RunnerContext.ToolCache = GitHubRunnerToolCache(opt.WorkingDir)

@@ -38,7 +38,7 @@ func DownloadAction(ctx context.Context, u *Uses) (*Metadata, io.ReadCloser, err
 		client = github.NewClient(http.DefaultClient)
 	}
 
-	client.BaseURL = GetGitHubAPIURL().JoinPath("/")
+	client.BaseURL = GetAPIURL().JoinPath("/")
 
 	// Get the sha in parallel for speed.
 	// Used later to know what directory of the action's tarball

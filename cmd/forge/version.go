@@ -5,16 +5,12 @@ import (
 	"strings"
 )
 
-// GoReleaser sets these.
 var (
-	version = "1.0.1"
-	commit  = ""
-	date    = ""
-	builtBy = ""
+	version = ""
 )
 
-// SemVer returns the semantic version of `forge` as
-// built from GoReleaser ldflags and debug build info.
+// SemVer returns the semantic version of `sindri` as
+// built from ldflags and debug build info.
 func SemVer() string {
 	semver := version
 
@@ -22,8 +18,6 @@ func SemVer() string {
 		var (
 			revision string
 			modified bool
-			_        = date
-			_        = builtBy
 		)
 		for _, setting := range buildInfo.Settings {
 			switch setting.Key {
@@ -32,10 +26,6 @@ func SemVer() string {
 			case "vcs.modified":
 				modified = setting.Value == "true"
 			}
-		}
-
-		if revision == "" {
-			revision = commit
 		}
 
 		if revision != "" {

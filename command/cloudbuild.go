@@ -73,7 +73,7 @@ func NewCloudBuild() *cobra.Command {
 					}
 				}
 
-				subs, err := cloudbuild.NewSubstituionsFromPath(wd, substitutions)
+				subs, err := cloudbuild.NewSubstitutionsFromPath(wd, substitutions)
 				if err != nil {
 					if subs, err = cloudbuild.NewSubstitutionsFromEnv(substitutions); err != nil {
 						return err

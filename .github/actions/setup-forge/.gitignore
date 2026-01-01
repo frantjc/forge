@@ -1,8 +1,0 @@
-# github actions
-!dist/
-
-# tsc
-lib/
-
-# nodejs
-node_modules/
