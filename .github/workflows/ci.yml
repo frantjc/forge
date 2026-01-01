@@ -23,14 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v6
+      - uses: frantjc/actions/setup-tool@v1
         with:
-          go-version-file: go.mod
-      - uses: crazy-max/ghaction-upx@v3
-        with:
-          install-only: true
+          repository: dagger/dagger
+          version: v0.19.8
       - name: Run make forge
-        run: make forge LOCALBIN=$RUNNER_TEMP
+        run: make LOCALBIN=$RUNNER_TEMP
       - name: Set path
         run: echo $RUNNER_TEMP >> $GITHUB_PATH
       - name: Test forge.sock
