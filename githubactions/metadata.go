@@ -8,6 +8,10 @@ import (
 	"github.com/frantjc/forge/internal/yaml"
 )
 
+// ActionYAMLFilenames holds the possible names of
+// a GitHub Action metadata file.
+var ActionYAMLFilenames = []string{"action.yml", "action.yaml"}
+
 const (
 	RunsUsingDockerImagePrefix = "docker://"
 	RunsUsingDocker            = "docker"
@@ -15,6 +19,7 @@ const (
 	RunsUsingNode12            = "node12"
 	RunsUsingNode16            = "node16"
 	RunsUsingNode20            = "node20"
+	RunsUsingNode24            = "node24"
 )
 
 func NewMetadataFromReader(r io.Reader) (*Metadata, error) {
@@ -47,8 +52,16 @@ func (m *Metadata) IsComposite() bool {
 	return m.Runs.Using == RunsUsingComposite
 }
 
+func (m *Metadata) IsNode() bool {
+	return m.Runs.Using == RunsUsingNode12 || m.Runs.Using == RunsUsingNode16 || m.Runs.Using == RunsUsingNode20 || m.Runs.Using == RunsUsingNode24
+}
+
+func (m *Metadata) IsDocker() bool {
+	return m.Runs.Using == RunsUsingDocker
+}
+
 func (m *Metadata) IsDockerfile() bool {
-	return m.Runs.Using == RunsUsingDocker && !strings.HasPrefix(m.Runs.Image, RunsUsingDockerImagePrefix)
+	return m.IsDocker() && !strings.HasPrefix(m.Runs.Image, RunsUsingDockerImagePrefix)
 }
 
 type Metadata struct {

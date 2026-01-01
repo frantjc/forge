@@ -14,6 +14,14 @@ YARN ?= yarn
 
 GOARCH ?= $(shell $(GO) env GOARCH)
 
+# FIXME(frantjc): The places that this is imported must be commented out before the install works.
+.PHONY: internal/client internal/client/
+internal/client internal/client/:
+	@cd $@ && rm -r dag/ dagger.gen.go || true
+	@cd $@ && cat dagger.json | jq 'del(.clients)' > dagger.json.tmp && mv dagger.json.tmp dagger.json
+	@cd $@ && dagger client install go ./
+	@cd $@ && rm go.mod go.sum
+
 .PHONY: .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/
 .github/actions/setup-forge/node_modules .github/actions/setup-forge/node_modules/:
 	@cd .github/actions/setup-forge && $(YARN)
@@ -33,28 +41,6 @@ download tidy:
 .PHONY: lint
 lint: golangci-lint
 	@$(GOLANGCI_LINT) run --fix
-
-.PHONY: internal/bin/shim_amd64
-internal/bin/shim_amd64:
-	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
-	@$(UPX) --ultra-brute $@
-
-.PHONY: internal/bin/fs_amd64.go
-internal/bin/fs_amd64.go:
-	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|amd64|g" > $@
-
-.PHONY: internal/bin/shim_arm64
-internal/bin/shim_arm64:
-	@GOOS=linux GOARCH=arm64 CGO_ENABLED=0 $(GO) build -ldflags "-s -w" -o $@ ./internal/cmd/shim
-	@$(UPX) --ultra-brute $@
-
-.PHONY: internal/bin/fs_arm64.go
-internal/bin/fs_arm64.go:
-	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|arm64|g" > $@
-
-.PHONY: clean
-clean:
-	@rm -rf dist/ rootfs/ vendor/ privileged version internal/bin/shim*.*
 
 .PHONY: release
 ifeq (,$(findstring -,$(SEMVER)))

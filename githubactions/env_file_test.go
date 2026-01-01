@@ -11,6 +11,10 @@ import (
 func TestParseEnvFile(t *testing.T) {
 	var (
 		env = `# comment
+cache-hit<<ghadelimiter_` + uuid.NewString() + `
+true
+ghadelimiter_` + uuid.NewString() + `
+
 HANDLE<<_GitHubActionsFileCommandDelimeter_
 old stuff # comment
 _GitHubActionsFileCommandDelimeter_
@@ -39,6 +43,7 @@ ghadelimiter_` + uuid.NewString() + "\n"
 			"BOLD":       "one",
 			"NARUTO":     "'uzumaki'",
 			"YOU_BETTER": `"believe it"`,
+			"cache-hit":  "true",
 		}
 		actual, err = githubactions.ParseEnvFile(bytes.NewBufferString(env))
 	)

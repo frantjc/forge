@@ -12,13 +12,13 @@ var (
 	valueDelimiter  = `ghadelimiter_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`
 	valueDelimiterR = regexp.MustCompile(valueDelimiter)
 
-	keyDelimiter  = `(\w+)<<` + valueDelimiter
+	keyDelimiter  = `(^[\w-]+)<<` + valueDelimiter
 	keyDelimiterR = regexp.MustCompile(keyDelimiter)
 
 	oldValueDelimiter  = `_GitHubActionsFileCommandDelimeter_`
 	oldValueDelimiterR = regexp.MustCompile(oldValueDelimiter)
 
-	oldKeyDelimiter  = `(\w+)<<` + oldValueDelimiter
+	oldKeyDelimiter  = `(^[\w-]+)<<` + oldValueDelimiter
 	oldKeyDelimiterR = regexp.MustCompile(oldKeyDelimiter)
 )
 

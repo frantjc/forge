@@ -6,22 +6,22 @@ import (
 )
 
 var (
-	DefaultURL        *url.URL
+	DefaultServerURL  *url.URL
 	DefaultAPIURL     *url.URL
 	DefaultGraphQLURL *url.URL
 )
 
 func init() {
 	var err error
-	if DefaultURL, err = url.Parse("https://github.com/"); err != nil {
+	if DefaultServerURL, err = url.Parse("https://github.com/"); err != nil {
 		panic("github.com/frantjc/forge/githubactions.DefaultURL is not a valid URL")
 	}
 
-	if DefaultAPIURL, err = APIURLFromBaseURL(DefaultURL); err != nil {
+	if DefaultAPIURL, err = APIURLFromBaseURL(DefaultServerURL); err != nil {
 		panic("github.com/frantjc/forge/githubactions.DefaultAPIURL is not a valid URL")
 	}
 
-	if DefaultGraphQLURL, err = GraphQLURLFromBaseURL(DefaultURL); err != nil {
+	if DefaultGraphQLURL, err = GraphQLURLFromBaseURL(DefaultServerURL); err != nil {
 		panic("github.com/frantjc/forge/githubactions.DefaultGraphQLURL is not a valid URL")
 	}
 }
@@ -52,20 +52,16 @@ func GraphQLURLFromBaseURL(base *url.URL) (*url.URL, error) {
 	return graphql, nil
 }
 
-func GetGitHubURL() *url.URL {
+func GetServerURL() *url.URL {
 	envVar := os.Getenv(EnvVarServerURL)
 	if u, err := url.Parse(envVar); err == nil && envVar != "" {
 		return u
 	}
 
-	return DefaultURL
+	return DefaultServerURL
 }
 
-func GetGitHubServerURL() *url.URL {
-	return GetGitHubURL()
-}
-
-func GetGitHubAPIURL() *url.URL {
+func GetAPIURL() *url.URL {
 	envVar := os.Getenv(EnvVarAPIURL)
 	if u, err := url.Parse(envVar); err == nil && envVar != "" {
 		return u

@@ -1,114 +1,213 @@
-package forge
+package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
+	"path"
 
 	"github.com/frantjc/forge/concourse"
-	xos "github.com/frantjc/x/os"
+	"github.com/frantjc/forge/internal/dagger"
+	"github.com/frantjc/forge/internal/envconv"
+	"sigs.k8s.io/yaml"
 )
 
 type Resource struct {
-	Method       string
-	Version      map[string]any
-	Params       map[string]any
-	Resource     *concourse.Resource
-	ResourceType *concourse.ResourceType
+	FinalizedResource
+	Source []string
 }
 
-func (o *Resource) Run(ctx context.Context, containerRuntime ContainerRuntime, opts ...RunOpt) error {
-	opt := runOptsWithDefaults(opts...)
+const (
+	resourcePath = "/forge/resource"
+)
 
-	image, err := containerRuntime.PullImage(ctx, resourceTypeToImageReference(o.ResourceType))
+func (f *Forge) Resource(
+	ctx context.Context,
+	resource string,
+	// +defaultPath=".forge.yml"
+	pipeline *dagger.File,
+	// +defaultPath="."
+	workdir *dagger.Directory,
+) (*Resource, error) {
+	contents, err := pipeline.Contents(ctx)
 	if err != nil {
-		return err
-	}
-
-	containerConfig := resourceToConfig(o.Resource, o.ResourceType, o.Method, opt)
-	containerConfig.Mounts = overrideMounts(containerConfig.Mounts, opt.Mounts...)
-
-	container, err := createSleepingContainer(ctx, containerRuntime, image, containerConfig, opt)
-	if err != nil {
-		return err
-	}
-	defer container.Stop(ctx)   //nolint:errcheck
-	defer container.Remove(ctx) //nolint:errcheck
-
-	streams, err := resourceStreams(opt.Streams, &concourse.Input{
-		Params: func() map[string]any {
-			if o.Method == concourse.MethodCheck {
-				return nil
-			}
-
-			return o.Params
-		}(),
-		Source: o.Resource.Source,
-		Version: func() map[string]any {
-			if o.Method == concourse.MethodPut {
-				return nil
-			}
-
-			return o.Version
-		}(),
-	})
-	if err != nil {
-		return err
-	}
-
-	if exitCode, err := container.Exec(ctx, containerConfig, streams); err != nil {
-		return err
-	} else if exitCode > 0 {
-		return xos.NewExitCodeError(ErrContainerExitedWithNonzeroExitCode, exitCode)
-	}
-
-	return nil
-}
-
-func resourceStreams(streams *Streams, input *concourse.Input) (*Streams, error) {
-	if streams.In != nil {
-		return nil, fmt.Errorf("stdin not supported for Concourse Resources")
-	}
-
-	in := new(bytes.Buffer)
-
-	if err := json.NewEncoder(in).Encode(input); err != nil {
 		return nil, err
 	}
 
-	return &Streams{
-		In:         in,
-		Out:        streams.Out,
-		Err:        streams.Err,
-		Tty:        streams.Tty,
-		DetachKeys: streams.DetachKeys,
+	parsed := &concourse.Pipeline{}
+
+	if err := yaml.Unmarshal([]byte(contents), parsed); err != nil {
+		return nil, err
+	}
+
+	parsed.ResourceTypes = append(parsed.ResourceTypes, concourse.BuiltinResourceTypes...)
+
+	r, rt, err := resourceAndType(parsed, resource)
+	if err != nil {
+		return nil, err
+	}
+
+	container := dag.Container().
+		From(fmt.Sprintf("%s:%s", rt.Source.Repository, rt.Source.Tag)).
+		WithWorkdir(path.Join(resourcePath, r.Name)).
+		WithMountedDirectory(path.Join(resourcePath, r.Name), workdir)
+
+	return &Resource{
+		FinalizedResource: FinalizedResource{
+			Ctr:  container,
+			Name: resource,
+		},
+		Source: envconv.MapToArr(r.Source),
 	}, nil
 }
 
-func resourceToConfig(resource *concourse.Resource, resourceType *concourse.ResourceType, method string, opt *RunOpts) *ContainerConfig {
-	return &ContainerConfig{
-		Entrypoint: concourse.GetEntrypoint(method),
-		Cmd:        []string{filepath.Join(ConcourseResourceWorkingDir(opt.WorkingDir), resource.Name)},
-		Privileged: resourceType.Privileged,
-		Mounts: []Mount{
-			{
-				Destination: filepath.Join(ConcourseResourceWorkingDir(opt.WorkingDir), resource.Name),
-			},
-		},
+func resourceAndType(pipeline *concourse.Pipeline, resource string) (r *concourse.Resource, rt *concourse.ResourceType, err error) {
+	for _, _r := range pipeline.Resources {
+		if _r.Name == resource {
+			r = &_r
+			break
+		}
 	}
+
+	if r == nil {
+		err = fmt.Errorf("resource %s not found", resource)
+		return
+	}
+
+	for _, _rt := range pipeline.ResourceTypes {
+		if _rt.Name == r.Type {
+			rt = &_rt
+			break
+		}
+	}
+
+	if rt == nil {
+		r = nil
+		err = fmt.Errorf("resource type %s not found", resource)
+		return
+	}
+
+	return
 }
 
-func resourceTypeToImageReference(resourceType *concourse.ResourceType) string {
-	if resourceType != nil && resourceType.Source != nil {
-		tag := resourceType.Source.Tag
-		if tag == "" {
-			tag = "latest"
-		}
-
-		return resourceType.Source.Repository + ":" + tag
+// Get runs the get step.
+func (r *Resource) Get(
+	// +optional
+	version []string,
+	// +optional
+	param []string,
+) (*FinalizedResource, error) {
+	stdin, err := getStdin(r.Source, version, param)
+	if err != nil {
+		return nil, err
 	}
 
-	return ""
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointGet, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+		Stdin: stdin,
+	})
+
+	return &r.FinalizedResource, nil
+}
+
+type FinalizedResource struct {
+	Ctr  *dagger.Container
+	Name string
+}
+
+// Check runs the check step.
+func (r *Resource) Check(
+	// +optional
+	version []string,
+) (*FinalizedResource, error) {
+	stdin, err := getStdin(r.Source, version, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointCheck, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+		Stdin: stdin,
+	})
+
+	return &r.FinalizedResource, nil
+}
+
+// Put runs the put step.
+func (r *Resource) Put(
+	// +optional
+	param []string,
+) (*FinalizedResource, error) {
+	stdin, err := getStdin(r.Source, nil, param)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Ctr = r.Container().WithExec([]string{concourse.EntrypointPut, path.Join(resourcePath, r.Name)}, dagger.ContainerWithExecOpts{
+		Stdin: stdin,
+	})
+
+	return &r.FinalizedResource, nil
+}
+
+func getStdin(source, version, params []string) (string, error) {
+	input := &concourse.Input{}
+
+	skv, err := parseKeyValuePairs(source)
+	if err != nil {
+		return "", err
+	}
+
+	if len(skv) > 0 {
+		input.Source = map[string]any{}
+
+		for k, v := range skv {
+			input.Source[k] = v
+		}
+	}
+
+	vkv, err := parseKeyValuePairs(version)
+	if err != nil {
+		return "", err
+	}
+
+	if len(vkv) > 0 {
+		input.Version = map[string]any{}
+
+		for k, v := range vkv {
+			input.Version[k] = v
+		}
+	}
+
+	pkv, err := parseKeyValuePairs(params)
+	if err != nil {
+		return "", err
+	}
+
+	if len(pkv) > 0 {
+		input.Params = map[string]any{}
+
+		for k, v := range pkv {
+			input.Params[k] = v
+		}
+	}
+
+	b, err := json.Marshal(input)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
+
+// Container gives access to the underlying container.
+func (r *FinalizedResource) Container() *dagger.Container {
+	return r.Ctr
+}
+
+// Terminal is a convenient alias for Container().Terminal().
+func (r *FinalizedResource) Terminal() *dagger.Container {
+	return r.Container().Terminal()
+}
+
+func (r *FinalizedResource) Workdir() *dagger.Directory {
+	return r.Container().Directory(path.Join(resourcePath, r.Name))
 }

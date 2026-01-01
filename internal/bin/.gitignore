@@ -1,7 +1,0 @@
-# shim
-shim*
-!shim_amd64
-!shim_arm64
-fs_*.go
-!fs_amd64.go
-!fs_arm64.go
