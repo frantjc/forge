@@ -42,4 +42,8 @@ const (
 	EnvVarRetentionDays    = "GITHUB_RETENTION_DAYS"
 	EnvVarStepSummary      = "GITHUB_STEP_SUMMARY"
 	EnvVarActionRepository = "GITHUB_ACTION_REPOSITORY"
+
+	EnvVarActionsResultsURL     = "ACTIONS_RESULTS_URL"
+	EnvVarActionsCacheURL       = "ACTIONS_CACHE_URL"
+	EnvVarActionsCacheServiceV2 = "ACTIONS_CACHE_SERVICE_V2"
 )
