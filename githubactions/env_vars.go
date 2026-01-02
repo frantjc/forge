@@ -46,4 +46,5 @@ const (
 	EnvVarActionsResultsURL     = "ACTIONS_RESULTS_URL"
 	EnvVarActionsCacheURL       = "ACTIONS_CACHE_URL"
 	EnvVarActionsCacheServiceV2 = "ACTIONS_CACHE_SERVICE_V2"
+	EnvVarActionsRuntimeToken   = "ACTIONS_RUNTIME_TOKEN"
 )
