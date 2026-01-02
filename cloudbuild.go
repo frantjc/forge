@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/frantjc/forge/cloudbuild"
+	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/internal/bin"
-	"github.com/frantjc/forge/internal/envconv"
 	xos "github.com/frantjc/x/os"
 	xslices "github.com/frantjc/x/slices"
 )

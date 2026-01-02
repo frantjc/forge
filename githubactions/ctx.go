@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/frantjc/forge/internal/envconv"
+	"github.com/frantjc/forge/envconv"
 	"github.com/go-git/go-git/v5"
 	"golang.org/x/exp/maps"
 )

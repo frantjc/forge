@@ -6,7 +6,7 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/cloudbuild"
-	"github.com/frantjc/forge/internal/envconv"
+	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/internal/hostfs"
 	"github.com/spf13/cobra"
 )

@@ -3,7 +3,7 @@ package envconv_test
 import (
 	"testing"
 
-	"github.com/frantjc/forge/internal/envconv"
+	"github.com/frantjc/forge/envconv"
 )
 
 func TestMapFromArr(t *testing.T) {

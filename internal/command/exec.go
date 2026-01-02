@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
+	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
-	"github.com/frantjc/forge/internal/envconv"
 	xos "github.com/frantjc/x/os"
 	"github.com/spf13/cobra"
 )
