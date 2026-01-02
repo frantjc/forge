@@ -1,6 +1,5 @@
 package forge
 
-
 const (
 	DefaultNode10ImageReference = "docker.io/library/node:10"
 	// DefaultNode12ImageReference is the default container image reference that
