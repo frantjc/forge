@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/command"
+	xerrors "github.com/frantjc/x/errors"
 	xos "github.com/frantjc/x/os"
 )
 
@@ -20,10 +19,10 @@ func main() {
 		ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	)
 
-	cmd.AddCommand(command.NewVersion(fmt.Sprintf("forge%s %s", SemVer(), runtime.Version())))
+	cmd.AddCommand(command.NewVersion(SemVer()))
 
-	err := cmd.ExecuteContext(ctx)
-	if err != nil && !errors.Is(err, forge.ErrContainerExitedWithNonzeroExitCode) {
+	err := xerrors.Ignore(cmd.ExecuteContext(ctx), context.Canceled, forge.ErrContainerExitedWithNonzeroExitCode)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
