@@ -7,7 +7,7 @@ require (
 	github.com/docker/cli v28.4.0+incompatible
 	github.com/docker/docker v28.4.0+incompatible
 	github.com/frantjc/x v0.0.0-20250708221246-4821241349c4
-	github.com/go-git/go-git/v5 v5.16.2
+	github.com/go-git/go-git/v5 v5.16.4
 	github.com/google/go-containerregistry v0.20.6
 	github.com/google/go-github/v69 v69.2.0
 	github.com/google/uuid v1.6.0
