@@ -13,7 +13,7 @@ jobs:
           repository: dagger/dagger
           version: v0.19.8
       - run: dagger call -y build-shims
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           add-paths: |
             internal/bin/shim_*
