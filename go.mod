@@ -15,7 +15,7 @@ require (
 	github.com/moby/term v0.5.2
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.1
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
 	golang.org/x/text v0.31.0
 	k8s.io/apimachinery v0.35.0
