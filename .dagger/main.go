@@ -114,7 +114,7 @@ func (m *ForgeDev) Binary(
 	}
 
 	g0 := dag.Go(dagger.GoOpts{
-		Module: module,
+		Module:                  module,
 		AdditionalWolfiPackages: []string{"upx"},
 	})
 	upx := g0.Container()
@@ -136,7 +136,6 @@ func (m *ForgeDev) Binary(
 			WithExec([]string{"upx", upxFlag, tmp}, dagger.ContainerWithExecOpts{Expand: true}).
 			File(tmp, dagger.ContainerFileOpts{Expand: true}),
 	)
-
 
 	return upx.
 		WithFile(
