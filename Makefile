@@ -9,17 +9,9 @@ $(FORGE): $(LOCALBIN)
 .git/hooks .git/hooks/ .git/hooks/pre-commit:
 	@cp .githooks/* .git/hooks
 
-.PHONY: internal/bin/fs_amd64.go
-internal/bin/fs_amd64.go:
-	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|amd64|g" > $@
-
-.PHONY: internal/bin/fs_arm64.go
-internal/bin/fs_arm64.go:
-	@cat internal/bin/fs.go.tpl | sed -e "s|GOARCH|arm64|g" > $@
-
 .PHONY: clean
 clean:
-	@rm -rf rootfs/ vendor/ privileged version internal/bin/shim*.*
+	@rm -rf rootfs/ vendor/ privileged version
 
 .PHONY: release
 release:

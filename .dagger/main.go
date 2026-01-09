@@ -57,35 +57,6 @@ func (m *ForgeDev) Fmt(ctx context.Context) *dagger.Changeset {
 	return root.Changes(m.Source)
 }
 
-func (m *ForgeDev) BuildShims(ctx context.Context) *dagger.Changeset {
-	root := m.Source
-	g0 := dag.Go(dagger.GoOpts{Module: root})
-	upx := dag.Wolfi().
-		Container(dagger.WolfiContainerOpts{
-			Packages: []string{"upx"},
-		})
-
-	for _, goarch := range []string{"amd64", "arm64"} {
-		tmp := "/usr/local/bin/shim"
-
-		shim := upx.
-			WithFile(
-				tmp,
-				g0.
-					Build(dagger.GoBuildOpts{
-						Pkg:    "./internal/cmd/shim",
-						Goarch: goarch,
-					}),
-			).
-			WithExec([]string{"upx", "--ultra-brute", tmp}).
-			File(tmp)
-
-		root = root.WithFile(fmt.Sprintf("internal/bin/shim_%s", goarch), shim)
-	}
-
-	return root.Changes(m.Source)
-}
-
 func (m *ForgeDev) Test(ctx context.Context) (*dagger.Container, error) {
 	return dag.Go(dagger.GoOpts{
 		Module: m.Source,
@@ -94,7 +65,11 @@ func (m *ForgeDev) Test(ctx context.Context) (*dagger.Container, error) {
 		WithExec([]string{"go", "test", "-race", "-cover", "-test.v", "./..."}), nil
 }
 
-func (m *ForgeDev) Release(ctx context.Context, githubToken *dagger.Secret) error {
+func (m *ForgeDev) Release(
+	ctx context.Context,
+	githubRepo string,
+	githubToken *dagger.Secret,
+) error {
 	gitRef := m.Source.AsGit().LatestVersion()
 
 	ref, err := gitRef.Ref(ctx)
@@ -103,46 +78,21 @@ func (m *ForgeDev) Release(ctx context.Context, githubToken *dagger.Secret) erro
 	}
 
 	tag := strings.TrimPrefix(ref, "refs/tags/")
+	opts := dagger.GhReleaseCreateOpts{
+		Assets: []*dagger.File{},
+	}
 
-	release := dag.Wolfi().
-		Container(dagger.WolfiContainerOpts{
-			Packages: []string{"gh"},
-		}).
-		WithSecretVariable("GITHUB_TOKEN", githubToken).
-		WithExec([]string{"gh", "release", "-R=frantjc/forge", "create", tag, "--generate-notes", "--draft"})
-
-	g0 := dag.Go(dagger.GoOpts{
-		Module: gitRef.Tree(),
-	})
+	m.Source = gitRef.Tree()
 
 	for _, goos := range []string{"darwin", "linux"} {
 		for _, goarch := range []string{"amd64", "arm64"} {
-			file := fmt.Sprintf("forge_%s_%s_%s", tag, goos, goarch)
-
-			release = release.
-				WithFile(
-					file,
-					g0.Build(dagger.GoBuildOpts{
-						Pkg:     "./cmd/forge",
-						Ldflags: "-s -w -X main.version=" + tag,
-						Goos:    goos,
-						Goarch:  goarch,
-					}),
-				).
-				WithExec([]string{
-					"gh", "release", "-R=frantjc/forge", "upload", tag, file,
-				})
+			opts.Assets = append(opts.Assets,
+				m.Binary(ctx, tag, goarch, goos, true).WithName(fmt.Sprintf("forge_%s_%s_%s", tag, goos, goarch)),
+			)
 		}
 	}
 
-	_, err = release.
-		WithExec([]string{"gh", "release", "-R=frantjc/forge", "edit", tag, "--latest", "--draft=false"}).
-		Sync(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return dag.Gh(githubToken).Release().Create(ctx, tag, githubRepo, opts)
 }
 
 func (m *ForgeDev) Binary(
@@ -153,16 +103,55 @@ func (m *ForgeDev) Binary(
 	goarch string,
 	// +optional
 	goos string,
+	// +optional
+	ultraBrute bool,
 ) *dagger.File {
-	return dag.Go(dagger.GoOpts{
-		Module: m.Source,
-	}).
-		Build(dagger.GoBuildOpts{
-			Pkg:     "./cmd/forge",
-			Ldflags: "-s -w -X main.version=" + version,
-			Goos:    goos,
-			Goarch:  goarch,
-		})
+	module := m.Source
+
+	upxFlag := "--brute"
+	if ultraBrute {
+		upxFlag = "--ultra-brute"
+	}
+
+	g0 := dag.Go(dagger.GoOpts{
+		Module: module,
+		AdditionalWolfiPackages: []string{"upx"},
+	})
+	upx := g0.Container()
+
+	tmp := "$GOBIN/output"
+
+	module = module.WithFile(
+		"internal/bin/shim",
+		upx.
+			WithFile(
+				tmp,
+				g0.
+					Build(dagger.GoBuildOpts{
+						Pkg:    "./internal/cmd/shim",
+						Goarch: goarch,
+					}),
+				dagger.ContainerWithFileOpts{Expand: true},
+			).
+			WithExec([]string{"upx", upxFlag, tmp}, dagger.ContainerWithExecOpts{Expand: true}).
+			File(tmp, dagger.ContainerFileOpts{Expand: true}),
+	)
+
+
+	return upx.
+		WithFile(
+			tmp,
+			g0.WithSource(module).
+				Build(dagger.GoBuildOpts{
+					Pkg:     "./cmd/forge",
+					Ldflags: "-s -w -X main.version=" + version,
+					Goos:    goos,
+					Goarch:  goarch,
+				}),
+			dagger.ContainerWithFileOpts{Expand: true},
+		).
+		WithExec([]string{"upx", upxFlag, tmp}, dagger.ContainerWithExecOpts{Expand: true}).
+		File(tmp, dagger.ContainerFileOpts{Expand: true})
 }
 
 func (m *ForgeDev) Vulncheck(ctx context.Context) (string, error) {

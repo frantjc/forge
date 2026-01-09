@@ -6,9 +6,14 @@
   },
   "dependencies": [
     {
+      "name": "gh",
+      "source": "github.com/frantjc/daggerverse/gh@main",
+      "pin": "39e6c9266405b74030c337aa2ee242b73fbd0e72"
+    },
+    {
       "name": "go",
       "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "20fda2ff7672c789fc919ff018abf03c1a447cfb"
+      "pin": "39e6c9266405b74030c337aa2ee242b73fbd0e72"
     },
     {
       "name": "wolfi",
