@@ -47,7 +47,7 @@ func (o *CloudBuild) Run(ctx context.Context, containerRuntime ContainerRuntime,
 	if err != nil {
 		return err
 	}
-	defer container.Stop(ctx) //nolint:errcheck
+	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
 
 	if err = copyScriptToContainer(ctx, container, script, opt); err != nil {
