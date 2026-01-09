@@ -17,8 +17,6 @@ func (o *Pipe) Run(ctx context.Context, containerRuntime ContainerRuntime, opts 
 	)
 
 	go func() {
-		defer pw.Close()
-
 		_ = pw.CloseWithError(o.From.Run(ctx, containerRuntime, &RunOpts{
 			Mounts: opt.Mounts,
 			Streams: &Streams{

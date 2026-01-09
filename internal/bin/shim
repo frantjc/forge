@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
-echo "The version of forge that you're using has this stubbed shim, which means that it was built incorrectly."
-echo "Please reinstall from an official release."
+echo "The version of Forge that you're using includes this stubbed shim, which means that it was built incorrectly."
+echo "Please reinstall via a supported method. See https://frantjc.github.io/forge/install."
 exit 1
