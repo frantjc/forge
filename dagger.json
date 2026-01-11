@@ -1,6 +1,6 @@
 {
   "name": "forge-dev",
-  "engineVersion": "v0.19.8",
+  "engineVersion": "v0.19.9",
   "sdk": {
     "source": "go"
   },
@@ -8,12 +8,12 @@
     {
       "name": "gh",
       "source": "github.com/frantjc/daggerverse/gh@main",
-      "pin": "39e6c9266405b74030c337aa2ee242b73fbd0e72"
+      "pin": "292051c40e92539ad687f476228c1bb4cc1d3c5a"
     },
     {
       "name": "go",
       "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "39e6c9266405b74030c337aa2ee242b73fbd0e72"
+      "pin": "292051c40e92539ad687f476228c1bb4cc1d3c5a"
     },
     {
       "name": "wolfi",

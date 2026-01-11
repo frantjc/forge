@@ -114,32 +114,33 @@ func (m *ForgeDev) Binary(
 	}
 
 	g0 := dag.Go(dagger.GoOpts{
-		Module:                  module,
-		AdditionalWolfiPackages: []string{"upx"},
+		Module: module,
 	})
-	upx := g0.Container()
+	upx := dag.Wolfi().
+		Container(dagger.WolfiContainerOpts{Packages: []string{"upx"}})
 
-	tmp := "$GOBIN/output"
+	shim := "/tmp/shim"
 
 	module = module.WithFile(
 		"internal/bin/shim",
 		upx.
 			WithFile(
-				tmp,
+				shim,
 				g0.
 					Build(dagger.GoBuildOpts{
 						Pkg:    "./internal/cmd/shim",
 						Goarch: goarch,
 					}),
-				dagger.ContainerWithFileOpts{Expand: true},
 			).
-			WithExec([]string{"upx", upxFlag, tmp}, dagger.ContainerWithExecOpts{Expand: true}).
-			File(tmp, dagger.ContainerFileOpts{Expand: true}),
+			WithExec([]string{"upx", upxFlag, shim}).
+			File(shim),
 	)
+
+	forge := "/tmp/forge"
 
 	return upx.
 		WithFile(
-			tmp,
+			forge,
 			g0.WithSource(module).
 				Build(dagger.GoBuildOpts{
 					Pkg:     "./cmd/forge",
@@ -147,10 +148,9 @@ func (m *ForgeDev) Binary(
 					Goos:    goos,
 					Goarch:  goarch,
 				}),
-			dagger.ContainerWithFileOpts{Expand: true},
 		).
-		WithExec([]string{"upx", upxFlag, tmp}, dagger.ContainerWithExecOpts{Expand: true}).
-		File(tmp, dagger.ContainerFileOpts{Expand: true})
+		WithExec([]string{"upx", upxFlag, forge}).
+		File(forge)
 }
 
 func (m *ForgeDev) Vulncheck(ctx context.Context) (string, error) {

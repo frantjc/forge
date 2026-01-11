@@ -15,7 +15,7 @@ jobs:
       - uses: frantjc/actions/setup-tool@v1
         with:
           repository: dagger/dagger
-          version: v0.19.8
+          version: v0.19.9
       - env:
           GITHUB_TOKEN: ${{ github.token }}
         run: dagger call release --github-token env://GITHUB_TOKEN

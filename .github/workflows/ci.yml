@@ -17,7 +17,7 @@ jobs:
       - uses: frantjc/actions/setup-tool@v1
         with:
           repository: dagger/dagger
-          version: v0.19.8
+          version: v0.19.9
       - run: dagger check
   e2e:
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
       - uses: frantjc/actions/setup-tool@v1
         with:
           repository: dagger/dagger
-          version: v0.19.8
+          version: v0.19.9
       - name: Run make forge
         run: make LOCALBIN=$RUNNER_TEMP
       - name: Set path
