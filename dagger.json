@@ -6,19 +6,24 @@
   },
   "dependencies": [
     {
-      "name": "gh",
-      "source": "github.com/frantjc/daggerverse/gh@main",
-      "pin": "292051c40e92539ad687f476228c1bb4cc1d3c5a"
-    },
-    {
       "name": "go",
       "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "292051c40e92539ad687f476228c1bb4cc1d3c5a"
+      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
+    },
+    {
+      "name": "release",
+      "source": "github.com/frantjc/daggerverse/release@main",
+      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
+    },
+    {
+      "name": "upx",
+      "source": "github.com/frantjc/daggerverse/upx@main",
+      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
     },
     {
       "name": "wolfi",
-      "source": "github.com/dagger/dagger/modules/wolfi@v0.19.8",
-      "pin": "1c8379708f82e0f1543fbc0a806b4b995793e55b"
+      "source": "github.com/dagger/dagger/modules/wolfi@v0.19.9",
+      "pin": "42e7b630c9f48f2a9bca26af4f6261b6e54d7374"
     }
   ],
   "source": ".dagger",

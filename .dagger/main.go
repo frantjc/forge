@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/frantjc/forge/.dagger/internal/dagger"
@@ -70,29 +69,7 @@ func (m *ForgeDev) Release(
 	githubRepo string,
 	githubToken *dagger.Secret,
 ) error {
-	gitRef := m.Source.AsGit().LatestVersion()
-
-	ref, err := gitRef.Ref(ctx)
-	if err != nil {
-		return err
-	}
-
-	tag := strings.TrimPrefix(ref, "refs/tags/")
-	opts := dagger.GhReleaseCreateOpts{
-		Assets: []*dagger.File{},
-	}
-
-	m.Source = gitRef.Tree()
-
-	for _, goos := range []string{"darwin", "linux"} {
-		for _, goarch := range []string{"amd64", "arm64"} {
-			opts.Assets = append(opts.Assets,
-				m.Binary(ctx, tag, goarch, goos, true).WithName(fmt.Sprintf("forge_%s_%s_%s", tag, goos, goarch)),
-			)
-		}
-	}
-
-	return dag.Gh(githubToken).Release().Create(ctx, tag, githubRepo, opts)
+	return dag.Release(m.Source.AsGit().LatestVersion()).Create(ctx, githubToken, githubRepo, "./cmd/forge", dagger.ReleaseCreateOpts{Brew: true})
 }
 
 func (m *ForgeDev) Binary(
@@ -103,54 +80,34 @@ func (m *ForgeDev) Binary(
 	goarch string,
 	// +optional
 	goos string,
-	// +optional
-	ultraBrute bool,
 ) *dagger.File {
 	module := m.Source
-
-	upxFlag := "--brute"
-	if ultraBrute {
-		upxFlag = "--ultra-brute"
-	}
 
 	g0 := dag.Go(dagger.GoOpts{
 		Module: module,
 	})
-	upx := dag.Wolfi().
-		Container(dagger.WolfiContainerOpts{Packages: []string{"upx"}})
-
-	shim := "/tmp/shim"
+	upx := dag.Upx()
 
 	module = module.WithFile(
 		"internal/bin/shim",
 		upx.
-			WithFile(
-				shim,
+			Pack(
 				g0.
 					Build(dagger.GoBuildOpts{
 						Pkg:    "./internal/cmd/shim",
 						Goarch: goarch,
 					}),
-			).
-			WithExec([]string{"upx", upxFlag, shim}).
-			File(shim),
+				dagger.UpxPackOpts{Brute: true},
+			),
 	)
 
-	forge := "/tmp/forge"
-
-	return upx.
-		WithFile(
-			forge,
-			g0.WithSource(module).
+	return g0.WithSource(module).
 				Build(dagger.GoBuildOpts{
 					Pkg:     "./cmd/forge",
 					Ldflags: "-s -w -X main.version=" + version,
 					Goos:    goos,
 					Goarch:  goarch,
-				}),
-		).
-		WithExec([]string{"upx", upxFlag, forge}).
-		File(forge)
+				})
 }
 
 func (m *ForgeDev) Vulncheck(ctx context.Context) (string, error) {
