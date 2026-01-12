@@ -102,12 +102,12 @@ func (m *ForgeDev) Binary(
 	)
 
 	return g0.WithSource(module).
-				Build(dagger.GoBuildOpts{
-					Pkg:     "./cmd/forge",
-					Ldflags: "-s -w -X main.version=" + version,
-					Goos:    goos,
-					Goarch:  goarch,
-				})
+		Build(dagger.GoBuildOpts{
+			Pkg:     "./cmd/forge",
+			Ldflags: "-s -w -X main.version=" + version,
+			Goos:    goos,
+			Goarch:  goarch,
+		})
 }
 
 func (m *ForgeDev) Vulncheck(ctx context.Context) (string, error) {
