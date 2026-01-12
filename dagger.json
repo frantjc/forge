@@ -8,17 +8,17 @@
     {
       "name": "go",
       "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
+      "pin": "54314d9de0a6d97d059c8e8f464052f534823ae1"
     },
     {
       "name": "release",
       "source": "github.com/frantjc/daggerverse/release@main",
-      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
+      "pin": "54314d9de0a6d97d059c8e8f464052f534823ae1"
     },
     {
       "name": "upx",
       "source": "github.com/frantjc/daggerverse/upx@main",
-      "pin": "8518f19d90099d9a17ef15492789d12e692aca96"
+      "pin": "54314d9de0a6d97d059c8e8f464052f534823ae1"
     },
     {
       "name": "wolfi",

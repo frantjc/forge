@@ -69,7 +69,7 @@ func (m *ForgeDev) Release(
 	githubRepo string,
 	githubToken *dagger.Secret,
 ) error {
-	return dag.Release(m.Source.AsGit().LatestVersion()).Create(ctx, githubToken, githubRepo, "./cmd/forge", dagger.ReleaseCreateOpts{Brew: true})
+	return dag.Release(m.Source.AsGit().LatestVersion()).Create(ctx, githubToken, githubRepo, "forge", dagger.ReleaseCreateOpts{Brew: true})
 }
 
 func (m *ForgeDev) Binary(
