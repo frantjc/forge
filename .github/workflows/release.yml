@@ -15,7 +15,7 @@ jobs:
       - uses: frantjc/actions/setup-tool@v1
         with:
           repository: dagger/dagger
-          version: v0.19.10
+          version: v0.19.11
       - env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: dagger call release
