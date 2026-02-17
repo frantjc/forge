@@ -1,3 +1,5 @@
+dagger.io/dagger v0.19.11 h1:Cra3wL1oaZsqXJcnPydocx3bIDD5tM7XCuwcn2Uh+2Q=
+dagger.io/dagger v0.19.11/go.mod h1:BjAJWl4Lx7XRW7nooNjBi0ZAC5Ici2pkthkdBIZdbTI=
 github.com/99designs/gqlgen v0.17.83 h1:LZOd4Of2snK5V22/ZWfBAPa3WoAZkBO70dKXM0ODHQk=
 github.com/99designs/gqlgen v0.17.83/go.mod h1:q6Lb64wknFqNFSbSUGzKRKupklvY/xgNr62g0GGWPB8=
 github.com/Khan/genqlient v0.8.1 h1:wtOCc8N9rNynRLXN3k3CnfzheCUNKBcvXmVv5zt6WCs=
@@ -10,8 +12,6 @@ github.com/cenkalti/backoff/v5 v5.0.3 h1:ZN+IMa753KfX5hd8vVaMixjnqRZ3y8CuJKRKj1x
 github.com/cenkalti/backoff/v5 v5.0.3/go.mod h1:rkhZdG3JZukswDf7f0cwqPNk4K0sa+F97BxZthm/crw=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/frantjc/x v0.0.0-20251110020906-e460e4351f65 h1:7mUlt2cQIEvtM3X8kMyVUmXixcYQicazTu9HEiJiJ2s=
-github.com/frantjc/x v0.0.0-20251110020906-e460e4351f65/go.mod h1:tddPtloeZsRJ+hPcZlVSgS4rbm9RIuTKfaYv8EMHDlc=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=

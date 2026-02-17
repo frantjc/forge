@@ -116,7 +116,7 @@ type Executions struct {
 
 // Execution ...
 type Execution struct {
-	AdditionalProperties map[string]interface{} `json:"-,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 	ArgumentFormat       string                 `json:"argumentFormat,omitempty"`
 	Platforms            []interface{}          `json:"platforms,omitempty"`
 
@@ -171,7 +171,7 @@ type Messages struct{}
 
 // Options ...
 type Options struct {
-	AdditionalProperties map[string]interface{} `json:"-,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // OutputVariable ...

@@ -1,8 +1,14 @@
 # Install
 
+Using Homebrew:
+
+```sh
+brew install --cask frantjc/tap/forge
+```
+
 From a [release](https://github.com/frantjc/forge/releases).
 
-From source:
+From source, after [installing Dagger](https://docs.dagger.io/getting-started/installation):
 
 ```sh
 git clone https://github.com/frantjc/forge
