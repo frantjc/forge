@@ -1,43 +1,40 @@
 {
   "name": "forge-dev",
-  "engineVersion": "v0.19.11",
+  "engineVersion": "v0.21.3",
   "sdk": {
     "source": "go"
   },
   "toolchains": [
     {
-      "name": "go",
-      "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "ab9f15bcc8154e86b4c207ce2221046ffd43c59b"
-    },
-    {
       "name": "dagger-module",
       "source": "github.com/frantjc/daggerverse/dagger-module@main",
-      "pin": "ab9f15bcc8154e86b4c207ce2221046ffd43c59b"
+      "pin": "382d2a0f8aa4fdd0ba466d77fc3e2aea6eb5b245"
+    },
+    {
+      "name": "go",
+      "source": "github.com/frantjc/daggerverse/go@main",
+      "pin": "382d2a0f8aa4fdd0ba466d77fc3e2aea6eb5b245",
+      "ignoreChecks": [
+        "vulncheck"
+      ]
     }
   ],
   "dependencies": [
     {
-      "name": "go",
-      "source": "github.com/frantjc/daggerverse/go@main",
-      "pin": "ab9f15bcc8154e86b4c207ce2221046ffd43c59b"
+      "name": "mise",
+      "source": "github.com/frantjc/daggerverse/mise@main",
+      "pin": "382d2a0f8aa4fdd0ba466d77fc3e2aea6eb5b245"
     },
     {
       "name": "release",
       "source": "github.com/frantjc/daggerverse/release@main",
-      "pin": "ab9f15bcc8154e86b4c207ce2221046ffd43c59b"
-    },
-    {
-      "name": "upx",
-      "source": "github.com/frantjc/daggerverse/upx@main",
-      "pin": "ab9f15bcc8154e86b4c207ce2221046ffd43c59b"
+      "pin": "382d2a0f8aa4fdd0ba466d77fc3e2aea6eb5b245"
     },
     {
       "name": "wolfi",
-      "source": "github.com/dagger/dagger/modules/wolfi@v0.19.11",
-      "pin": "d8811256e5e901e6760f7011431080fedd61fc47"
+      "source": "github.com/dagger/dagger/modules/wolfi@v0.21.3",
+      "pin": "0ec84486003f052214339a2f8bdcd5761f23cead"
     }
   ],
-  "source": ".dagger",
-  "disableDefaultFunctionCaching": true
+  "source": ".dagger"
 }

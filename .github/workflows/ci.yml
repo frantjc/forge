@@ -14,19 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: frantjc/actions/setup-tool@v1
+      - uses: jdx/mise-action@v4
         with:
-          repository: dagger/dagger
-          version: v0.19.11
+          install_args: dagger
       - run: dagger check
   e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: frantjc/actions/setup-tool@v1
+      - uses: jdx/mise-action@v4
         with:
-          repository: dagger/dagger
-          version: v0.19.11
+          install_args: dagger
       - name: Run make forge
         run: make LOCALBIN=$RUNNER_TEMP
       - name: Set path
