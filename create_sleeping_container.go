@@ -34,7 +34,10 @@ func (c *SleepingShimContainer) Exec(ctx context.Context, cc *ContainerConfig, s
 	}
 
 	exitCode, err := c.Container.Exec(ctx, ccc, s)
-	return exitCode, fmt.Errorf("sleeping container exec: %w", err)
+	if err != nil {
+		err = fmt.Errorf("sleeping container exec: %w", err)
+	}
+	return exitCode, err
 }
 
 func createSleepingContainer(ctx context.Context, containerRuntime ContainerRuntime, image Image, containerConfig *ContainerConfig, opt *RunOpts) (Container, error) {
@@ -100,7 +103,8 @@ func writeShim() (err error) {
 			return
 		}
 
-		f, err := os.OpenFile(shimPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
+		var f *os.File
+		f, err = os.OpenFile(shimPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o755)
 		if err != nil {
 			return
 		}

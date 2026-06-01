@@ -31,5 +31,5 @@ func TestResourceCheck(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, r.Run(ctx, cr, forge.WithMountShim(), forge.WithStreams(Streams(t))))
+	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t))))
 }

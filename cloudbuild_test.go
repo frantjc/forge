@@ -21,7 +21,7 @@ func TestCloudBuildRun(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithMountShim(), forge.WithStreams(Streams(t))))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
 }
 
 func TestCloudBuildRunScript(t *testing.T) {
@@ -35,5 +35,5 @@ func TestCloudBuildRunScript(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(ctx, cr, forge.WithMountShim(), forge.WithStreams(Streams(t))))
+	require.NoError(t, step.Run(ctx, cr, forge.WithStreams(Streams(t))))
 }

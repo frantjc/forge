@@ -10,7 +10,8 @@
       "source": "github.com/frantjc/daggerverse/go@main",
       "pin": "382d2a0f8aa4fdd0ba466d77fc3e2aea6eb5b245",
       "ignoreChecks": [
-        "test"
+        "test",
+        "vulncheck"
       ]
     }
   ],

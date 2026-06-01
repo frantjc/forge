@@ -41,6 +41,7 @@ func (m *ForgeDev) SourceWithShim(
 	)
 }
 
+// +check
 func (m *ForgeDev) Test(
 	ctx context.Context,
 	// +optional
@@ -84,6 +85,7 @@ func (m *ForgeDev) Release(
 	return dag.Release(m.Source.AsGit().LatestVersion()).Create(ctx, githubToken, githubRepo, "forge", dagger.ReleaseCreateOpts{Brew: true})
 }
 
+// +check
 func (m *ForgeDev) Binary(
 	ctx context.Context,
 	// +default=v0.0.0-unknown
