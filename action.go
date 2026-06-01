@@ -14,7 +14,9 @@ import (
 
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/githubactions"
+	"github.com/frantjc/forge/internal/featureflags"
 	"github.com/frantjc/forge/internal/hostfs"
+	xtar "github.com/frantjc/x/archive/tar"
 	xos "github.com/frantjc/x/os"
 	"github.com/opencontainers/go-digest"
 )
@@ -65,6 +67,20 @@ func (o *Action) Run(ctx context.Context, containerRuntime ContainerRuntime, opt
 		}
 		defer container.Stop(ctx)   //nolint:errcheck
 		defer container.Remove(ctx) //nolint:errcheck
+
+		if !featureflags.BindMounts {
+			dir, err := usesToRootDirectory(uses)
+			if err != nil {
+				return err
+			}
+
+			rc := xtar.Compress(dir)
+			defer rc.Close()
+
+			if err = container.CopyTo(ctx, GitHubActionPath(opt.WorkingDir), rc); err != nil {
+				return fmt.Errorf("copy action to container: %w", err)
+			}
+		}
 
 		if exitCode, err := container.Exec(ctx, &cc, workflowCommandStreams); err != nil {
 			return err
@@ -225,7 +241,6 @@ func actionToConfigs(globalContext *githubactions.GlobalContext, uses *githubact
 				actionPath = filepath.Join(GitHubActionPath(opt.WorkingDir), uses.GetActionPath())
 				mounts     = []Mount{
 					{
-						Source:      dir,
 						Destination: GitHubActionPath(opt.WorkingDir),
 					},
 					{
@@ -240,6 +255,10 @@ func actionToConfigs(globalContext *githubactions.GlobalContext, uses *githubact
 				}
 				entrypoints [][]string
 			)
+
+			if featureflags.BindMounts {
+				mounts[0].Source = dir
+			}
 
 			switch actionMetadata.Runs.Using {
 			case githubactions.RunsUsingNode12, githubactions.RunsUsingNode16, githubactions.RunsUsingNode20:

@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/frantjc/forge/internal/bin"
+	"github.com/frantjc/forge/internal/featureflags"
 	"github.com/frantjc/forge/internal/hostfs"
 )
 
@@ -62,7 +63,7 @@ func createSleepingContainer(ctx context.Context, containerRuntime ContainerRunt
 	ccc.Entrypoint = entrypoint
 	ccc.Cmd = nil
 
-	if opt.MountShim {
+	if featureflags.BindMounts {
 		if err := writeShim(); err != nil {
 			return nil, fmt.Errorf("write shim: %w", err)
 		}
@@ -77,7 +78,7 @@ func createSleepingContainer(ctx context.Context, containerRuntime ContainerRunt
 		return nil, fmt.Errorf("create sleeping container: %w", err)
 	}
 
-	if !opt.MountShim {
+	if !featureflags.BindMounts {
 		if err = container.CopyTo(ctx, opt.WorkingDir, bin.NewShimTarArchive(ShimName)); err != nil {
 			return nil, fmt.Errorf("copy shim to sleeping container: %w", err)
 		}

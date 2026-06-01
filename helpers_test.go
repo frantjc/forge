@@ -9,9 +9,16 @@ import (
 	"testing"
 
 	"github.com/frantjc/forge"
+	"github.com/frantjc/forge/internal/featureflags"
 	"github.com/frantjc/forge/runtime"
 	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	if os.Getenv("DAGGER_SESSION_PORT") == "" && os.Getenv("DAGGER_SESSION_TOKEN") == "" {
+		featureflags.BindMounts = true
+	}
+}
 
 func Runtime(t testing.TB) forge.ContainerRuntime {
 	t.Helper()
@@ -35,12 +42,4 @@ func StreamsCaptureStdout(t testing.TB) (*forge.Streams, *bytes.Buffer) {
 	t.Helper()
 	buf := new(bytes.Buffer)
 	return &forge.Streams{Out: buf, Err: t.Output()}, buf
-}
-
-func MountShim(t testing.TB) forge.RunOpt {
-	t.Helper()
-	if os.Getenv("DAGGER_SESSION_TOKEN") != "" {
-		return new(forge.RunOpts)
-	}
-	return forge.WithMountShim()
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/frantjc/forge/cloudbuild"
 	"github.com/frantjc/forge/envconv"
 	"github.com/frantjc/forge/internal/bin"
+	"github.com/frantjc/forge/internal/featureflags"
+	xtar "github.com/frantjc/x/archive/tar"
 	xos "github.com/frantjc/x/os"
 	xslices "github.com/frantjc/x/slices"
 )
@@ -49,6 +51,24 @@ func (o *CloudBuild) Run(ctx context.Context, containerRuntime ContainerRuntime,
 	}
 	defer container.Stop(ctx)   //nolint:errcheck
 	defer container.Remove(ctx) //nolint:errcheck
+
+	if !featureflags.BindMounts {
+		_home := os.Getenv("HOME")
+		if _home == "" {
+			if u, err := user.Current(); err == nil {
+				_home = u.HomeDir
+			}
+		}
+		source := filepath.Join(_home, ".config/gcloud")
+		if fi, err := os.Stat(source); err == nil && fi.IsDir() {
+			rc := xtar.Compress(source)
+			defer rc.Close()
+
+			if err = container.CopyTo(ctx, filepath.Join(home, ".config"), rc); err != nil {
+				return fmt.Errorf("copy gcloud config to container: %w", err)
+			}
+		}
+	}
 
 	if err = copyScriptToContainer(ctx, container, script, opt); err != nil {
 		return err
@@ -102,9 +122,11 @@ func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Im
 	if fi, err := os.Stat(source); err == nil && fi.IsDir() {
 		containerConfig.Mounts = []Mount{
 			{
-				Source:      source,
 				Destination: filepath.Join(home, ".config/gcloud"),
 			},
+		}
+		if featureflags.BindMounts {
+			containerConfig.Mounts[0].Source = source
 		}
 	}
 

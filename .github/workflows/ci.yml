@@ -17,6 +17,7 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           install_args: dagger
+			# FIXME(frantjc): Docker tests still fail in Dagger.
       # - name: Prepare .env
       #   run: |
       #     cat <<EOF > .env

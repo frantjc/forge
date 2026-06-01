@@ -16,7 +16,7 @@ func TestActionRunDockerfile(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
-		Name: "test-dockerfile",
+		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using: githubactions.RunsUsingDocker,
 			Image: "Dockerfile",
@@ -29,14 +29,14 @@ func TestActionRunDockerfile(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
 }
 
 func TestActionRunDockerfileWithArgs(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
-		Name: "test-dockerfile-args",
+		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "Dockerfile",
@@ -50,14 +50,14 @@ func TestActionRunDockerfileWithArgs(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
 }
 
 func TestActionRunDockerfileWithUnusualName(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
-		Name: "test-dockerfile-args",
+		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "test.Dockerfile",
@@ -71,5 +71,5 @@ func TestActionRunDockerfileWithUnusualName(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
 }

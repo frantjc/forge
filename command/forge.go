@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 
+	"github.com/frantjc/forge/internal/featureflags"
 	"github.com/spf13/cobra"
 )
 
@@ -22,8 +23,7 @@ func NewVersion(version string) *cobra.Command {
 // which acts as Forge's CLI entrypoint.
 func NewForge() *cobra.Command {
 	cmd := setCommon(&cobra.Command{Use: "forge"})
-
+	cmd.PersistentFlags().BoolVar(&featureflags.BindMounts, "bind-mounts", true, "Allow use of bind mounts (for Docker running locally)")
 	cmd.AddCommand(NewUse(), NewGet(), NewPut(), NewCheck(), NewTask(), NewCloudBuild(), NewCache())
-
 	return cmd
 }

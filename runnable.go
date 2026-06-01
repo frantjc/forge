@@ -20,7 +20,6 @@ type RunOpts struct {
 	Streams             *Streams
 	Mounts              []Mount
 	InterceptDockerSock bool
-	MountShim           bool
 	WorkingDir          string
 }
 
@@ -35,9 +34,6 @@ func (o *RunOpts) Apply(opts *RunOpts) {
 	if o.InterceptDockerSock {
 		opts.InterceptDockerSock = true
 	}
-	if o.MountShim {
-		opts.MountShim = true
-	}
 	if o.WorkingDir != "" {
 		opts.WorkingDir = o.WorkingDir
 	}
@@ -51,10 +47,6 @@ func WithStreams(streams *Streams) RunOpt {
 
 func WithStdStreams() RunOpt {
 	return WithStreams(StdStreams())
-}
-
-func WithMountShim() RunOpt {
-	return &RunOpts{MountShim: true}
 }
 
 type RunOpt interface {
