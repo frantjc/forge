@@ -89,6 +89,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 	errC := make(chan error, 1)
 	outC := make(chan any, 1)
 	go func() {
+		var err error
 		if tty {
 			_, err = io.Copy(stdout, hjr.Reader)
 		} else {
@@ -118,6 +119,7 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 		}
 
 		go func() {
+			var err error
 			if _, err = io.Copy(hjr.Conn, stdin); err != nil {
 				errC <- err
 			}

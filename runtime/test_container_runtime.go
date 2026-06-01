@@ -35,7 +35,7 @@ func TestContainerRuntimeConformance(t *testing.T, cr forge.ContainerRuntime) {
 func TestPullImage(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
 
-	img, err := cr.PullImage(ctx, "alpine")
+	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
 	require.NotNil(t, img)
 	require.NotEmpty(t, img.Name())
@@ -49,7 +49,7 @@ func TestPullImage(t *testing.T, cr forge.ContainerRuntime) {
 
 func TestCreateContainer(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
-	img, err := cr.PullImage(ctx, "alpine")
+	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
 
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
@@ -68,7 +68,7 @@ func TestCreateContainer(t *testing.T, cr forge.ContainerRuntime) {
 
 func TestStartContainer(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
-	img, err := cr.PullImage(ctx, "alpine")
+	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
 
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
@@ -87,7 +87,7 @@ func TestStartContainer(t *testing.T, cr forge.ContainerRuntime) {
 
 func TestContainerExec(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
-	img, err := cr.PullImage(ctx, "alpine")
+	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
 
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
@@ -120,7 +120,7 @@ func TestContainerExec(t *testing.T, cr forge.ContainerRuntime) {
 
 func TestContainerCopy(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
-	img, err := cr.PullImage(ctx, "alpine")
+	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
 
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{

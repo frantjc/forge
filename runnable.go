@@ -2,13 +2,11 @@ package forge
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 func runOptsWithDefaults(opts ...RunOpt) *RunOpts {
 	o := &RunOpts{
-		WorkingDir: "/" + uuid.NewString(),
+		WorkingDir: "/",
 	}
 
 	for _, opt := range opts {

@@ -1,19 +1,19 @@
 package forge
 
 const (
-	DefaultNode10ImageReference = "docker.io/library/node:10"
+	DefaultNode10ImageReference = "public.ecr.aws/docker/library/node:10"
 	// DefaultNode12ImageReference is the default container image reference that
 	// is used by GitHub Actions that run using node12.
-	DefaultNode12ImageReference = "docker.io/library/node:12"
+	DefaultNode12ImageReference = "public.ecr.aws/docker/library/node:12"
 	// DefaultNode16ImageReference is the default container image reference that
 	// is used by GitHub Actions that run using node16.
-	DefaultNode16ImageReference = "docker.io/library/node:16"
+	DefaultNode16ImageReference = "public.ecr.aws/docker/library/node:16"
 	// DefaultNode20ImageReference is the default container image reference that
 	// is used by GitHub Actions that run using node20.
-	DefaultNode20ImageReference = "docker.io/library/node:20"
+	DefaultNode20ImageReference = "public.ecr.aws/docker/library/node:20"
 	// DefaultNode24ImageReference is the default container image reference that
 	// is used by GitHub Actions that run using node24.
-	DefaultNode24ImageReference = "docker.io/library/node:24"
+	DefaultNode24ImageReference = "public.ecr.aws/docker/library/node:24"
 	DefaultNodeImageReference   = DefaultNode16ImageReference
 )
 

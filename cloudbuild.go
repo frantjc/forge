@@ -109,11 +109,11 @@ func stepToContainerConfigAndScript(step *cloudbuild.Step, home string, image Im
 	}
 
 	if step.Script != "" {
-		if step.Entrypoint != "" || len(step.Args) > 0 {
-			return nil, "", fmt.Errorf("cannot specify args or entrypoint with script")
+		if step.Entrypoint != "" {
+			return nil, "", fmt.Errorf("cannot specify entrypoint with script")
 		}
 
-		containerConfig.Entrypoint = []string{filepath.Join(opt.WorkingDir, ScriptName)}
+		containerConfig.Entrypoint = append([]string{filepath.Join(opt.WorkingDir, ScriptName)}, step.Args...)
 	} else {
 		if lenArgs := len(step.Args); step.Entrypoint == "" || lenArgs == 0 {
 			config, err := image.Config()

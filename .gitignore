@@ -15,3 +15,5 @@ version
 # mkdocs
 site/
 gh-pages/
+
+.env
