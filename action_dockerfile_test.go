@@ -22,9 +22,10 @@ func TestActionRunDockerfile(t *testing.T) {
 			Image: "Dockerfile",
 		},
 	})
-	require.NoError(t, os.WriteFile(filepath.Join(uses, "Dockerfile"), []byte(`FROM public.ecr.aws/docker/library/alpine
-CMD ["/bin/sh", "-c", "exit 0"]
-`), 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(uses, "Dockerfile"), []byte(
+		"FROM public.ecr.aws/docker/library/alpine\n"+
+			`CMD ["/bin/sh", "-c", "exit 0"]`+"\n",
+	), 0o644))
 
 	action := &forge.Action{Uses: uses}
 
@@ -43,8 +44,9 @@ func TestActionRunDockerfileWithArgs(t *testing.T) {
 			Args:       []string{"-c", "exit 0"},
 		},
 	})
-	require.NoError(t, os.WriteFile(filepath.Join(uses, "Dockerfile"), []byte(`FROM public.ecr.aws/docker/library/alpine
-`), 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(uses, "Dockerfile"), []byte(
+		"FROM public.ecr.aws/docker/library/alpine\n",
+	), 0o644))
 
 	action := &forge.Action{Uses: uses}
 
@@ -63,8 +65,9 @@ func TestActionRunDockerfileWithUnusualName(t *testing.T) {
 			Args:       []string{"-c", "exit 0"},
 		},
 	})
-	require.NoError(t, os.WriteFile(filepath.Join(uses, "test.Dockerfile"), []byte(`FROM public.ecr.aws/docker/library/alpine
-`), 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(uses, "test.Dockerfile"), []byte(
+		"FROM public.ecr.aws/docker/library/alpine\n",
+	), 0o644))
 
 	action := &forge.Action{Uses: uses}
 

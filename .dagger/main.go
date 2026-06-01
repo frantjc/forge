@@ -57,12 +57,14 @@ func (m *ForgeDev) Test(
 			Container().
 			With(func(r *dagger.Container) *dagger.Container {
 				if dockerSock != nil {
-					tags = append(tags, "dockerd")
+					// FIXME(frantjc): This fails in Dagger.
+					// tags = append(tags, "dockerd")
 					return r.
 						WithUnixSocket("/var/run/docker.sock", dockerSock).
 						With(func(s *dagger.Container) *dagger.Container {
 							if docker != nil {
-								tags = append(tags, "docker")
+								// FIXME(frantjc): This fails in Dagger.
+								// tags = append(tags, "docker")
 								return s.WithFile("/usr/local/bin/docker", docker)
 							}
 							return s

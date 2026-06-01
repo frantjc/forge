@@ -125,7 +125,7 @@ func TestActionRunDockerWithInputs(t *testing.T) {
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
-func TestActionRunTestdataNode(t *testing.T) {
+func TestActionRunNode(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
@@ -133,18 +133,18 @@ func TestActionRunTestdataNode(t *testing.T) {
 		Runs: &githubactions.MetadataRuns{
 			Using: githubactions.RunsUsingNode20,
 			Main:  "main.js",
-			Env:   map[string]string{"HELLO": "world"},
+			Env:   map[string]string{"HELLO": "there"},
 		},
 	})
 	require.NoError(t, os.WriteFile(filepath.Join(uses, "main.js"), []byte(
-		"if (process.env.HELLO !== 'world') { process.exit(1); }\n",
+		"if (process.env.HELLO !== 'there') { process.exit(1); }\n",
 	), 0o644))
 
 	action := &forge.Action{Uses: uses}
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
-func TestActionRunTestdataSaveState(t *testing.T) {
+func TestActionRunSaveState(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
@@ -163,7 +163,7 @@ func TestActionRunTestdataSaveState(t *testing.T) {
 	require.Equal(t, "kenobi", gc.EnvContext["STATE_general"])
 }
 
-func TestActionRunTestdataSetEnv(t *testing.T) {
+func TestActionRunSetEnv(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
@@ -182,7 +182,7 @@ func TestActionRunTestdataSetEnv(t *testing.T) {
 	require.Equal(t, "kenobi", gc.EnvContext["GENERAL"])
 }
 
-func TestActionRunTestdataSetOutput(t *testing.T) {
+func TestActionRunSetOutput(t *testing.T) {
 	cr := Runtime(t)
 
 	uses := Uses(t, &githubactions.Metadata{
@@ -201,7 +201,29 @@ func TestActionRunTestdataSetOutput(t *testing.T) {
 	require.Equal(t, "kenobi", gc.StepsContext["test"].Outputs["general"])
 }
 
-func TestActionRunTestdataYmlVYaml(t *testing.T) {
+func TestActionRunGlobalContext(t *testing.T) {
+	cr := Runtime(t)
+
+	uses := Uses(t, &githubactions.Metadata{
+		Name: "test-docker-global-context",
+		Runs: &githubactions.MetadataRuns{
+			Using:      githubactions.RunsUsingDocker,
+			Image:      "docker://public.ecr.aws/docker/library/alpine",
+			Entrypoint: "/bin/sh",
+			Args:       []string{"-c", `[ "$GITHUB_ACTOR" = "octocat" ] && [ "$GITHUB_REPOSITORY" = "octocat/hello-world" ] && [ "$GITHUB_REF" = "refs/heads/main" ]`},
+		},
+	})
+
+	gc := githubactions.NewGlobalContextFromEnv()
+	gc.GitHubContext.Actor = "octocat"
+	gc.GitHubContext.Repository = "octocat/hello-world"
+	gc.GitHubContext.Ref = "refs/heads/main"
+
+	action := &forge.Action{Uses: uses, GlobalContext: gc}
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
+}
+
+func TestActionRunYmlVYaml(t *testing.T) {
 	cr := Runtime(t)
 
 	require.Len(t, githubactions.ActionYAMLFilenames, 2)
