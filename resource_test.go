@@ -31,7 +31,7 @@ func TestResourceCheck(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestResourceGet(t *testing.T) {
@@ -58,7 +58,7 @@ func TestResourceGet(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestResourcePut(t *testing.T) {
@@ -85,5 +85,5 @@ func TestResourcePut(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, r.Run(ctx, cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }

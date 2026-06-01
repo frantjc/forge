@@ -24,7 +24,7 @@ func TestCloudBuildRun(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunScript(t *testing.T) {
@@ -38,7 +38,7 @@ func TestCloudBuildRunScript(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(ctx, cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(ctx, cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunNonzeroExitCode(t *testing.T) {
@@ -53,7 +53,7 @@ func TestCloudBuildRunNonzeroExitCode(t *testing.T) {
 		},
 	}
 
-	err := step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim())
+	err := step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t))
 	require.Error(t, err)
 	actual := xos.ErrorExitCode(err)
 	require.Equal(t, expected, actual)
@@ -71,7 +71,7 @@ func TestCloudBuildRunEnv(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunSubstitutions(t *testing.T) {
@@ -89,7 +89,7 @@ func TestCloudBuildRunSubstitutions(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunDynamicSubstitutions(t *testing.T) {
@@ -109,7 +109,7 @@ func TestCloudBuildRunDynamicSubstitutions(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunScriptWithArgs(t *testing.T) {
@@ -123,7 +123,7 @@ func TestCloudBuildRunScriptWithArgs(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunScriptNoShebang(t *testing.T) {
@@ -137,7 +137,7 @@ func TestCloudBuildRunScriptNoShebang(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunScriptWithEntrypointFails(t *testing.T) {
@@ -151,7 +151,7 @@ func TestCloudBuildRunScriptWithEntrypointFails(t *testing.T) {
 		},
 	}
 
-	require.Error(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.Error(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestCloudBuildRunScriptNode(t *testing.T) {
@@ -164,5 +164,5 @@ func TestCloudBuildRunScriptNode(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, step.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }

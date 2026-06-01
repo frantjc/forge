@@ -28,7 +28,7 @@ CMD ["/bin/sh", "-c", "exit 0"]
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerfileWithArgs(t *testing.T) {
@@ -48,7 +48,7 @@ func TestActionRunDockerfileWithArgs(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerfileWithUnusualName(t *testing.T) {
@@ -68,5 +68,5 @@ func TestActionRunDockerfileWithUnusualName(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }

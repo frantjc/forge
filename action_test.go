@@ -39,7 +39,7 @@ func TestActionRunDocker(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerNonzeroExitCode(t *testing.T) {
@@ -57,7 +57,7 @@ func TestActionRunDockerNonzeroExitCode(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.Error(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.Error(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerWithEnv(t *testing.T) {
@@ -76,7 +76,7 @@ func TestActionRunDockerWithEnv(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerWithUserEnv(t *testing.T) {
@@ -98,7 +98,7 @@ func TestActionRunDockerWithUserEnv(t *testing.T) {
 		Env:  map[string]string{"MY_VAR": "hello"},
 	}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunDockerWithInputs(t *testing.T) {
@@ -122,7 +122,7 @@ func TestActionRunDockerWithInputs(t *testing.T) {
 		With: map[string]string{"greeting": "hello"},
 	}
 
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunTestdataNode(t *testing.T) {
@@ -141,7 +141,7 @@ func TestActionRunTestdataNode(t *testing.T) {
 	), 0o644))
 
 	action := &forge.Action{Uses: uses}
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 }
 
 func TestActionRunTestdataSaveState(t *testing.T) {
@@ -159,7 +159,7 @@ func TestActionRunTestdataSaveState(t *testing.T) {
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{Uses: uses, GlobalContext: gc}
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 	require.Equal(t, "kenobi", gc.EnvContext["STATE_general"])
 }
 
@@ -178,7 +178,7 @@ func TestActionRunTestdataSetEnv(t *testing.T) {
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{Uses: uses, GlobalContext: gc}
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 	require.Equal(t, "kenobi", gc.EnvContext["GENERAL"])
 }
 
@@ -197,7 +197,7 @@ func TestActionRunTestdataSetOutput(t *testing.T) {
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{ID: "test", Uses: uses, GlobalContext: gc}
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t)), MountShim(t)))
 	require.Equal(t, "kenobi", gc.StepsContext["test"].Outputs["general"])
 }
 
@@ -231,7 +231,7 @@ func TestActionRunTestdataYmlVYaml(t *testing.T) {
 
 	action := &forge.Action{Uses: uses}
 	streams, stdout := StreamsCaptureStdout(t)
-	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(streams), forge.WithMountShim()))
+	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(streams), MountShim(t)))
 	actual := strings.TrimSpace(stdout.String())
 	require.Equal(t, expected, actual)
 }

@@ -5,6 +5,7 @@ package forge_test
 import (
 	"bytes"
 	"io"
+	"os"
 	"testing"
 
 	"github.com/frantjc/forge"
@@ -12,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Runtime(t *testing.T) forge.ContainerRuntime {
+func Runtime(t testing.TB) forge.ContainerRuntime {
 	t.Helper()
 	ctx := t.Context()
 	cr, err := runtime.New(ctx, "")
@@ -20,18 +21,26 @@ func Runtime(t *testing.T) forge.ContainerRuntime {
 	return cr
 }
 
-func DiscardStreams(t *testing.T) *forge.Streams {
+func DiscardStreams(t testing.TB) *forge.Streams {
 	t.Helper()
 	return &forge.Streams{Out: io.Discard, Err: io.Discard}
 }
 
-func Streams(t *testing.T) *forge.Streams {
+func Streams(t testing.TB) *forge.Streams {
 	t.Helper()
 	return &forge.Streams{Out: t.Output(), Err: t.Output()}
 }
 
-func StreamsCaptureStdout(t *testing.T) (*forge.Streams, *bytes.Buffer) {
+func StreamsCaptureStdout(t testing.TB) (*forge.Streams, *bytes.Buffer) {
 	t.Helper()
 	buf := new(bytes.Buffer)
 	return &forge.Streams{Out: buf, Err: t.Output()}, buf
+}
+
+func MountShim(t testing.TB) forge.RunOpt {
+	t.Helper()
+	if os.Getenv("DAGGER_SESSION_TOKEN") == "" {
+		return MountShim(t)
+	}
+	return new(forge.RunOpts)
 }
