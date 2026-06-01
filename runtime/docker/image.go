@@ -3,6 +3,7 @@ package docker
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os/exec"
 
@@ -19,9 +20,6 @@ func (i *Image) Name() string { return i.Ref }
 
 func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
 	var (
-		configFile = &struct {
-			Config *imagespecsv1.ImageConfig `json:"config"`
-		}{}
 		buf = new(bytes.Buffer)
 		//nolint:gosec
 		cmd = exec.Command(i.Path, "inspect", i.Ref)
@@ -32,7 +30,17 @@ func (i *Image) Config() (*imagespecsv1.ImageConfig, error) {
 		return nil, xos.NewExitCodeError(err, cmd.ProcessState.ExitCode())
 	}
 
-	return configFile.Config, json.NewDecoder(buf).Decode(configFile)
+	var cfgs []struct {
+		Config *imagespecsv1.ImageConfig `json:"config"`
+	}
+	if err := json.NewDecoder(buf).Decode(&cfgs); err != nil {
+		return nil, err
+	}
+	if len(cfgs) == 0 {
+		return nil, fmt.Errorf("no inspect results for %s", i.Ref)
+	}
+
+	return cfgs[0].Config, nil
 }
 
 func (i *Image) Blob() io.Reader {

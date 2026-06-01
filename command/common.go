@@ -2,15 +2,11 @@ package command
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
-	"os/exec"
 
-	"github.com/docker/docker/client"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/runtime/docker"
-	"github.com/frantjc/forge/runtime/dockerd"
+	"github.com/frantjc/forge/runtime"
 	xslices "github.com/frantjc/x/slices"
 	"github.com/spf13/cobra"
 )
@@ -76,20 +72,12 @@ func runOptsAndContainerRuntime(cmd *cobra.Command, stdoutUsed ...bool) (forge.C
 		dindPath = ""
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	rt, err := runtime.New(cmd.Context(), dindPath)
 	if err != nil {
-		for _, cli := range []string{"docker", "podman", "nerdctl"} {
-			if bin, nerr := exec.LookPath(cli); nerr == nil {
-				return docker.New(bin), opts, nil
-			} else {
-				err = errors.Join(err, nerr)
-			}
-		}
-
 		return nil, nil, err
 	}
 
-	return dockerd.New(cli, dindPath), opts, nil
+	return rt, opts, nil
 }
 
 func setCommon(cmd *cobra.Command) *cobra.Command {

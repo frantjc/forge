@@ -3,6 +3,7 @@ package docker
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -16,16 +17,23 @@ type ContainerRuntime struct {
 	Path string
 }
 
-func New(path string) *ContainerRuntime {
+func New(path string) (*ContainerRuntime, error) {
 	r := &ContainerRuntime{
 		Path: path,
 	}
-
-	if r.Path == "" {
-		r.Path = "docker"
+	if r.Path != "" {
+		return r, nil
 	}
-
-	return r
+	var err error
+	for _, name := range []string{"docker", "podman", "nerdctl"} {
+		if bin, nerr := exec.LookPath(name); nerr == nil {
+			r.Path = bin
+			return r, nil
+		} else {
+			err = errors.Join(err, nerr)
+		}
+	}
+	return nil, err
 }
 
 func (r *ContainerRuntime) CreateContainer(ctx context.Context, img forge.Image, cfg *forge.ContainerConfig) (forge.Container, error) {
