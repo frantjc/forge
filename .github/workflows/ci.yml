@@ -36,7 +36,7 @@ jobs:
           CGO_ENABLED: "0"
         run: |
           rm internal/bin/shim
-          go run -o internal/bin/shim ./internal/cmd/shim
+          go build -o internal/bin/shim ./internal/cmd/shim
       - name: Run go test
         run: go test -race -tags docker,dockerd,shim ./...
   integration:
