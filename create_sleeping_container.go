@@ -90,7 +90,7 @@ func createSleepingContainer(ctx context.Context, containerRuntime ContainerRunt
 }
 
 var (
-	shimPath = filepath.Join(hostfs.CacheHome, ShimName)
+	shimPath      = filepath.Join(hostfs.CacheHome, ShimName)
 	writeShimOnce sync.Once
 )
 
@@ -105,7 +105,6 @@ func writeShim() (err error) {
 			return
 		}
 		defer f.Close()
-
 
 		_, err = io.Copy(f, bin.NewShimReader())
 	})

@@ -33,6 +33,7 @@ func (m *ForgeDev) SourceWithShim(
 					Source: m.Source,
 				}).
 					Build(dagger.GoBuildOpts{
+						Pkg: "./internal/cmd/shim",
 						Cgo: 	false,
 						Goarch: goarch,
 					}),

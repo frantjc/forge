@@ -19,12 +19,27 @@ jobs:
           install_args: dagger
       - name: Prepare .env
         run: |
-          cat <<EOF < .env
+          cat <<EOF > .env
           forgeDev_test_dockerSock=/var/run/docker.sock
           forgeDev_test_docker=$(which docker)
           EOF
       - run: dagger check
   e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v4
+        with:
+          install_args: go
+      - name: Prepare shim
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          rm internal/bin/shim
+          go run -o internal/bin/shim ./internal/cmd/shim
+      - name: Run go test
+        run: go test -race -tags docker,dockerd,shim ./...
+  integration:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
