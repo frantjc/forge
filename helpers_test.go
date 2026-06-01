@@ -39,8 +39,8 @@ func StreamsCaptureStdout(t testing.TB) (*forge.Streams, *bytes.Buffer) {
 
 func MountShim(t testing.TB) forge.RunOpt {
 	t.Helper()
-	if os.Getenv("DAGGER_SESSION_TOKEN") == "" {
-		return MountShim(t)
+	if os.Getenv("DAGGER_SESSION_TOKEN") != "" {
+		return new(forge.RunOpts)
 	}
-	return new(forge.RunOpts)
+	return forge.WithMountShim()
 }
