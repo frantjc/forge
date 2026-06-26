@@ -3,6 +3,8 @@
 package forge_test
 
 import (
+	"fmt"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/frantjc/forge"
 	"github.com/frantjc/forge/githubactions"
+	xos "github.com/frantjc/x/os"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
@@ -45,19 +48,23 @@ func TestActionRunDocker(t *testing.T) {
 func TestActionRunDockerNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
+	expected := rand.IntN(254) + 1
 	uses := Uses(t, &githubactions.Metadata{
 		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "docker://public.ecr.aws/docker/library/alpine",
 			Entrypoint: "/bin/sh",
-			Args:       []string{"-c", "exit 1"},
+			Args:       []string{"-c", fmt.Sprintf("exit %d", expected)},
 		},
 	})
 
 	action := &forge.Action{Uses: uses}
 
-	require.Error(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
+	err := action.Run(t.Context(), cr, forge.WithStreams(Streams(t)))
+	require.Error(t, err)
+	require.ErrorIs(t, err, forge.ErrContainerExitedWithNonzeroExitCode)
+	require.Equal(t, expected, xos.ErrorExitCode(err))
 }
 
 func TestActionRunDockerWithEnv(t *testing.T) {
@@ -147,77 +154,87 @@ func TestActionRunNode(t *testing.T) {
 func TestActionRunSaveState(t *testing.T) {
 	cr := Runtime(t)
 
+	k, v := "general", "kenobi"
 	uses := Uses(t, &githubactions.Metadata{
 		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "docker://public.ecr.aws/docker/library/alpine",
 			Entrypoint: "/bin/sh",
-			Args:       []string{"-c", `printf 'general=kenobi\n' >> "$GITHUB_STATE"`},
+			Args:       []string{"-c", fmt.Sprintf(`printf '%s=%s\n' >> "$%s"`, k, v, githubactions.EnvVarState)},
 		},
 	})
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{Uses: uses, GlobalContext: gc}
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
-	require.Equal(t, "kenobi", gc.EnvContext["STATE_general"])
+	require.Equal(t, v, gc.EnvContext[githubactions.StateEnvVar(k)])
 }
 
 func TestActionRunSetEnv(t *testing.T) {
 	cr := Runtime(t)
 
+	k, v := "GENERAL", "kenobi"
 	uses := Uses(t, &githubactions.Metadata{
 		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "docker://public.ecr.aws/docker/library/alpine",
 			Entrypoint: "/bin/sh",
-			Args:       []string{"-c", `printf 'GENERAL=kenobi\n' >> "$GITHUB_ENV"`},
+			Args:       []string{"-c", fmt.Sprintf(`printf '%s=%s\n' >> "$%s"`, k, v, githubactions.EnvVarEnv)},
 		},
 	})
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{Uses: uses, GlobalContext: gc}
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
-	require.Equal(t, "kenobi", gc.EnvContext["GENERAL"])
+	require.Equal(t, v, gc.EnvContext[k])
 }
 
 func TestActionRunSetOutput(t *testing.T) {
 	cr := Runtime(t)
 
+	k, v := "general", "kenobi"
 	uses := Uses(t, &githubactions.Metadata{
 		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "docker://public.ecr.aws/docker/library/alpine",
 			Entrypoint: "/bin/sh",
-			Args:       []string{"-c", `printf 'general=kenobi\n' >> "$GITHUB_OUTPUT"`},
+			Args:       []string{"-c", fmt.Sprintf(`printf '%s=%s\n' >> "$%s"`, k, v, githubactions.EnvVarOutput)},
 		},
 	})
 
 	gc := githubactions.NewGlobalContextFromEnv()
 	action := &forge.Action{ID: "test", Uses: uses, GlobalContext: gc}
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))
-	require.Equal(t, "kenobi", gc.StepsContext["test"].Outputs["general"])
+	require.Equal(t, v, gc.StepsContext[action.ID].Outputs[k])
 }
 
 func TestActionRunGlobalContext(t *testing.T) {
 	cr := Runtime(t)
 
+	gc := githubactions.NewGlobalContextFromEnv()
+	gc.GitHubContext.Actor = "octocat"
+	gc.GitHubContext.Repository = "octocat/hello-world"
+	gc.GitHubContext.Ref = "refs/heads/main"
 	uses := Uses(t, &githubactions.Metadata{
 		Name: "test-docker-global-context",
 		Runs: &githubactions.MetadataRuns{
 			Using:      githubactions.RunsUsingDocker,
 			Image:      "docker://public.ecr.aws/docker/library/alpine",
 			Entrypoint: "/bin/sh",
-			Args:       []string{"-c", `[ "$GITHUB_ACTOR" = "octocat" ] && [ "$GITHUB_REPOSITORY" = "octocat/hello-world" ] && [ "$GITHUB_REF" = "refs/heads/main" ]`},
+			Args: []string{
+				"-c",
+				fmt.Sprintf(
+					`[ "$%s" = "%s" ] && [ "$%s" = "%s" ] && [ "$%s" = "%s" ]`,
+					githubactions.EnvVarActor, gc.GitHubContext.Actor,
+					githubactions.EnvVarRepository, gc.GitHubContext.Repository,
+					githubactions.EnvVarRef, gc.GitHubContext.Ref,
+				),
+			},
 		},
 	})
-
-	gc := githubactions.NewGlobalContextFromEnv()
-	gc.GitHubContext.Actor = "octocat"
-	gc.GitHubContext.Repository = "octocat/hello-world"
-	gc.GitHubContext.Ref = "refs/heads/main"
 
 	action := &forge.Action{Uses: uses, GlobalContext: gc}
 	require.NoError(t, action.Run(t.Context(), cr, forge.WithStreams(Streams(t))))

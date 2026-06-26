@@ -92,7 +92,7 @@ func TestContainerExec(t *testing.T, cr forge.ContainerRuntime) {
 
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
 		Entrypoint: []string{"/bin/sh", "-c"},
-		Cmd:        []string{"sleep 30"},
+		Cmd:        []string{"sleep infinity"},
 	})
 	require.NoError(t, err)
 
@@ -122,10 +122,9 @@ func TestContainerCopy(t *testing.T, cr forge.ContainerRuntime) {
 	ctx := t.Context()
 	img, err := cr.PullImage(ctx, "public.ecr.aws/docker/library/alpine")
 	require.NoError(t, err)
-
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
 		Entrypoint: []string{"/bin/sh", "-c"},
-		Cmd:        []string{"sleep 30"},
+		Cmd:        []string{"sleep"},
 	})
 	require.NoError(t, err)
 

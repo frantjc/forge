@@ -1,5 +1,7 @@
 package githubactions
 
+import "fmt"
+
 const (
 	EnvVarCI              = "CI"
 	EnvVarWorkflow        = "GITHUB_WORKFLOW"
@@ -48,3 +50,7 @@ const (
 	EnvVarActionsCacheServiceV2 = "ACTIONS_CACHE_SERVICE_V2"
 	EnvVarActionsRuntimeToken   = "ACTIONS_RUNTIME_TOKEN"
 )
+
+func StateEnvVar(key string) string {
+	return fmt.Sprintf("STATE_%s", key)
+}

@@ -1,6 +1,6 @@
 {
   "name": "forge-dev",
-  "engineVersion": "v0.21.3",
+  "engineVersion": "v0.21.7",
   "sdk": {
     "source": "go"
   },
@@ -33,8 +33,8 @@
     },
     {
       "name": "wolfi",
-      "source": "github.com/dagger/dagger/modules/wolfi@v0.21.3",
-      "pin": "0ec84486003f052214339a2f8bdcd5761f23cead"
+      "source": "github.com/dagger/dagger/modules/wolfi@v0.21.7",
+      "pin": "054f94b2d86c0ac00bef11ac4550816973c4aeef"
     }
   ],
   "source": ".dagger"
