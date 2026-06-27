@@ -124,7 +124,7 @@ func TestContainerCopy(t *testing.T, cr forge.ContainerRuntime) {
 	require.NoError(t, err)
 	c, err := cr.CreateContainer(ctx, img, &forge.ContainerConfig{
 		Entrypoint: []string{"/bin/sh", "-c"},
-		Cmd:        []string{"sleep"},
+		Cmd:        []string{"sleep infinity"},
 	})
 	require.NoError(t, err)
 
