@@ -44,7 +44,7 @@ func TestCloudBuildRunScript(t *testing.T) {
 func TestCloudBuildRunNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
-	expected := rand.IntN(254) + 1
+	expected := rand.IntN(254) + 2
 	step := &forge.CloudBuild{
 		Step: cloudbuild.Step{
 			Name:       "public.ecr.aws/docker/library/alpine",

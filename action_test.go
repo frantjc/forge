@@ -48,7 +48,7 @@ func TestActionRunDocker(t *testing.T) {
 func TestActionRunDockerNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
-	expected := rand.IntN(254) + 1
+	expected := rand.IntN(254) + 2
 	uses := Uses(t, &githubactions.Metadata{
 		Name: t.Name(),
 		Runs: &githubactions.MetadataRuns{

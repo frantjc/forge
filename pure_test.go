@@ -30,7 +30,7 @@ func TestPure(t *testing.T) {
 func TestPureNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
-	expected := rand.IntN(254) + 1
+	expected := rand.IntN(254) + 2
 	pure := &forge.Pure{
 		Image:      "public.ecr.aws/docker/library/alpine",
 		Entrypoint: []string{"sh", "-c"},

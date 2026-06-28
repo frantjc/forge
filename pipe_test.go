@@ -35,7 +35,7 @@ func TestPipe(t *testing.T) {
 func TestPipeFromNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
-	expected := rand.IntN(254) + 1
+	expected := rand.IntN(254) + 2
 	pipe := &forge.Pipe{
 		From: &forge.Pure{
 			Image:      "public.ecr.aws/docker/library/alpine",
@@ -58,7 +58,7 @@ func TestPipeFromNonzeroExitCode(t *testing.T) {
 func TestPipeToNonzeroExitCode(t *testing.T) {
 	cr := Runtime(t)
 
-	expected := rand.IntN(254) + 1
+	expected := rand.IntN(254) + 2
 	pipe := &forge.Pipe{
 		From: &forge.Pure{
 			Image:      "public.ecr.aws/docker/library/alpine",
