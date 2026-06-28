@@ -10,8 +10,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frantjc/forge"
-	"github.com/frantjc/forge/internal/changroup"
 	"github.com/moby/term"
+	"golang.org/x/sync/errgroup"
 )
 
 type Container struct {
@@ -86,77 +86,60 @@ func (c *Container) Exec(ctx context.Context, containerConfig *forge.ContainerCo
 	}
 	defer hjr.Close()
 
-	errC := make(chan error, 1)
-	outC := make(chan any, 1)
-	go func() {
-		var err error
+	eg, _ := errgroup.WithContext(ctx)
+
+	eg.Go(func() error {
 		if tty {
-			_, err = io.Copy(stdout, hjr.Reader)
-		} else {
-			// "exit status 1" comes from here
-			_, err = stdcopy.StdCopy(
-				stdout,
-				stderr,
-				hjr.Reader,
-			)
-		}
-		if err != nil {
-			errC <- err
+			if _, err := io.Copy(stdout, hjr.Reader); err != nil {
+				return err
+			}
+
+			return nil
 		}
 
-		go close(outC)
-	}()
+		if _, err := stdcopy.StdCopy(stdout, stderr, hjr.Reader); err != nil {
+			return err
+		}
 
-	inC := make(chan any, 1)
+		return nil
+	})
+
 	if stdin != nil {
-		if detachKeys != "" {
-			detachKeysB, err := term.ToBytes(detachKeys)
-			if err != nil {
-				return -1, err
+		eg.Go(func() error {
+			defer hjr.CloseWrite()
+
+			_stdin := stdin
+
+			if detachKeys != "" {
+				detachKeysB, err := term.ToBytes(detachKeys)
+				if err != nil {
+					return err
+				}
+				_stdin = term.NewEscapeProxy(_stdin, detachKeysB)
 			}
 
-			stdin = term.NewEscapeProxy(stdin, detachKeysB)
-		}
-
-		go func() {
-			var err error
-			if _, err = io.Copy(hjr.Conn, stdin); err != nil {
-				errC <- err
+			if _, err := io.Copy(hjr.Conn, _stdin); err != nil {
+				return err
 			}
 
-			if err = hjr.CloseWrite(); err != nil {
-				errC <- err
-			}
-
-			go close(inC)
-		}()
-	} else {
-		go close(inC)
+			return nil
+		})
 	}
 
-	select {
-	case err = <-errC:
-		if _, ok := err.(term.EscapeError); ok {
-			err = nil
-		}
-	case <-ctx.Done():
-		err = ctx.Err()
-	case <-changroup.AllSettled(inC, outC):
+	if err := eg.Wait(); err != nil {
+		return -1, err
 	}
+
+	cei, err := c.ContainerExecInspect(ctx, idr.ID)
 	if err != nil {
 		return -1, err
 	}
 
-	cei, inspectErr := c.ContainerExecInspect(ctx, idr.ID)
-	if inspectErr != nil {
-		return -1, inspectErr
-	}
-
-	return cei.ExitCode, err
+	return cei.ExitCode, nil
 }
 
 func (c *Container) Stop(ctx context.Context) error {
-	seconds := -1
+	seconds := 0
 	if deadline, ok := ctx.Deadline(); ok {
 		seconds = int(time.Until(deadline).Seconds())
 	}
