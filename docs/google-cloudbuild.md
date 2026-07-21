@@ -32,7 +32,7 @@ Forge can modify the entrypoint to a Google CloudBuild step as well, like so:
 forge cloudbuild --entrypoint bash gcr.io/cloud-builders/docker -- -c "docker build -t 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-docker-repo/my-image' ."
 ```
 
-> In the previous example, `""` are important to pass the entire `docker` command as the value to `bash`'s `-c` flag.
+> In the previous example, `""` are important to pass the entire `docker` command as the value to `bash -c`.
 
 For additional debugging, you can attach to the container running the step to snoop around:
 

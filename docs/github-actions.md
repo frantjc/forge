@@ -40,7 +40,7 @@ However, in the event that an action errors and reports that a variable that it 
 In such cases, you can provide the value as an environment variable:
 
 ```sh
-GITHUB_REPOSITORY=frantjc/forge forge use actions/checkout@v4
+GITHUB_REPOSITORY=frantjc/forge forge use actions/checkout@v7
 ```
 
 Authentication to GitHub is provided to Forge in a similar way--through the `GITHUB_TOKEN` environment variable. The value for the environment variable should be a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) and can be injected into the environment more safely via something like `~/.bash_profile` like so:
@@ -57,7 +57,7 @@ To signify to Forge that a GitHub Action can be found on the filesystem as oppos
 forge use ./testdata/actions/docker
 ```
 
-> Local Actions cannot refer to files outside of the `action.yml`'s directory.
+> Local Actions cannot refer to files outside of the `action.yml` directory.
 
 For additional assistance with debugging, you can attach to the container running the Action to snoop around as in this [example](https://github.com/frantjc/forge/blob/main/testdata/actions/dockerfile/action.yml):
 

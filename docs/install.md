@@ -1,5 +1,11 @@
 # Install
 
+Using [mise](https://mise.jdx.dev/):
+
+```sh
+mise use github:frantjc/forge
+```
+
 Using Homebrew:
 
 ```sh
